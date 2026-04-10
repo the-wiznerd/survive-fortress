@@ -25,8 +25,8 @@ function init() {
   // 20x20 dirt grid at elevation 0, checkerboard sprites.
   for (let y = 0; y < WORLD_SIZE; y++) {
     for (let x = 0; x < WORLD_SIZE; x++) {
-      const spriteRow = (x + y) % 2 === 0 ? 5 : 6;
-      spawnTerrain(world, x, y, 0, 'dirt', 0, spriteRow);
+      const spriteCol = (x + y) % 2 === 0 ? 5 : 6;
+      spawnTerrain(world, x, y, 0, 'dirt', spriteCol, 0);
     }
   }
 
@@ -45,6 +45,9 @@ function init() {
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const renderer = new Renderer(canvas, 32, 24, 20); // 32x24 viewport, 20px tiles
+
+// Re-render once sprite sheet finishes loading.
+renderer.onReady = () => renderer.render(world);
 
 // ─── Input ───
 

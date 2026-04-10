@@ -27,8 +27,12 @@ export class Renderer {
     this.spriteSheet.src = '/sprites/sprites.png';
     this.spriteSheet.onload = () => {
       this.spriteReady = true;
+      this.onReady?.();
     };
   }
+
+  /** Callback invoked when the sprite sheet finishes loading. */
+  onReady: (() => void) | null = null;
 
   setCamera(x: number, y: number) {
     this.cameraX = x - Math.floor(this.viewWidth / 2);
