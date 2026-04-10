@@ -22,28 +22,18 @@ export interface ChunkRef {
 export interface ChunkData {
   cx: number;
   cy: number;
-  /** terrain[row][col] — row-major, sized chunkSize × chunkSize. */
-  terrain: TileSave[][];
-  /** Non-terrain entities in this chunk. */
+  /** All entities in this chunk — terrain, creatures, items, players, everything. */
   entities: EntitySave[];
 }
 
-/** A single terrain tile. */
-export interface TileSave {
-  type: string;
-  spriteCol: number;
-  spriteRow: number;
-  elevation: number;
-}
-
-/** A non-terrain entity. */
+/** A saved entity. Format is controlled by the entity type's exporter. */
 export interface EntitySave {
   entityType: string;
   x: number;
   y: number;
   elevation: number;
-  /** Arbitrary component data keyed by component name. */
-  components: Record<string, unknown>;
+  /** Type-specific state. Each entity type decides what goes here. */
+  state: Record<string, unknown>;
 }
 
 // ─── Chunk key helpers ───

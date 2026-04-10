@@ -1,11 +1,20 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import {
   createWorld,
-  spawnPlayer,
   getComponent,
+  getEntityTypeDef,
+  registerAllTypes,
   tick,
   simulate,
 } from '@sf/core';
+
+// Register entity types once before all tests.
+beforeAll(() => { registerAllTypes(); });
+
+/** Convenience: spawn a player at (x, y) using the registry. */
+function spawnPlayer(world: ReturnType<typeof createWorld>, x: number, y: number) {
+  return getEntityTypeDef('player')!.import(world, x, y, 0, {});
+}
 
 describe('hunger system', () => {
   it('drains hunger by 1 each tick', () => {

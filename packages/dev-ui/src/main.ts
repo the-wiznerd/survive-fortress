@@ -2,12 +2,16 @@ import {
   getComponent,
   tick,
   importWorld,
+  registerAllTypes,
   type WorldManifest,
   type ChunkData,
   type World,
   type EntityId,
   type Action,
 } from '@sf/core';
+
+// Register entity types before any import/export.
+registerAllTypes();
 import { Renderer } from './renderer.js';
 
 // ─── Game State ───

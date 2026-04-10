@@ -1,4 +1,5 @@
 import { type World, type Action, queryEntities, getComponent } from './ecs.js';
+import { getEntityTypeDef } from './registry.js';
 
 export type System = (world: World) => void;
 
@@ -46,9 +47,20 @@ export const hungerSystem: System = (world) => {
   }
 };
 
+/** Run entity-type-specific tick logic for all typed entities. */
+export const entityTypeTickSystem: System = (world) => {
+  for (const id of queryEntities(world, 'entityType')) {
+    const typeName = getComponent(world, id, 'entityType')!.type;
+    const def = getEntityTypeDef(typeName);
+    if (def?.tick) {
+      def.tick(world, id);
+    }
+  }
+};
+
 // ─── Tick Engine ───
 
-const defaultSystems: System[] = [movementSystem, hungerSystem];
+const defaultSystems: System[] = [movementSystem, hungerSystem, entityTypeTickSystem];
 
 export function tick(world: World, systems: System[] = defaultSystems): void {
   for (const system of systems) {

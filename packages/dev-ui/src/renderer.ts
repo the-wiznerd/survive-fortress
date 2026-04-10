@@ -1,6 +1,18 @@
-import { type World, queryEntities, getComponent } from '@sf/core';
+import { type World, type Position, queryEntities, getComponent } from '@sf/core';
 
 const SPRITE_SIZE = 16; // pixels per tile in the sprite sheet
+
+/** Maps terrain type → sprite column(s) in the sheet. Checkerboards use two columns. */
+const TERRAIN_SPRITES: Record<string, { cols: [number, number]; row: number }> = {
+  dirt: { cols: [5, 6], row: 0 },
+  water: { cols: [14, 15], row: 0 },
+};
+
+function terrainSprite(type: string, pos: Position): { col: number; row: number } {
+  const entry = TERRAIN_SPRITES[type] ?? { cols: [0, 0], row: 0 };
+  const col = (pos.x + pos.y) % 2 === 0 ? entry.cols[0] : entry.cols[1];
+  return { col, row: entry.row };
+}
 
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
@@ -66,10 +78,11 @@ export class Renderer {
       const sy = pos.y - cameraY;
 
       if (sx < 0 || sx >= viewWidth || sy < 0 || sy >= viewHeight) continue;
-      this.drawSprite(terrain.spriteCol, terrain.spriteRow, sx, sy);
+      const sprite = terrainSprite(terrain.type, pos);
+      this.drawSprite(sprite.col, sprite.row, sx, sy);
     }
 
-    // Draw entities (player, etc.) on top.
+    // Draw player on top.
     for (const id of queryEntities(world, 'position', 'playerControlled')) {
       const pos = getComponent(world, id, 'position')!;
       const sx = pos.x - cameraX;

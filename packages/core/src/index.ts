@@ -10,6 +10,7 @@ export {
   type Speed,
   type PlayerControlled,
   type Terrain,
+  type EntityType,
   type Action,
   type World,
   createWorld,
@@ -23,13 +24,21 @@ export {
 
 export { type System, movementSystem, hungerSystem, tick, simulate } from './tick.js';
 
-export { spawnPlayer, spawnTerrain } from './spawners.js';
+export {
+  type EntityTypeDef,
+  registerEntityType,
+  getEntityTypeDef,
+  getRegisteredTypes,
+  exportComponents,
+  importComponents,
+} from './registry.js';
+
+export { registerAllTypes } from './entity-types.js';
 
 export {
   type WorldManifest,
   type ChunkRef,
   type ChunkData,
-  type TileSave,
   type EntitySave,
   chunkKey,
   parseChunkKey,

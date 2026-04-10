@@ -10,6 +10,7 @@ export interface ComponentTypes {
   speed: Speed;
   playerControlled: PlayerControlled;
   terrain: Terrain;
+  entityType: EntityType;
 }
 
 export type ComponentName = keyof ComponentTypes;
@@ -45,10 +46,10 @@ export interface PlayerControlled {
 
 export interface Terrain {
   type: string;
-  /** Sprite column in the sprite sheet. */
-  spriteCol: number;
-  /** Sprite row in the sprite sheet. */
-  spriteRow: number;
+}
+
+export interface EntityType {
+  type: string;
 }
 
 // ─── Actions ───
@@ -79,6 +80,7 @@ export function createWorld(): World {
       speed: new Map(),
       playerControlled: new Map(),
       terrain: new Map(),
+      entityType: new Map(),
     },
   };
 }
