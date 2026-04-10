@@ -55,6 +55,11 @@ function submitAction(action: Action) {
   const pc = getComponent(world, playerId, 'playerControlled')!;
   pc.pendingAction = action;
   tick(world);
+
+  // Update camera before rendering so the player stays centered.
+  const pos = getComponent(world, playerId, 'position');
+  if (pos) renderer.setCamera(pos.x, pos.y);
+
   updateUI();
   renderer.render(world);
 }
@@ -69,10 +74,6 @@ document.addEventListener('keydown', (e) => {
     case 'p': case 'P': toggleAutoPlay(); break;
     case 'r': case 'R': init(); break;
   }
-
-  // Keep camera centered on player.
-  const pos = getComponent(world, playerId, 'position');
-  if (pos) renderer.setCamera(pos.x, pos.y);
 });
 
 function toggleAutoPlay() {
