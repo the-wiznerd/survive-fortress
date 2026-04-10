@@ -1,5 +1,7 @@
-import { defineConfig } from 'vite';
-import path from 'path';
+import { defineConfig } from 'vite'
+import path from 'path'
+import AutoImport from 'unplugin-auto-import/vite'
+import { coreImports } from '../../vitest.config'
 
 export default defineConfig({
   resolve: {
@@ -7,8 +9,17 @@ export default defineConfig({
       '@sf/core': path.resolve(__dirname, '../core/src'),
     },
   },
+  plugins: [
+    AutoImport({
+      imports: Object.entries(coreImports).map(([from, names]) => ({ [from]: names })),
+      dts: path.resolve(__dirname, 'src/auto-imports.d.ts'),
+    }),
+  ],
+  optimizeDeps: {
+    exclude: ['@sf/core'],
+  },
   server: {
     port: 5173,
     open: false,
   },
-});
+})

@@ -1,25 +1,23 @@
-import { type World, type Position, queryEntities, getComponent } from '@sf/core';
-
-const SPRITE_SIZE = 16; // pixels per tile in the sprite sheet
+const SPRITE_SIZE = 16 // pixels per tile in the sprite sheet
 
 /** Maps terrain type → sprite column(s) in the sheet. Checkerboards use two columns. */
 const TERRAIN_SPRITES: Record<string, { cols: [number, number]; row: number }> = {
   dirt: { cols: [5, 6], row: 0 },
   water: { cols: [14, 15], row: 0 },
-};
+}
 
 function terrainSprite(type: string, pos: Position): { col: number; row: number } {
-  const entry = TERRAIN_SPRITES[type] ?? { cols: [0, 0], row: 0 };
-  const col = (pos.x + pos.y) % 2 === 0 ? entry.cols[0] : entry.cols[1];
-  return { col, row: entry.row };
+  const entry = TERRAIN_SPRITES[type] ?? { cols: [0, 0], row: 0 }
+  const col = (pos.x + pos.y) % 2 === 0 ? entry.cols[0] : entry.cols[1]
+  return { col, row: entry.row }
 }
 
 export class Renderer {
-  private ctx: CanvasRenderingContext2D;
-  private cameraX = 0;
-  private cameraY = 0;
-  private spriteSheet: HTMLImageElement;
-  private spriteReady = false;
+  private ctx: CanvasRenderingContext2D
+  private cameraX = 0
+  private cameraY = 0
+  private spriteSheet: HTMLImageElement
+  private spriteReady = false
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -27,79 +25,79 @@ export class Renderer {
     private viewHeight: number,
     private tileSize: number,
   ) {
-    canvas.width = viewWidth * tileSize;
-    canvas.height = viewHeight * tileSize;
-    this.ctx = canvas.getContext('2d')!;
+    canvas.width = viewWidth * tileSize
+    canvas.height = viewHeight * tileSize
+    this.ctx = canvas.getContext('2d')!
 
     // Crisp pixel scaling.
-    this.ctx.imageSmoothingEnabled = false;
+    this.ctx.imageSmoothingEnabled = false
 
     // Load sprite sheet.
-    this.spriteSheet = new Image();
-    this.spriteSheet.src = '/sprites/sprites.png';
+    this.spriteSheet = new Image()
+    this.spriteSheet.src = '/sprites/sprites.png'
     this.spriteSheet.onload = () => {
-      this.spriteReady = true;
-      this.onReady?.();
-    };
+      this.spriteReady = true
+      this.onReady?.()
+    }
   }
 
   /** Callback invoked when the sprite sheet finishes loading. */
-  onReady: (() => void) | null = null;
+  onReady: (() => void) | null = null
 
   setCamera(x: number, y: number) {
-    this.cameraX = x - Math.floor(this.viewWidth / 2);
-    this.cameraY = y - Math.floor(this.viewHeight / 2);
+    this.cameraX = x - Math.floor(this.viewWidth / 2)
+    this.cameraY = y - Math.floor(this.viewHeight / 2)
   }
 
   /** Draw a sprite from the sheet by column and row index. */
   private drawSprite(col: number, row: number, screenX: number, screenY: number) {
-    if (!this.spriteReady) return;
+    if (!this.spriteReady) return
     this.ctx.drawImage(
       this.spriteSheet,
       col * SPRITE_SIZE, row * SPRITE_SIZE, // source x, y
       SPRITE_SIZE, SPRITE_SIZE,              // source w, h
       screenX * this.tileSize, screenY * this.tileSize, // dest x, y
       this.tileSize, this.tileSize,          // dest w, h
-    );
+    )
   }
 
   render(world: World) {
-    const { ctx, tileSize, viewWidth, viewHeight, cameraX, cameraY } = this;
+    const { ctx, tileSize, viewWidth, viewHeight, cameraX, cameraY } = this
 
     // Clear.
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.fillStyle = '#1a1a2e'
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
     // Draw terrain tiles.
     for (const id of queryEntities(world, 'position', 'terrain')) {
-      const pos = getComponent(world, id, 'position')!;
-      const terrain = getComponent(world, id, 'terrain')!;
-      const sx = pos.x - cameraX;
-      const sy = pos.y - cameraY;
+      const pos = getComponent(world, id, 'position')!
+      const terrain = getComponent(world, id, 'terrain')!
+      const sx = pos.x - cameraX
+      const sy = pos.y - cameraY
 
-      if (sx < 0 || sx >= viewWidth || sy < 0 || sy >= viewHeight) continue;
-      const sprite = terrainSprite(terrain.type, pos);
-      this.drawSprite(sprite.col, sprite.row, sx, sy);
+      if (sx < 0 || sx >= viewWidth || sy < 0 || sy >= viewHeight) continue
+      const sprite = terrainSprite(terrain.type, pos)
+      this.drawSprite(sprite.col, sprite.row, sx, sy)
     }
 
     // Draw player on top.
     for (const id of queryEntities(world, 'position', 'playerControlled')) {
-      const pos = getComponent(world, id, 'position')!;
-      const sx = pos.x - cameraX;
-      const sy = pos.y - cameraY;
+      const pos = getComponent(world, id, 'position')!
+      const sx = pos.x - cameraX
+      const sy = pos.y - cameraY
 
-      if (sx < 0 || sx >= viewWidth || sy < 0 || sy >= viewHeight) continue;
+      if (sx < 0 || sx >= viewWidth || sy < 0 || sy >= viewHeight) continue
 
       // Player glyph (placeholder until we have a player sprite).
-      ctx.fillStyle = '#ffff00';
-      ctx.font = `bold ${tileSize - 4}px Courier New`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffff00'
+      ctx.font = `bold ${tileSize - 4}px Courier New`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
       ctx.fillText(
         '@',
         sx * tileSize + tileSize / 2,
         sy * tileSize + tileSize / 2,
-      );
+      )
     }
   }
 }

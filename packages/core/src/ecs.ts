@@ -1,72 +1,72 @@
 // ─── Entity ───
-export type EntityId = number;
+export type EntityId = number
 
 // ─── Component Registry ───
 // Add new components here. Each key is the component name, value is its data shape.
 export interface ComponentTypes {
-  position: Position;
-  health: Health;
-  hunger: Hunger;
-  speed: Speed;
-  playerControlled: PlayerControlled;
-  terrain: Terrain;
-  entityType: EntityType;
+  position: Position
+  health: Health
+  hunger: Hunger
+  speed: Speed
+  playerControlled: PlayerControlled
+  terrain: Terrain
+  entityType: EntityType
 }
 
-export type ComponentName = keyof ComponentTypes;
+export type ComponentName = keyof ComponentTypes
 
 // ─── Component Definitions ───
 
 export interface Position {
-  x: number;
-  y: number;
-  elevation: number;
+  x: number
+  y: number
+  elevation: number
 }
 
 export interface Health {
-  current: number;
-  max: number;
+  current: number
+  max: number
 }
 
 export interface Hunger {
-  current: number;
-  max: number;
-  drainPerTick: number;
+  current: number
+  max: number
+  drainPerTick: number
 }
 
 export interface Speed {
-  ap: number;
-  apPerTick: number;
+  ap: number
+  apPerTick: number
 }
 
 export interface PlayerControlled {
   /** Queued action for the current tick, if any. */
-  pendingAction: Action | null;
+  pendingAction: Action | null
 }
 
 export interface Terrain {
-  type: string;
+  type: string
 }
 
 export interface EntityType {
-  type: string;
+  type: string
 }
 
 // ─── Actions ───
 
 export type Action =
   | { type: 'move'; dx: number; dy: number }
-  | { type: 'wait' };
+  | { type: 'wait' }
 
 // ─── World ───
 
 export interface World {
-  tick: number;
-  nextEntityId: EntityId;
+  tick: number
+  nextEntityId: EntityId
   /** Sparse component storage: componentName → (entityId → componentData) */
   components: {
-    [K in ComponentName]: Map<EntityId, ComponentTypes[K]>;
-  };
+    [K in ComponentName]: Map<EntityId, ComponentTypes[K]>
+  }
 }
 
 export function createWorld(): World {
@@ -82,13 +82,13 @@ export function createWorld(): World {
       terrain: new Map(),
       entityType: new Map(),
     },
-  };
+  }
 }
 
 // ─── Entity Operations ───
 
 export function createEntity(world: World): EntityId {
-  return world.nextEntityId++;
+  return world.nextEntityId++
 }
 
 export function addComponent<K extends ComponentName>(
@@ -97,7 +97,7 @@ export function addComponent<K extends ComponentName>(
   name: K,
   data: ComponentTypes[K],
 ): void {
-  world.components[name].set(entity, data);
+  world.components[name].set(entity, data)
 }
 
 export function getComponent<K extends ComponentName>(
@@ -105,7 +105,7 @@ export function getComponent<K extends ComponentName>(
   entity: EntityId,
   name: K,
 ): ComponentTypes[K] | undefined {
-  return world.components[name].get(entity);
+  return world.components[name].get(entity)
 }
 
 export function hasComponent(
@@ -113,12 +113,12 @@ export function hasComponent(
   entity: EntityId,
   name: ComponentName,
 ): boolean {
-  return world.components[name].has(entity);
+  return world.components[name].has(entity)
 }
 
 export function removeEntity(world: World, entity: EntityId): void {
   for (const store of Object.values(world.components)) {
-    (store as Map<EntityId, unknown>).delete(entity);
+    (store as Map<EntityId, unknown>).delete(entity)
   }
 }
 
@@ -129,20 +129,20 @@ export function queryEntities(
   world: World,
   ...required: ComponentName[]
 ): EntityId[] {
-  if (required.length === 0) return [];
+  if (required.length === 0) return []
 
   // Start with the smallest store for efficiency.
-  let smallest: Map<EntityId, unknown> = world.components[required[0]];
+  let smallest: Map<EntityId, unknown> = world.components[required[0]]
   for (const name of required) {
-    const store = world.components[name] as Map<EntityId, unknown>;
-    if (store.size < smallest.size) smallest = store;
+    const store = world.components[name] as Map<EntityId, unknown>
+    if (store.size < smallest.size) smallest = store
   }
 
-  const result: EntityId[] = [];
+  const result: EntityId[] = []
   for (const id of smallest.keys()) {
     if (required.every((name) => world.components[name].has(id))) {
-      result.push(id);
+      result.push(id)
     }
   }
-  return result;
+  return result
 }

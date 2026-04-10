@@ -4,15 +4,15 @@ import {
   createWorld,
   getComponent,
   queryEntities,
-} from './ecs.js';
+} from './ecs.js'
 import {
   type WorldManifest,
   type ChunkData,
   type ChunkRef,
   type EntitySave,
   chunkKey,
-} from './save.js';
-import { getEntityTypeDef } from './registry.js';
+} from './save.js'
+import { getEntityTypeDef } from './registry.js'
 
 // ─── Export: ECS → Save Format ───
 
@@ -23,20 +23,20 @@ export function exportChunk(
   cy: number,
   chunkSize: number,
 ): ChunkData {
-  const originX = cx * chunkSize;
-  const originY = cy * chunkSize;
+  const originX = cx * chunkSize
+  const originY = cy * chunkSize
 
-  const entities: EntitySave[] = [];
+  const entities: EntitySave[] = []
 
   for (const id of queryEntities(world, 'position', 'entityType')) {
-    const pos = getComponent(world, id, 'position')!;
-    const lx = pos.x - originX;
-    const ly = pos.y - originY;
-    if (lx < 0 || lx >= chunkSize || ly < 0 || ly >= chunkSize) continue;
+    const pos = getComponent(world, id, 'position')!
+    const lx = pos.x - originX
+    const ly = pos.y - originY
+    if (lx < 0 || lx >= chunkSize || ly < 0 || ly >= chunkSize) continue
 
-    const typeName = getComponent(world, id, 'entityType')!.type;
-    const def = getEntityTypeDef(typeName);
-    if (!def) continue;
+    const typeName = getComponent(world, id, 'entityType')!.type
+    const def = getEntityTypeDef(typeName)
+    if (!def) continue
 
     entities.push({
       entityType: typeName,
@@ -44,10 +44,10 @@ export function exportChunk(
       y: pos.y,
       elevation: pos.elevation,
       state: def.export(world, id),
-    });
+    })
   }
 
-  return { cx, cy, entities };
+  return { cx, cy, entities }
 }
 
 /** Build a WorldManifest from the current world state. */
@@ -57,11 +57,11 @@ export function exportManifest(
   chunkSize: number,
   chunkCoords: { cx: number; cy: number }[],
 ): WorldManifest {
-  const chunks: Record<string, ChunkRef> = {};
+  const chunks: Record<string, ChunkRef> = {}
   for (const { cx, cy } of chunkCoords) {
-    chunks[chunkKey(cx, cy)] = { cx, cy, state: 'frozen', freezeTick: world.tick };
+    chunks[chunkKey(cx, cy)] = { cx, cy, state: 'frozen', freezeTick: world.tick }
   }
-  return { seed, tick: world.tick, chunkSize, chunks };
+  return { seed, tick: world.tick, chunkSize, chunks }
 }
 
 // ─── Import: Save Format → ECS ───
@@ -72,12 +72,12 @@ export function importChunk(
   chunk: ChunkData,
 ): void {
   for (const ent of chunk.entities) {
-    const def = getEntityTypeDef(ent.entityType);
+    const def = getEntityTypeDef(ent.entityType)
     if (!def) {
-      console.warn(`Unknown entity type "${ent.entityType}", skipping`);
-      continue;
+      console.warn(`Unknown entity type "${ent.entityType}", skipping`)
+      continue
     }
-    def.import(world, ent.x, ent.y, ent.elevation, ent.state);
+    def.import(world, ent.x, ent.y, ent.elevation, ent.state)
   }
 }
 
@@ -86,15 +86,15 @@ export function importWorld(
   manifest: WorldManifest,
   chunks: ChunkData[],
 ): { world: World; playerIds: EntityId[] } {
-  const world = createWorld();
-  world.tick = manifest.tick;
+  const world = createWorld()
+  world.tick = manifest.tick
 
   for (const chunk of chunks) {
-    importChunk(world, chunk);
+    importChunk(world, chunk)
   }
 
   // Find player entities.
-  const playerIds = queryEntities(world, 'playerControlled');
+  const playerIds = queryEntities(world, 'playerControlled')
 
-  return { world, playerIds };
+  return { world, playerIds }
 }

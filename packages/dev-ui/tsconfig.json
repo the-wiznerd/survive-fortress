@@ -7,7 +7,7 @@
     "declaration": false,
     "declarationMap": false
   },
-  "include": ["src"],
+  "include": ["src", "../core/src/types.d.ts"],
   "references": [
     { "path": "../core" }
   ]
