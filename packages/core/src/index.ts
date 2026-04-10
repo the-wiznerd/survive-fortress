@@ -24,3 +24,20 @@ export {
 export { type System, movementSystem, hungerSystem, tick, simulate } from './tick.js';
 
 export { spawnPlayer, spawnTerrain } from './spawners.js';
+
+export {
+  type WorldManifest,
+  type ChunkRef,
+  type ChunkData,
+  type TileSave,
+  type EntitySave,
+  chunkKey,
+  parseChunkKey,
+} from './save.js';
+
+export {
+  exportChunk,
+  exportManifest,
+  importChunk,
+  importWorld,
+} from './serialization.js';

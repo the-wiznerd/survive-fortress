@@ -1,9 +1,9 @@
 import {
-  createWorld,
-  spawnPlayer,
-  spawnTerrain,
   getComponent,
   tick,
+  importWorld,
+  type WorldManifest,
+  type ChunkData,
   type World,
   type EntityId,
   type Action,
@@ -17,26 +17,27 @@ let playerId: EntityId;
 let autoPlay = false;
 let autoPlayInterval: ReturnType<typeof setInterval> | null = null;
 
-const WORLD_SIZE = 20;
+const SAVE_PATH = '/saves/test-world';
 
-function init() {
-  world = createWorld();
+async function init() {
+  // Load world manifest.
+  const manifestResp = await fetch(`${SAVE_PATH}/world.json`);
+  const manifest: WorldManifest = await manifestResp.json();
 
-  // 20x20 dirt grid at elevation 0, checkerboard sprites.
-  for (let y = 0; y < WORLD_SIZE; y++) {
-    for (let x = 0; x < WORLD_SIZE; x++) {
-      const spriteCol = (x + y) % 2 === 0 ? 5 : 6;
-      spawnTerrain(world, x, y, 0, 'dirt', spriteCol, 0);
-    }
+  // Load all referenced chunks.
+  const chunks: ChunkData[] = [];
+  for (const ref of Object.values(manifest.chunks)) {
+    const chunkResp = await fetch(`${SAVE_PATH}/chunks/${ref.cx}_${ref.cy}.json`);
+    chunks.push(await chunkResp.json());
   }
 
-  // Player at center, elevation 1.
-  const cx = Math.floor(WORLD_SIZE / 2);
-  const cy = Math.floor(WORLD_SIZE / 2);
-  playerId = spawnPlayer(world, cx, cy);
-  getComponent(world, playerId, 'position')!.elevation = 1;
+  // Import into ECS.
+  const result = importWorld(manifest, chunks);
+  world = result.world;
+  playerId = result.playerIds[0];
 
-  renderer.setCamera(cx, cy);
+  const pos = getComponent(world, playerId, 'position')!;
+  renderer.setCamera(pos.x, pos.y);
   updateUI();
   renderer.render(world);
 }
@@ -46,8 +47,8 @@ function init() {
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const renderer = new Renderer(canvas, 32, 24, 20); // 32x24 viewport, 20px tiles
 
-// Re-render once sprite sheet finishes loading.
-renderer.onReady = () => renderer.render(world);
+// Re-render once sprite sheet finishes loading (only if world is ready).
+renderer.onReady = () => { if (world) renderer.render(world); };
 
 // ─── Input ───
 
@@ -72,7 +73,7 @@ document.addEventListener('keydown', (e) => {
     case 'ArrowRight': submitAction({ type: 'move', dx: 1, dy: 0 }); break;
     case ' ': submitAction({ type: 'wait' }); break;
     case 'p': case 'P': toggleAutoPlay(); break;
-    case 'r': case 'R': init(); break;
+    case 'r': case 'R': init().catch(console.error); break;
   }
 });
 
@@ -109,4 +110,4 @@ function updateUI() {
 
 // ─── Start ───
 
-init();
+init().catch(console.error);
