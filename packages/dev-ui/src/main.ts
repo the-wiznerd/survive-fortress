@@ -1,0 +1,92 @@
+import {
+  createWorld,
+  spawnPlayer,
+  getComponent,
+  tick,
+  type World,
+  type EntityId,
+  type Action,
+} from '@sf/core';
+import { Renderer } from './renderer.js';
+
+// ─── Game State ───
+
+let world: World;
+let playerId: EntityId;
+let autoPlay = false;
+let autoPlayInterval: ReturnType<typeof setInterval> | null = null;
+
+function init() {
+  world = createWorld();
+  playerId = spawnPlayer(world, 10, 10);
+
+  renderer.setCamera(10, 10);
+  updateUI();
+  renderer.render(world);
+}
+
+// ─── Renderer ───
+
+const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+const renderer = new Renderer(canvas, 32, 24, 20); // 32x24 viewport, 20px tiles
+
+// ─── Input ───
+
+function submitAction(action: Action) {
+  const pc = getComponent(world, playerId, 'playerControlled')!;
+  pc.pendingAction = action;
+  tick(world);
+  updateUI();
+  renderer.render(world);
+}
+
+document.addEventListener('keydown', (e) => {
+  switch (e.key) {
+    case 'ArrowUp':    submitAction({ type: 'move', dx: 0, dy: -1 }); break;
+    case 'ArrowDown':  submitAction({ type: 'move', dx: 0, dy: 1 }); break;
+    case 'ArrowLeft':  submitAction({ type: 'move', dx: -1, dy: 0 }); break;
+    case 'ArrowRight': submitAction({ type: 'move', dx: 1, dy: 0 }); break;
+    case ' ':          submitAction({ type: 'wait' }); break;
+    case 'p': case 'P': toggleAutoPlay(); break;
+    case 'r': case 'R': init(); break;
+  }
+
+  // Keep camera centered on player.
+  const pos = getComponent(world, playerId, 'position');
+  if (pos) renderer.setCamera(pos.x, pos.y);
+});
+
+function toggleAutoPlay() {
+  autoPlay = !autoPlay;
+  if (autoPlay) {
+    autoPlayInterval = setInterval(() => {
+      submitAction({ type: 'wait' });
+    }, 200);
+  } else if (autoPlayInterval) {
+    clearInterval(autoPlayInterval);
+    autoPlayInterval = null;
+  }
+}
+
+// ─── UI ───
+
+const statsEl = document.getElementById('stats')!;
+
+function updateUI() {
+  const health = getComponent(world, playerId, 'health');
+  const hunger = getComponent(world, playerId, 'hunger');
+  const pos = getComponent(world, playerId, 'position');
+  const speed = getComponent(world, playerId, 'speed');
+
+  statsEl.innerHTML = `
+    <div class="stat"><span class="label">Tick:</span> ${world.tick}</div>
+    <div class="stat"><span class="label">Pos:</span> ${pos?.x}, ${pos?.y}</div>
+    <div class="stat"><span class="label">HP:</span> ${health?.current}/${health?.max}</div>
+    <div class="stat"><span class="label">Hunger:</span> ${hunger?.current}/${hunger?.max}</div>
+    <div class="stat"><span class="label">AP:</span> ${speed?.ap}</div>
+  `;
+}
+
+// ─── Start ───
+
+init();

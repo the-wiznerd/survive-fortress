@@ -1,0 +1,22 @@
+{
+  "name": "survive-fortress",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --build",
+    "dev": "cd packages/dev-ui && vite"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.1.0"
+  },
+  "packageManager": "yarn@4.13.0",
+  "engines": {
+    "node": ">=22"
+  }
+}

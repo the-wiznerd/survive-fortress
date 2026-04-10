@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Survive Fortress — Dev UI</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #game-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    canvas {
+      image-rendering: pixelated;
+      border: 1px solid #333;
+    }
+    #sidebar {
+      width: 280px;
+      padding: 16px;
+      background: #16213e;
+      border-left: 1px solid #333;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    #sidebar h2 { color: #87ceeb; margin-bottom: 8px; font-size: 14px; }
+    #sidebar .stat { margin-bottom: 4px; }
+    #sidebar .label { color: #888; }
+    #sidebar .section { margin-top: 16px; }
+    #controls { color: #666; margin-top: 16px; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="canvas"></canvas>
+  </div>
+  <div id="sidebar">
+    <h2>Survive Fortress</h2>
+    <div id="stats"></div>
+    <div id="inspector" class="section"></div>
+    <div id="controls">
+      <h2>Controls</h2>
+      Arrow keys: move<br>
+      Space: wait one tick<br>
+      P: auto-play / pause<br>
+      R: restart
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
