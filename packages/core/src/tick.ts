@@ -1,6 +1,3 @@
-import { type World, type Action, queryEntities, getComponent } from './ecs.js'
-import { getEntityTypeDef } from './registry.js'
-
 export type System = (world: World) => void
 
 // ─── Systems ───

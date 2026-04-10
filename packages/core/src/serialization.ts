@@ -1,19 +1,3 @@
-import {
-  type World,
-  type EntityId,
-  createWorld,
-  getComponent,
-  queryEntities,
-} from './ecs.js'
-import {
-  type WorldManifest,
-  type ChunkData,
-  type ChunkRef,
-  type EntitySave,
-  chunkKey,
-} from './save.js'
-import { getEntityTypeDef } from './registry.js'
-
 // ─── Export: ECS → Save Format ───
 
 /** Build a ChunkData from all entities in a given chunk region. */

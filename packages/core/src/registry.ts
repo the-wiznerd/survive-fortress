@@ -1,13 +1,3 @@
-import {
-  type EntityId,
-  type World,
-  type ComponentName,
-  type ComponentTypes,
-  createEntity,
-  addComponent,
-  getComponent,
-} from './ecs.js'
-
 // ─── Entity Type Definition ───
 
 export interface EntityTypeDef {

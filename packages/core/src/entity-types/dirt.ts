@@ -1,6 +1,3 @@
-import { type EntityId, type World, createEntity, addComponent } from '../ecs.js'
-import { type EntityTypeDef, registerEntityType } from '../registry.js'
-
 export class Dirt implements EntityTypeDef {
   type = 'dirt'
 
