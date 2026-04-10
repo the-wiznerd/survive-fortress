@@ -42,11 +42,11 @@ function submitAction(action: Action) {
 
 document.addEventListener('keydown', (e) => {
   switch (e.key) {
-    case 'ArrowUp':    submitAction({ type: 'move', dx: 0, dy: -1 }); break;
-    case 'ArrowDown':  submitAction({ type: 'move', dx: 0, dy: 1 }); break;
-    case 'ArrowLeft':  submitAction({ type: 'move', dx: -1, dy: 0 }); break;
+    case 'ArrowUp': submitAction({ type: 'move', dx: 0, dy: -1 }); break;
+    case 'ArrowDown': submitAction({ type: 'move', dx: 0, dy: 1 }); break;
+    case 'ArrowLeft': submitAction({ type: 'move', dx: -1, dy: 0 }); break;
     case 'ArrowRight': submitAction({ type: 'move', dx: 1, dy: 0 }); break;
-    case ' ':          submitAction({ type: 'wait' }); break;
+    case ' ': submitAction({ type: 'wait' }); break;
     case 'p': case 'P': toggleAutoPlay(); break;
     case 'r': case 'R': init(); break;
   }

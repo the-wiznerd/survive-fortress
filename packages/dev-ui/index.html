@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Survive Fortress — Dev UI</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       background: #1a1a2e;
       color: #e0e0e0;
@@ -14,16 +20,19 @@
       height: 100vh;
       overflow: hidden;
     }
+
     #game-container {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
     }
+
     canvas {
       image-rendering: pixelated;
       border: 1px solid #333;
     }
+
     #sidebar {
       width: 280px;
       padding: 16px;
@@ -33,13 +42,33 @@
       font-size: 13px;
       line-height: 1.5;
     }
-    #sidebar h2 { color: #87ceeb; margin-bottom: 8px; font-size: 14px; }
-    #sidebar .stat { margin-bottom: 4px; }
-    #sidebar .label { color: #888; }
-    #sidebar .section { margin-top: 16px; }
-    #controls { color: #666; margin-top: 16px; font-size: 11px; }
+
+    #sidebar h2 {
+      color: #87ceeb;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    #sidebar .stat {
+      margin-bottom: 4px;
+    }
+
+    #sidebar .label {
+      color: #888;
+    }
+
+    #sidebar .section {
+      margin-top: 16px;
+    }
+
+    #controls {
+      color: #666;
+      margin-top: 16px;
+      font-size: 11px;
+    }
   </style>
 </head>
+
 <body>
   <div id="game-container">
     <canvas id="canvas"></canvas>
@@ -58,4 +87,5 @@
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>
+
 </html>
