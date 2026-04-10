@@ -9,6 +9,7 @@ export interface ComponentTypes {
   hunger: Hunger;
   speed: Speed;
   playerControlled: PlayerControlled;
+  terrain: Terrain;
 }
 
 export type ComponentName = keyof ComponentTypes;
@@ -42,6 +43,14 @@ export interface PlayerControlled {
   pendingAction: Action | null;
 }
 
+export interface Terrain {
+  type: string;
+  /** Sprite column in the sprite sheet. */
+  spriteCol: number;
+  /** Sprite row in the sprite sheet. */
+  spriteRow: number;
+}
+
 // ─── Actions ───
 
 export type Action =
@@ -69,6 +78,7 @@ export function createWorld(): World {
       hunger: new Map(),
       speed: new Map(),
       playerControlled: new Map(),
+      terrain: new Map(),
     },
   };
 }

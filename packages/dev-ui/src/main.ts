@@ -1,6 +1,7 @@
 import {
   createWorld,
   spawnPlayer,
+  spawnTerrain,
   getComponent,
   tick,
   type World,
@@ -16,11 +17,26 @@ let playerId: EntityId;
 let autoPlay = false;
 let autoPlayInterval: ReturnType<typeof setInterval> | null = null;
 
+const WORLD_SIZE = 20;
+
 function init() {
   world = createWorld();
-  playerId = spawnPlayer(world, 10, 10);
 
-  renderer.setCamera(10, 10);
+  // 20x20 dirt grid at elevation 0, checkerboard sprites.
+  for (let y = 0; y < WORLD_SIZE; y++) {
+    for (let x = 0; x < WORLD_SIZE; x++) {
+      const spriteRow = (x + y) % 2 === 0 ? 5 : 6;
+      spawnTerrain(world, x, y, 0, 'dirt', 0, spriteRow);
+    }
+  }
+
+  // Player at center, elevation 1.
+  const cx = Math.floor(WORLD_SIZE / 2);
+  const cy = Math.floor(WORLD_SIZE / 2);
+  playerId = spawnPlayer(world, cx, cy);
+  getComponent(world, playerId, 'position')!.elevation = 1;
+
+  renderer.setCamera(cx, cy);
   updateUI();
   renderer.render(world);
 }

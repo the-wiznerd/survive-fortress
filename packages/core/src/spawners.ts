@@ -19,3 +19,19 @@ export function spawnPlayer(
   addComponent(world, id, 'playerControlled', { pendingAction: null });
   return id;
 }
+
+/** Spawn a terrain tile. */
+export function spawnTerrain(
+  world: World,
+  x: number,
+  y: number,
+  elevation: number,
+  type: string,
+  spriteCol: number,
+  spriteRow: number,
+): EntityId {
+  const id = createEntity(world);
+  addComponent(world, id, 'position', { x, y, elevation });
+  addComponent(world, id, 'terrain', { type, spriteCol, spriteRow });
+  return id;
+}

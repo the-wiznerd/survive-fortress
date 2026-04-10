@@ -9,6 +9,7 @@ export {
   type Hunger,
   type Speed,
   type PlayerControlled,
+  type Terrain,
   type Action,
   type World,
   createWorld,
@@ -22,4 +23,4 @@ export {
 
 export { type System, movementSystem, hungerSystem, tick, simulate } from './tick.js';
 
-export { spawnPlayer } from './spawners.js';
+export { spawnPlayer, spawnTerrain } from './spawners.js';

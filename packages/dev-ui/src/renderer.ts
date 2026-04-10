@@ -1,18 +1,13 @@
 import { type World, queryEntities, getComponent } from '@sf/core';
 
-const TILE_COLORS: Record<string, string> = {
-  grass: '#2d5a1e',
-  default: '#1a1a1a',
-};
-
-const ENTITY_GLYPHS: Record<string, { char: string; color: string }> = {
-  player: { char: '@', color: '#ffff00' },
-};
+const SPRITE_SIZE = 16; // pixels per tile in the sprite sheet
 
 export class Renderer {
   private ctx: CanvasRenderingContext2D;
   private cameraX = 0;
   private cameraY = 0;
+  private spriteSheet: HTMLImageElement;
+  private spriteReady = false;
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -23,6 +18,16 @@ export class Renderer {
     canvas.width = viewWidth * tileSize;
     canvas.height = viewHeight * tileSize;
     this.ctx = canvas.getContext('2d')!;
+
+    // Crisp pixel scaling.
+    this.ctx.imageSmoothingEnabled = false;
+
+    // Load sprite sheet.
+    this.spriteSheet = new Image();
+    this.spriteSheet.src = '/sprites/sprites.png';
+    this.spriteSheet.onload = () => {
+      this.spriteReady = true;
+    };
   }
 
   setCamera(x: number, y: number) {
@@ -30,42 +35,53 @@ export class Renderer {
     this.cameraY = y - Math.floor(this.viewHeight / 2);
   }
 
+  /** Draw a sprite from the sheet by column and row index. */
+  private drawSprite(col: number, row: number, screenX: number, screenY: number) {
+    if (!this.spriteReady) return;
+    this.ctx.drawImage(
+      this.spriteSheet,
+      col * SPRITE_SIZE, row * SPRITE_SIZE, // source x, y
+      SPRITE_SIZE, SPRITE_SIZE,              // source w, h
+      screenX * this.tileSize, screenY * this.tileSize, // dest x, y
+      this.tileSize, this.tileSize,          // dest w, h
+    );
+  }
+
   render(world: World) {
     const { ctx, tileSize, viewWidth, viewHeight, cameraX, cameraY } = this;
 
     // Clear.
     ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Draw terrain (placeholder: all grass for now).
-    for (let vy = 0; vy < viewHeight; vy++) {
-      for (let vx = 0; vx < viewWidth; vx++) {
-        ctx.fillStyle = TILE_COLORS.grass;
-        ctx.fillRect(vx * tileSize, vy * tileSize, tileSize - 1, tileSize - 1);
-      }
+    // Draw terrain tiles.
+    for (const id of queryEntities(world, 'position', 'terrain')) {
+      const pos = getComponent(world, id, 'position')!;
+      const terrain = getComponent(world, id, 'terrain')!;
+      const sx = pos.x - cameraX;
+      const sy = pos.y - cameraY;
+
+      if (sx < 0 || sx >= viewWidth || sy < 0 || sy >= viewHeight) continue;
+      this.drawSprite(terrain.spriteCol, terrain.spriteRow, sx, sy);
     }
 
-    // Draw entities with positions.
-    for (const id of queryEntities(world, 'position')) {
+    // Draw entities (player, etc.) on top.
+    for (const id of queryEntities(world, 'position', 'playerControlled')) {
       const pos = getComponent(world, id, 'position')!;
-      const screenX = pos.x - cameraX;
-      const screenY = pos.y - cameraY;
+      const sx = pos.x - cameraX;
+      const sy = pos.y - cameraY;
 
-      if (screenX < 0 || screenX >= viewWidth || screenY < 0 || screenY >= viewHeight) {
-        continue;
-      }
+      if (sx < 0 || sx >= viewWidth || sy < 0 || sy >= viewHeight) continue;
 
-      const isPlayer = getComponent(world, id, 'playerControlled') !== undefined;
-      const glyph = isPlayer ? ENTITY_GLYPHS.player : { char: '?', color: '#aaa' };
-
-      ctx.fillStyle = glyph.color;
+      // Player glyph (placeholder until we have a player sprite).
+      ctx.fillStyle = '#ffff00';
       ctx.font = `bold ${tileSize - 4}px Courier New`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(
-        glyph.char,
-        screenX * tileSize + tileSize / 2,
-        screenY * tileSize + tileSize / 2,
+        '@',
+        sx * tileSize + tileSize / 2,
+        sy * tileSize + tileSize / 2,
       );
     }
   }
