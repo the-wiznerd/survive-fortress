@@ -31,7 +31,10 @@ export class Dirt implements EntityTypeDef {
       [pos.x, pos.y + 1],
     ]
     const hasMoistNeighbor = neighbors.some(([nx, ny]) =>
-      getEntitiesAt(world, nx, ny, pos.z).some(nid => hasComponent(world, nid, 'moisture'))
+      getEntitiesAt(world, nx, ny, pos.z).some(nid => {
+        const m = getComponent(world, nid, 'moisture')
+        return m !== undefined && m.current > 0
+      })
     )
 
     if (hasMoistNeighbor) {
