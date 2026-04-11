@@ -16,7 +16,7 @@ export default defineConfig({
     }),
   ],
   optimizeDeps: {
-    exclude: ['@sf/core'],
+    exclude: Object.keys(coreImports),
   },
   server: {
     port: 5173,

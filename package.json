@@ -8,7 +8,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --build",
-    "dev": "yarn workspace @sf/ui dev"
+    "dev": "yarn workspace @sf/ui dev",
+    "dev:kill": "lsof -ti :5173 -ti :5174 -ti :5175 | xargs kill -9 2>/dev/null; echo 'Dev servers killed'"
   },
   "devDependencies": {
     "tsx": "^4.19.0",

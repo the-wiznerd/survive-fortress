@@ -6,9 +6,8 @@ This project uses `unplugin-auto-import` and a global `types.d.ts` so that **all
 
 ### Rules
 
-- **Never add `import` statements for `@sf/core` values or types.** They are already globally available.
-- Values (`createWorld`, `addComponent`, `getComponent`, `tick`, `registerEntityType`, etc.) are auto-imported by the plugin at build/test time.
-- Types (`World`, `EntityId`, `Action`, `Position`, `EntityTypeDef`, `ChunkData`, etc.) are declared globally via `packages/core/src/types.d.ts`.
+- **Do not add `import` statements for `@sf/core` values or types.** They are globally available via auto-imports and `types.d.ts` in all files (core, ui, and tests).
+- `@sf/core/*` sub-paths are excluded from Vite's dependency pre-bundling (`optimizeDeps.exclude`) so the auto-import plugin can transform them.
 - The generated `auto-imports.d.ts` files provide IDE support. They are generated automatically by vitest/vite — do not hand-edit them.
 
 ### What still needs explicit imports
