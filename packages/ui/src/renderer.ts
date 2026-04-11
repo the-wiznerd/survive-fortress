@@ -10,12 +10,13 @@ type AnimatedSprite = { frames: StaticSprite[]; interval: number }
 /** Maps entity type → sprite location (or animation) in the sheet. */
 const ENTITY_SPRITES: Record<string, StaticSprite | AnimatedSprite> = {
   dirt: { col: 0, row: 1 },
+  sand: { col: 2, row: 1 },
   water: {
     frames: [
-      { col: 3, row: 1 },
       { col: 4, row: 1 },
       { col: 5, row: 1 },
       { col: 6, row: 1 },
+      { col: 7, row: 1 },
     ],
     interval: 250,
   },
