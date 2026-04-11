@@ -1,10 +1,10 @@
 export class Player implements EntityTypeDef {
   type = 'player'
 
-  import(world: World, x: number, y: number, elevation: number, state: Record<string, unknown>): EntityId {
+  import(world: World, x: number, y: number, z: number, state: Record<string, unknown>): EntityId {
     const id = createEntity(world)
     addComponent(world, id, 'entityType', { type: 'player' })
-    addComponent(world, id, 'position', { x, y, elevation })
+    addComponent(world, id, 'position', { x, y, elevation: z })
     addComponent(world, id, 'health', { current: 100, max: 100 })
     addComponent(world, id, 'hunger', { current: 100, max: 100, drainPerTick: 1 })
     addComponent(world, id, 'speed', { ap: 0, apPerTick: 10 })

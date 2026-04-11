@@ -26,14 +26,16 @@ export interface ChunkData {
   entities: EntitySave[]
 }
 
-/** A saved entity. Format is controlled by the entity type's exporter. */
+/**
+ * A saved entity. The serializer writes entityType, x, y, z.
+ * The entity type's exporter spreads any additional fields it needs.
+ */
 export interface EntitySave {
   entityType: string
   x: number
   y: number
-  elevation: number
-  /** Type-specific state. Each entity type decides what goes here. */
-  state: Record<string, unknown>
+  z: number
+  [key: string]: unknown
 }
 
 // ─── Chunk key helpers ───

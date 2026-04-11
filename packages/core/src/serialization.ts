@@ -26,8 +26,8 @@ export function exportChunk(
       entityType: typeName,
       x: pos.x,
       y: pos.y,
-      elevation: pos.elevation,
-      state: def.export(world, id),
+      z: pos.elevation,
+      ...def.export(world, id),
     })
   }
 
@@ -61,7 +61,8 @@ export function importChunk(
       console.warn(`Unknown entity type "${ent.entityType}", skipping`)
       continue
     }
-    def.import(world, ent.x, ent.y, ent.elevation, ent.state)
+    const { entityType: _, x, y, z, ...state } = ent
+    def.import(world, x, y, z, state)
   }
 }
 

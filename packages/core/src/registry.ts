@@ -4,16 +4,16 @@ export interface EntityTypeDef {
   type: string
 
   /**
-   * Export: given an entity in the world, produce the type-specific save state.
-   * Position is handled by the framework — just return type-specific data.
+   * Export: given an entity in the world, produce extra fields for the save entry.
+   * The serializer already writes entityType, x, y, z — return anything else.
    */
   export(world: World, id: EntityId): Record<string, unknown>
 
   /**
    * Import: given save data, spawn the entity in the world and return its ID.
-   * Position is already extracted — use the provided x, y, elevation.
+   * x, y, z are extracted by the serializer; state contains everything else.
    */
-  import(world: World, x: number, y: number, elevation: number, state: Record<string, unknown>): EntityId
+  import(world: World, x: number, y: number, z: number, state: Record<string, unknown>): EntityId
 
   /**
    * Optional per-entity tick logic. Called once per tick for each entity of this type.
