@@ -20,7 +20,7 @@ This project uses `unplugin-auto-import` and a global `types.d.ts` so that **all
 ### How it works
 
 - `vitest.config.ts` exports a `coreImports` map that lists every public value from `@sf/core/*` sub-paths.
-- Both `vitest.config.ts` and `packages/dev-ui/vite.config.ts` feed this map to `unplugin-auto-import`.
+- Both `vitest.config.ts` and `packages/ui/vite.config.ts` feed this map to `unplugin-auto-import`.
 - `packages/core/src/types.d.ts` uses `declare global` to make all `@sf/core` types ambient.
 - `@sf/core` has no barrel `index.ts` — package.json `exports` map to sub-paths (`./ecs`, `./tick`, `./registry`, `./save`, `./serialization`).
 

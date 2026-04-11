@@ -16,6 +16,6 @@
   },
   "references": [
     { "path": "packages/core" },
-    { "path": "packages/dev-ui" }
+    { "path": "packages/ui" }
   ]
 }

@@ -639,9 +639,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@sf/dev-ui@workspace:packages/dev-ui":
+"@sf/ui@workspace:packages/ui":
   version: 0.0.0-use.local
-  resolution: "@sf/dev-ui@workspace:packages/dev-ui"
+  resolution: "@sf/ui@workspace:packages/ui"
   dependencies:
     "@sf/core": "workspace:*"
     vite: "npm:^6.3.0"
