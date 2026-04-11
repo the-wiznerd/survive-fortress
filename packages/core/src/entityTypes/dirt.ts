@@ -1,4 +1,4 @@
-const MOISTURE_THRESHOLD = 10
+const MOISTURE_THRESHOLD = 3
 
 export class Dirt implements EntityTypeDef {
   type = 'dirt'
@@ -6,7 +6,7 @@ export class Dirt implements EntityTypeDef {
   import(world: World, x: number, y: number, z: number, state: Record<string, unknown>): EntityId {
     const id = createEntity(world)
     addComponent(world, id, 'entityType', { type: 'dirt' })
-    addComponent(world, id, 'position', { x, y, elevation: z })
+    addComponent(world, id, 'position', { x, y, z })
     addComponent(world, id, 'terrain', { type: 'dirt' })
     addComponent(world, id, 'moisture', {
       current: (state.moisture as number) ?? 0,
@@ -32,7 +32,7 @@ export class Dirt implements EntityTypeDef {
       [pos.x, pos.y + 1],
     ]
     const hasMoistNeighbor = neighbors.some(([nx, ny]) =>
-      getEntitiesAt(world, nx, ny, pos.elevation).some(nid => hasComponent(world, nid, 'moisture'))
+      getEntitiesAt(world, nx, ny, pos.z).some(nid => hasComponent(world, nid, 'moisture'))
     )
 
     if (hasMoistNeighbor) {

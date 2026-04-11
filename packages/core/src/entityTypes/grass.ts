@@ -4,7 +4,7 @@ export class Grass implements EntityTypeDef {
   import(world: World, x: number, y: number, z: number, _state: Record<string, unknown>): EntityId {
     const id = createEntity(world)
     addComponent(world, id, 'entityType', { type: 'grass' })
-    addComponent(world, id, 'position', { x, y, elevation: z })
+    addComponent(world, id, 'position', { x, y, z })
     addComponent(world, id, 'terrain', { type: 'grass' })
     return id
   }

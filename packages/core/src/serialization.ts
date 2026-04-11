@@ -26,7 +26,7 @@ export function exportChunk(
       entityType: typeName,
       x: pos.x,
       y: pos.y,
-      z: pos.elevation,
+      z: pos.z,
       ...def.export(world, id),
     })
   }

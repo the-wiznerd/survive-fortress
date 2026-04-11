@@ -21,7 +21,7 @@ export type ComponentName = keyof ComponentTypes
 export interface Position {
   x: number
   y: number
-  elevation: number
+  z: number
 }
 
 export interface Health {
@@ -155,10 +155,10 @@ export function queryEntities(
 }
 
 /** Return all entity IDs at the given position. */
-export function getEntitiesAt(world: World, x: number, y: number, elevation: number): EntityId[] {
+export function getEntitiesAt(world: World, x: number, y: number, z: number): EntityId[] {
   const result: EntityId[] = []
   for (const [id, pos] of world.components.position) {
-    if (pos.x === x && pos.y === y && pos.elevation === elevation) {
+    if (pos.x === x && pos.y === y && pos.z === z) {
       result.push(id)
     }
   }

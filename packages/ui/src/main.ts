@@ -12,10 +12,10 @@ import { Renderer } from './renderer.js'
 
 let world: World
 let playerId: EntityId
-let autoPlay = false
-let autoPlayInterval: ReturnType<typeof setInterval> | null = null
+let pendingInput: Action | null = null
 
 const SAVE_PATH = '/saves/test-world'
+const TICK_INTERVAL = 1000 // ms per game tick
 
 async function init() {
   // Load world manifest.
@@ -50,42 +50,34 @@ renderer.onReady = () => { if (world) renderer.render(world); }
 
 // ─── Input ───
 
-function submitAction(action: Action) {
-  const pc = getComponent(world, playerId, 'playerControlled')!
-  pc.pendingAction = action
-  tick(world)
-
-  // Update camera before rendering so the player stays centered.
-  const pos = getComponent(world, playerId, 'position')
-  if (pos) renderer.setCamera(pos.x, pos.y)
-
-  updateUI()
-  renderer.render(world)
-}
-
 document.addEventListener('keydown', (e) => {
   switch (e.key) {
-    case 'ArrowUp': submitAction({ type: 'move', dx: 0, dy: -1 }); break
-    case 'ArrowDown': submitAction({ type: 'move', dx: 0, dy: 1 }); break
-    case 'ArrowLeft': submitAction({ type: 'move', dx: -1, dy: 0 }); break
-    case 'ArrowRight': submitAction({ type: 'move', dx: 1, dy: 0 }); break
-    case ' ': submitAction({ type: 'wait' }); break
-    case 'p': case 'P': toggleAutoPlay(); break
+    case 'ArrowUp': pendingInput = { type: 'move', dx: 0, dy: -1 }; break
+    case 'ArrowDown': pendingInput = { type: 'move', dx: 0, dy: 1 }; break
+    case 'ArrowLeft': pendingInput = { type: 'move', dx: -1, dy: 0 }; break
+    case 'ArrowRight': pendingInput = { type: 'move', dx: 1, dy: 0 }; break
+    case ' ': pendingInput = { type: 'wait' }; break
     case 'r': case 'R': init().catch(console.error); break
   }
 })
 
-function toggleAutoPlay() {
-  autoPlay = !autoPlay
-  if (autoPlay) {
-    autoPlayInterval = setInterval(() => {
-      submitAction({ type: 'wait' })
-    }, 200)
-  } else if (autoPlayInterval) {
-    clearInterval(autoPlayInterval)
-    autoPlayInterval = null
-  }
+// ─── Tick Loop ───
+
+function gameTick() {
+  if (!world) return
+
+  const pc = getComponent(world, playerId, 'playerControlled')!
+  pc.pendingAction = pendingInput ?? { type: 'wait' }
+  pendingInput = null
+
+  tick(world)
+
+  const pos = getComponent(world, playerId, 'position')
+  if (pos) renderer.setCamera(pos.x, pos.y)
+  updateUI()
 }
+
+setInterval(gameTick, TICK_INTERVAL)
 
 // ─── UI ───
 
