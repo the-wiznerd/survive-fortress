@@ -39,7 +39,7 @@ async function init() {
 // ─── Renderer ───
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement
-const renderer = new Renderer(canvas, 32, 24, 20); // 32x24 viewport, 20px tiles
+const renderer = new Renderer(canvas, 32, 24, 2) // 32×24 viewport, 2× pixel scale
 
 // Re-render once sprite sheet finishes loading (only if world is ready).
 renderer.onReady = () => { if (world) renderer.render(world); }
