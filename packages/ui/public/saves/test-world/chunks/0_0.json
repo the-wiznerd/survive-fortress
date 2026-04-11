@@ -1017,13 +1017,13 @@
       "z": 0
     },
     {
-      "entityType": "dirt",
+      "entityType": "water",
       "x": 9,
       "y": 8,
       "z": 0
     },
     {
-      "entityType": "dirt",
+      "entityType": "water",
       "x": 10,
       "y": 8,
       "z": 0
@@ -1137,13 +1137,13 @@
       "z": 0
     },
     {
-      "entityType": "dirt",
+      "entityType": "water",
       "x": 9,
       "y": 9,
       "z": 0
     },
     {
-      "entityType": "dirt",
+      "entityType": "water",
       "x": 10,
       "y": 9,
       "z": 0
@@ -2405,7 +2405,7 @@
     {
       "entityType": "player",
       "x": 10,
-      "y": 10,
+      "y": 11,
       "z": 1
     }
   ]
