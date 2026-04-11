@@ -2,24 +2,48 @@
 
 export interface EntityTypeDef {
   type: string
-
-  /**
-   * Export: given an entity in the world, produce extra fields for the save entry.
-   * The serializer already writes entityType, x, y, z — return anything else.
-   */
   export(world: World, id: EntityId): Record<string, unknown>
-
-  /**
-   * Import: given save data, spawn the entity in the world and return its ID.
-   * x, y, z are extracted by the serializer; state contains everything else.
-   */
-  import(world: World, x: number, y: number, z: number, state: Record<string, unknown>): EntityId
-
-  /**
-   * Optional per-entity tick logic. Called once per tick for each entity of this type.
-   * Use for entity-specific behavior (FSMs, AI, etc.).
-   */
+  import(world: World, id: EntityId, state: Record<string, unknown>): void
   tick?(world: World, id: EntityId): void
+}
+
+// ─── Base Class ───
+
+import type { Trait } from './traits/trait.js'
+
+export abstract class BaseEntityType implements EntityTypeDef {
+  abstract type: string
+
+  private entities = new Map<EntityId, Trait<any>[]>()
+
+  protected abstract createTraits(world: World, id: EntityId): Trait<any>[]
+
+  import(world: World, id: EntityId, state: Record<string, unknown>): void {
+    const traits = this.createTraits(world, id)
+    for (const t of traits) {
+      t.init(state[t.component] as Record<string, unknown> | undefined)
+    }
+    this.entities.set(id, traits)
+  }
+
+  export(_world: World, id: EntityId): Record<string, unknown> {
+    const result: Record<string, unknown> = {}
+    const traits = this.entities.get(id)
+    if (!traits) return result
+    for (const t of traits) {
+      const saved = t.save()
+      if (saved) result[t.component] = saved
+    }
+    return result
+  }
+
+  trait<K extends ComponentName>(id: EntityId, component: K): Trait<K> | undefined {
+    return this.entities.get(id)?.find(t => t.component === component) as Trait<K> | undefined
+  }
+
+  destroyTraits(id: EntityId): void {
+    this.entities.delete(id)
+  }
 }
 
 // ─── Registry ───
@@ -36,41 +60,4 @@ export function getEntityTypeDef(type: string): EntityTypeDef | undefined {
 
 export function getRegisteredTypes(): string[] {
   return [...registry.keys()]
-}
-
-// ─── Helpers for common patterns ───
-
-/**
- * Helper to export a set of components by name.
- * Returns an object with each component's data keyed by name.
- */
-export function exportComponents(
-  world: World,
-  id: EntityId,
-  ...names: ComponentName[]
-): Record<string, unknown> {
-  const result: Record<string, unknown> = {}
-  for (const name of names) {
-    const data = getComponent(world, id, name)
-    if (data !== undefined) {
-      result[name] = { ...data }
-    }
-  }
-  return result
-}
-
-/**
- * Helper to import components from saved state onto an entity.
- */
-export function importComponents(
-  world: World,
-  id: EntityId,
-  state: Record<string, unknown>,
-  ...names: ComponentName[]
-): void {
-  for (const name of names) {
-    if (state[name] !== undefined) {
-      addComponent(world, id, name, state[name] as ComponentTypes[typeof name])
-    }
-  }
 }

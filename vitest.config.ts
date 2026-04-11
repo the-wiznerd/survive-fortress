@@ -16,17 +16,14 @@ export const coreImports: Record<string, string[]> = {
     'getNeighborCoords',
   ],
   '@sf/core/tick': [
-    'movementSystem',
-    'hungerSystem',
     'tick',
     'simulate',
   ],
   '@sf/core/registry': [
+    'BaseEntityType',
     'registerEntityType',
     'getEntityTypeDef',
     'getRegisteredTypes',
-    'exportComponents',
-    'importComponents',
   ],
   '@sf/core/serialization': [
     'exportChunk',
@@ -38,6 +35,16 @@ export const coreImports: Record<string, string[]> = {
     'chunkKey',
     'parseChunkKey',
   ],
+  '@sf/core/traits/trait': ['Trait'],
+  '@sf/core/traits/moisture': ['MoistureTrait'],
+  '@sf/core/traits/health': ['HealthTrait'],
+  '@sf/core/traits/hunger': ['HungerTrait'],
+  '@sf/core/traits/speed': ['SpeedTrait'],
+  '@sf/core/traits/playerControlled': ['PlayerControlledTrait'],
+  '@sf/core/systems/movement': ['movementSystem'],
+  '@sf/core/systems/hunger': ['hungerSystem'],
+  '@sf/core/systems/moisture': ['moistureSystem'],
+  '@sf/core/systems/entityTypeTick': ['entityTypeTickSystem'],
 }
 
 export default defineConfig({

@@ -5,7 +5,11 @@ import '../src/entityTypes/player.js'
 
 /** Convenience: spawn a player at (x, y) using the registry. */
 function spawnPlayer(world: ReturnType<typeof createWorld>, x: number, y: number) {
-  return getEntityTypeDef('player')!.import(world, x, y, 0, {})
+  const id = createEntity(world)
+  addComponent(world, id, 'entityType', { type: 'player' })
+  addComponent(world, id, 'position', { x, y, z: 0 })
+  getEntityTypeDef('player')!.import(world, id, {})
+  return id
 }
 
 describe('hunger system', () => {

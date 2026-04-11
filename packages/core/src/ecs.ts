@@ -50,7 +50,8 @@ export interface EntityType {
 
 export interface Moisture {
   current: number
-  threshold: number
+  capacity: number
+  rate: number
 }
 
 // ─── Actions ───

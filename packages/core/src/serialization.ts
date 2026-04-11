@@ -62,7 +62,10 @@ export function importChunk(
       continue
     }
     const { entityType: _, x, y, z, ...state } = ent
-    def.import(world, x, y, z, state)
+    const id = createEntity(world)
+    addComponent(world, id, 'entityType', { type: ent.entityType })
+    addComponent(world, id, 'position', { x, y, z })
+    def.import(world, id, state)
   }
 }
 

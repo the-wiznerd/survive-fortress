@@ -5,99 +5,213 @@ description: "Entity type definition pattern — how to create new entity types 
 
 # Entity Type Definitions
 
-## Architecture: Composition Over Inheritance
+## Architecture: Traits + Systems + Entity Types
 
-Entity types use **flat composition via ECS components**, not class inheritance. Each entity type is a class that implements `EntityTypeDef` — but the class is just a **factory and serializer**, not a container for behavior or state.
+The game uses a **three-layer architecture**:
 
-### What the class does
+1. **Systems** (`systems/`) — Global, ordered, run first. Resolve cross-entity interactions (moisture equalization, combat resolution, fluid flow). Entities are passive subjects. Systems operate on raw ECS component data.
+2. **Traits** (`traits/`) — Data + defaults + serialization + typed API + optional behavior methods. Each trait wraps a single ECS component, providing defaults, typed access, and automatic save/load. Traits hold a back-reference to their world and entity ID.
+3. **Entity Types** (`entityTypes/`) — Compose traits. Own the tick. Run FSMs. Decide state transitions. Extend `BaseEntityType`.
 
-- **`import()`** — Factory: creates an entity, attaches the right components, returns the ID.
-- **`export()`** — Serializer: reads components and returns a plain state object for saving.
-- **`tick()`** (optional) — Per-entity behavior each game tick (FSMs, AI, growth, decay).
+### The two phases of a tick
 
-### What the class does NOT do
+```
+Phase 1: Systems (the world acts on you)
+  - moisture equalization
+  - hunger drain
+  - movement resolution
+  → You don't get a say. These resolve world state.
 
-- **Does not hold entity state.** All state lives in ECS components. The class is stateless.
-- **Does not extend a base class.** No `extends Animal`, no `extends Terrain`. A "grass that grows" just adds a `tick()` method — it doesn't inherit from `Plant`.
-- **Does not define shared behavior via inheritance.** If multiple entity types share logic (e.g. "things that burn"), that's a **system** that queries for the relevant components, not a base class.
+Phase 2: Entity type ticks (you act in the world)
+  - Dirt checks moisture → become grass?
+  - AI decides next action
+  - FSM state transitions
+  → Entity type orchestrates its traits based on resolved state.
+```
 
-### Why no inheritance
+### What an entity type class does
 
-Inheritance creates rigid hierarchies. "Is a WaterPlant a Plant or a Water?" is the wrong question. Instead:
-- A water plant has a `terrain` component (it's walkable-on), a `growth` component (it grows), and a `flammable` component (it burns).
-- Systems process entities by component, not by type. The burn system doesn't care if something is a plant — it cares if it has `flammable`.
+- **`createTraits()`** — Declares which traits this entity has, with any default overrides.
+- **`tick()`** (optional) — Per-entity behavior each game tick. Reads resolved state, orchestrates traits, handles state transitions.
+- **`import()`/`export()`** — Inherited from `BaseEntityType`. Automatically handled via traits.
 
-### Composition patterns
+### What an entity type class does NOT do
 
-**Simple terrain** — just position + terrain + entityType:
+- **Does not manually call `addComponent()`.** Traits handle that.
+- **Does not manually implement `import()`/`export()`.** `BaseEntityType` iterates traits automatically.
+- **Does not extend other entity types.** No `extends Animal`. Shared behavior comes from shared traits and/or systems.
+
+## Traits
+
+A trait is a class that extends `Trait<K>` where `K` is a `ComponentName`. Each trait:
+
+- Wraps a single ECS component
+- Declares its `defaults()`
+- Gets auto-serialization: only saves when component data differs from defaults
+- Has typed `this.data` access to its component
+- Has `this.position` for spatial access
+- Has `this.world` and `this.entityId` for ECS queries
+
+### Trait with fixed defaults
+
 ```ts
-export class Dirt implements EntityTypeDef {
-  type = 'dirt'
+export class HealthTrait extends Trait<'health'> {
+  readonly component = 'health' as const
 
-  import(world: World, x: number, y: number, elevation: number, _state: Record<string, unknown>): EntityId {
-    const id = createEntity(world)
-    addComponent(world, id, 'entityType', { type: 'dirt' })
-    addComponent(world, id, 'position', { x, y, elevation })
-    addComponent(world, id, 'terrain', { type: 'dirt' })
-    return id
+  defaults(): Health {
+    return { current: 100, max: 100 }
+  }
+}
+```
+
+### Trait with configurable defaults
+
+When different entity types need different defaults for the same trait:
+
+```ts
+export class MoistureTrait extends Trait<'moisture'> {
+  readonly component = 'moisture' as const
+
+  constructor(world: World, entityId: EntityId, private overrides: Partial<Moisture> = {}) {
+    super(world, entityId)
   }
 
-  export(_world: World, _id: EntityId): Record<string, unknown> {
-    return {}
+  defaults(): Moisture {
+    return { current: 0, capacity: 100, rate: 1, ...this.overrides }
+  }
+}
+```
+
+### Creating a new trait
+
+1. Create `packages/core/src/traits/<name>.ts`.
+2. Extend `Trait<'componentName'>`.
+3. Set `readonly component = 'componentName' as const`.
+4. Implement `defaults()` returning the component's data shape.
+5. Add constructor overrides if different entity types need different defaults.
+6. Add the trait class to `coreImports` in `vitest.config.ts`.
+7. **Do not add any import statements** — all `@sf/core` values and types are globally available.
+
+## Systems
+
+Systems are global functions that process all entities with certain components. They run in Phase 1, before entity type ticks. They operate on raw ECS component data, not traits.
+
+### When to use a system vs. a trait tick
+
+- **System**: Cross-entity interactions that need deduplication or global resolution (moisture equalization, combat, fluid flow). "The world acts on you."
+- **Entity type tick**: Per-entity decisions based on resolved state (dirt→grass, AI behavior, FSM transitions). "You act in the world."
+
+### Creating a new system
+
+1. Create `packages/core/src/systems/<name>.ts`.
+2. Export a `const mySystem: System = (world) => { ... }`.
+3. Add it to `defaultSystems` in `tick.ts` (order matters — systems before `entityTypeTickSystem`).
+4. Add the system to `coreImports` in `vitest.config.ts`.
+5. **Do not add any import statements.**
+
+## Entity Types
+
+### Simple terrain (no traits)
+
+```ts
+export class Grass extends BaseEntityType {
+  type = 'grass'
+
+  protected createTraits() {
+    return []
+  }
+}
+
+registerEntityType(new Grass())
+```
+
+### Entity with traits
+
+```ts
+export class Dirt extends BaseEntityType {
+  type = 'dirt'
+
+  protected createTraits(world: World, id: EntityId) {
+    return [
+      new MoistureTrait(world, id, { current: 0, capacity: 50, rate: 1 }),
+    ]
+  }
+
+  tick(world: World, id: EntityId): void {
+    const moisture = getComponent(world, id, 'moisture')
+    if (moisture && moisture.current >= GRASS_THRESHOLD) {
+      getComponent(world, id, 'entityType')!.type = 'grass'
+      world.components.moisture.delete(id)
+      this.destroyTraits(id)
+    }
   }
 }
 
 registerEntityType(new Dirt())
 ```
 
-**Complex entity with saved state** — uses helper functions for round-tripping components:
+### Complex entity with many traits
+
 ```ts
-export class Player implements EntityTypeDef {
+export class Player extends BaseEntityType {
   type = 'player'
 
-  import(world: World, x: number, y: number, elevation: number, state: Record<string, unknown>): EntityId {
-    const id = createEntity(world)
-    addComponent(world, id, 'entityType', { type: 'player' })
-    addComponent(world, id, 'position', { x, y, elevation })
-    addComponent(world, id, 'health', { current: 100, max: 100 })
-    addComponent(world, id, 'hunger', { current: 100, max: 100, drainPerTick: 1 })
-    addComponent(world, id, 'speed', { ap: 0, apPerTick: 10 })
-    addComponent(world, id, 'playerControlled', { pendingAction: null })
-    importComponents(world, id, state, 'health', 'hunger', 'speed')
-    return id
-  }
-
-  export(world: World, id: EntityId): Record<string, unknown> {
-    return exportComponents(world, id, 'health', 'hunger', 'speed')
+  protected createTraits(world: World, id: EntityId) {
+    return [
+      new HealthTrait(world, id),
+      new HungerTrait(world, id),
+      new SpeedTrait(world, id),
+      new PlayerControlledTrait(world, id),
+    ]
   }
 }
 
 registerEntityType(new Player())
 ```
 
-## Self-Registration
-
-Each entity type file calls `registerEntityType(new ClassName())` at **module scope** (bottom of file). This means:
-- No barrel file or manual registration list.
-- Consumers just add a **side-effect import** to trigger registration: `import '../../core/src/entityTypes/mytype.js'`
-- The test file and ui `main.ts` each import the entity types they need this way.
-
-## Creating a New Entity Type
+### Creating a new entity type
 
 1. Create `packages/core/src/entityTypes/<name>.ts`.
-2. Define a class implementing `EntityTypeDef`.
-3. In `import()`, call `createEntity()` then `addComponent()` for each component the entity needs. Always include `entityType` and `position`.
-4. In `export()`, return the state that needs to be saved. Use `exportComponents()` helper for component round-tripping. Return `{}` if there's no type-specific state.
-5. Optionally add `tick()` for per-entity behavior.
+2. Extend `BaseEntityType`.
+3. Set `type = '<name>'`.
+4. Implement `createTraits()` — return an array of trait instances.
+5. Optionally add `tick()` for per-entity behavior (Phase 2).
 6. Call `registerEntityType(new ClassName())` at the bottom of the file.
 7. Add a side-effect import in consumers (`main.ts`, test files) that need this type.
 8. **Do not add any import statements** — all `@sf/core` values and types are globally available.
 
-## Cross-Cutting Behavior: Use Systems, Not Base Classes
+## Self-Registration
 
-If you need behavior shared across entity types:
-- Add a new **component** to `ecs.ts` (e.g. `flammable`, `growable`).
-- Add the component in `import()` of entity types that need it.
+Each entity type file calls `registerEntityType(new ClassName())` at **module scope** (bottom of file). Consumers add a **side-effect import** to trigger registration:
+
+```ts
+import '@sf/core/entityTypes/dirt.js'
+```
+
+## Accessing traits from entity type ticks
+
+Use `this.trait(id, 'componentName')` to get a trait instance, or read raw ECS data via `getComponent()`:
+
+```ts
+tick(world: World, id: EntityId): void {
+  // Raw ECS access (simple reads)
+  const moisture = getComponent(world, id, 'moisture')
+
+  // Trait instance access (when you need trait methods)
+  const moistureTrait = this.trait(id, 'moisture')
+}
+```
+
+## Serialization
+
+`BaseEntityType` handles import/export automatically:
+
+- **Import**: For each trait, creates the instance, writes defaults to ECS, then overlays any saved state via shallow merge (`{ ...defaults, ...saved }`).
+- **Export**: For each trait, compares current component data to defaults. Only saves components that have changed. Components at defaults produce no save data.
+
+This means:
+- Forward-compatible: new fields in defaults get picked up on load.
+- Minimal saves: transient/default components (like `playerControlled`) never appear in save files.
 - Create a **system** in `tick.ts` that queries for that component and processes all matching entities.
 
 This keeps entity types as thin factories and avoids the diamond problem entirely.

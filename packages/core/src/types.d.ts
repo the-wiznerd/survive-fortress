@@ -5,6 +5,7 @@ import type * as Ecs from './ecs.js'
 import type * as Tick from './tick.js'
 import type * as Save from './save.js'
 import type * as Registry from './registry.js'
+import type * as TraitBase from './traits/trait.js'
 
 declare global {
   // ECS
@@ -17,6 +18,7 @@ declare global {
   type Speed = Ecs.Speed
   type PlayerControlled = Ecs.PlayerControlled
   type EntityType = Ecs.EntityType
+  type Moisture = Ecs.Moisture
   type Action = Ecs.Action
   type World = Ecs.World
 
@@ -31,4 +33,7 @@ declare global {
 
   // Registry
   type EntityTypeDef = Registry.EntityTypeDef
+
+  // Traits
+  type Trait<K extends ComponentName> = TraitBase.Trait<K>
 }

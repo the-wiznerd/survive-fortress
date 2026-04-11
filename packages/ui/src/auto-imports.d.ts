@@ -24,6 +24,7 @@ declare global {
   const importChunk: typeof import('@sf/core/serialization').importChunk
   const importComponents: typeof import('@sf/core/registry').importComponents
   const importWorld: typeof import('@sf/core/serialization').importWorld
+  const moistureSystem: typeof import('@sf/core/tick').moistureSystem
   const movementSystem: typeof import('@sf/core/tick').movementSystem
   const parseChunkKey: typeof import('@sf/core/save').parseChunkKey
   const queryEntities: typeof import('@sf/core/ecs').queryEntities
