@@ -6,10 +6,18 @@
 // biome-ignore lint: disable
 export {}
 declare global {
+  const BaseEntityType: typeof import('@sf/core/registry').BaseEntityType
+  const HealthTrait: typeof import('@sf/core/traits/health').HealthTrait
+  const HungerTrait: typeof import('@sf/core/traits/hunger').HungerTrait
+  const MoistureTrait: typeof import('@sf/core/traits/moisture').MoistureTrait
+  const PlayerControlledTrait: typeof import('@sf/core/traits/playerControlled').PlayerControlledTrait
+  const SpeedTrait: typeof import('@sf/core/traits/speed').SpeedTrait
+  const Trait: typeof import('@sf/core/traits/trait').Trait
   const addComponent: typeof import('@sf/core/ecs').addComponent
   const chunkKey: typeof import('@sf/core/save').chunkKey
   const createEntity: typeof import('@sf/core/ecs').createEntity
   const createWorld: typeof import('@sf/core/ecs').createWorld
+  const entityTypeTickSystem: typeof import('@sf/core/systems/entityTypeTick').entityTypeTickSystem
   const exportChunk: typeof import('@sf/core/serialization').exportChunk
   const exportComponents: typeof import('@sf/core/registry').exportComponents
   const exportManifest: typeof import('@sf/core/serialization').exportManifest
@@ -20,12 +28,12 @@ declare global {
   const getRegisteredTypes: typeof import('@sf/core/registry').getRegisteredTypes
   const hasComponent: typeof import('@sf/core/ecs').hasComponent
   const hasTerrainAt: typeof import('@sf/core/ecs').hasTerrainAt
-  const hungerSystem: typeof import('@sf/core/tick').hungerSystem
+  const hungerSystem: typeof import('@sf/core/systems/hunger').hungerSystem
   const importChunk: typeof import('@sf/core/serialization').importChunk
   const importComponents: typeof import('@sf/core/registry').importComponents
   const importWorld: typeof import('@sf/core/serialization').importWorld
-  const moistureSystem: typeof import('@sf/core/tick').moistureSystem
-  const movementSystem: typeof import('@sf/core/tick').movementSystem
+  const moistureSystem: typeof import('@sf/core/systems/moisture').moistureSystem
+  const movementSystem: typeof import('@sf/core/systems/movement').movementSystem
   const parseChunkKey: typeof import('@sf/core/save').parseChunkKey
   const queryEntities: typeof import('@sf/core/ecs').queryEntities
   const registerEntityType: typeof import('@sf/core/registry').registerEntityType
