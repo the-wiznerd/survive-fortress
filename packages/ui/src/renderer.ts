@@ -17,7 +17,7 @@ const ENTITY_SPRITES: Record<string, StaticSprite | AnimatedSprite> = {
       { col: 5, row: 1 },
       { col: 6, row: 1 },
     ],
-    interval: 400,
+    interval: 250,
   },
 }
 
@@ -111,7 +111,8 @@ export class Renderer {
 
         if (sprite) {
           if ('frames' in sprite) {
-            const frame = sprite.frames[Math.floor(performance.now() / sprite.interval) % sprite.frames.length]
+            const offset = (sx + cameraX + sy + cameraY) % sprite.frames.length
+            const frame = sprite.frames[(Math.floor(performance.now() / sprite.interval) + offset) % sprite.frames.length]
             this.drawSprite(frame.col, frame.row, sx, sy)
           } else {
             this.drawSprite(sprite.col, sprite.row, sx, sy)
