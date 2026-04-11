@@ -3,7 +3,7 @@ export class Sand implements EntityTypeDef {
 
   import(world: World, x: number, y: number, z: number, _state: Record<string, unknown>): EntityId {
     const id = createEntity(world)
-    addComponent(world, id, 'entityType', { type: 'sand' })
+    addComponent(world, id, 'entityType', { type: this.type })
     addComponent(world, id, 'position', { x, y, z })
     return id
   }

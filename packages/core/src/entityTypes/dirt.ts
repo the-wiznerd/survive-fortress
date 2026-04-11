@@ -5,7 +5,7 @@ export class Dirt implements EntityTypeDef {
 
   import(world: World, x: number, y: number, z: number, state: Record<string, unknown>): EntityId {
     const id = createEntity(world)
-    addComponent(world, id, 'entityType', { type: 'dirt' })
+    addComponent(world, id, 'entityType', { type: this.type })
     addComponent(world, id, 'position', { x, y, z })
     addComponent(world, id, 'moisture', {
       current: (state.moisture as number) ?? 0,
