@@ -104,6 +104,14 @@ function updateUI() {
   `
 }
 
+// ─── Animation Loop ───
+
+function animationLoop() {
+  if (world) renderer.render(world)
+  requestAnimationFrame(animationLoop)
+}
+requestAnimationFrame(animationLoop)
+
 // ─── Start ───
 
 init().catch(console.error)

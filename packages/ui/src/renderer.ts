@@ -4,10 +4,21 @@ const SPRITE_W = 16
 const SPRITE_H = 24
 const FACE_H = 12 // height of each "face" (top / front) in source pixels
 
-/** Maps entity type → sprite location in the sheet. */
-const ENTITY_SPRITES: Record<string, { col: number; row: number }> = {
+type StaticSprite = { col: number; row: number }
+type AnimatedSprite = { frames: StaticSprite[]; interval: number }
+
+/** Maps entity type → sprite location (or animation) in the sheet. */
+const ENTITY_SPRITES: Record<string, StaticSprite | AnimatedSprite> = {
   dirt: { col: 0, row: 1 },
-  water: { col: 3, row: 1 },
+  water: {
+    frames: [
+      { col: 3, row: 1 },
+      { col: 4, row: 1 },
+      { col: 5, row: 1 },
+      { col: 6, row: 1 },
+    ],
+    interval: 400,
+  },
 }
 
 export class Renderer {
@@ -99,7 +110,12 @@ export class Renderer {
         const sprite = ENTITY_SPRITES[typeName]
 
         if (sprite) {
-          this.drawSprite(sprite.col, sprite.row, sx, sy)
+          if ('frames' in sprite) {
+            const frame = sprite.frames[Math.floor(performance.now() / sprite.interval) % sprite.frames.length]
+            this.drawSprite(frame.col, frame.row, sx, sy)
+          } else {
+            this.drawSprite(sprite.col, sprite.row, sx, sy)
+          }
         } else {
           // Fallback glyph for entities with no sprite (e.g. player).
           const pc = getComponent(world, id, 'playerControlled')
