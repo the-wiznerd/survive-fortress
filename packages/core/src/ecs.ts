@@ -9,7 +9,6 @@ export interface ComponentTypes {
   hunger: Hunger
   speed: Speed
   playerControlled: PlayerControlled
-  terrain: Terrain
   entityType: EntityType
   moisture: Moisture
 }
@@ -43,10 +42,6 @@ export interface Speed {
 export interface PlayerControlled {
   /** Queued action for the current tick, if any. */
   pendingAction: Action | null
-}
-
-export interface Terrain {
-  type: string
 }
 
 export interface EntityType {
@@ -85,7 +80,6 @@ export function createWorld(): World {
       hunger: new Map(),
       speed: new Map(),
       playerControlled: new Map(),
-      terrain: new Map(),
       entityType: new Map(),
       moisture: new Map(),
     },

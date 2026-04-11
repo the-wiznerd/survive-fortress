@@ -7,7 +7,6 @@ export class Dirt implements EntityTypeDef {
     const id = createEntity(world)
     addComponent(world, id, 'entityType', { type: 'dirt' })
     addComponent(world, id, 'position', { x, y, z })
-    addComponent(world, id, 'terrain', { type: 'dirt' })
     addComponent(world, id, 'moisture', {
       current: (state.moisture as number) ?? 0,
       threshold: MOISTURE_THRESHOLD,
@@ -40,9 +39,8 @@ export class Dirt implements EntityTypeDef {
     }
 
     if (moisture.current >= moisture.threshold) {
-      // Convert to grass: swap entityType + terrain, remove moisture.
+      // Convert to grass: swap entityType, remove moisture.
       getComponent(world, id, 'entityType')!.type = 'grass'
-      getComponent(world, id, 'terrain')!.type = 'grass'
       world.components.moisture.delete(id)
     }
   }

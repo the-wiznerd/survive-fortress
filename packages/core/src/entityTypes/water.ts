@@ -5,7 +5,6 @@ export class Water implements EntityTypeDef {
     const id = createEntity(world)
     addComponent(world, id, 'entityType', { type: 'water' })
     addComponent(world, id, 'position', { x, y, z })
-    addComponent(world, id, 'terrain', { type: 'water' })
     addComponent(world, id, 'moisture', { current: 100, threshold: 100 })
     return id
   }

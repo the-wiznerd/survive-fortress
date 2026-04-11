@@ -16,7 +16,6 @@ declare global {
   type Hunger = Ecs.Hunger
   type Speed = Ecs.Speed
   type PlayerControlled = Ecs.PlayerControlled
-  type Terrain = Ecs.Terrain
   type EntityType = Ecs.EntityType
   type Action = Ecs.Action
   type World = Ecs.World

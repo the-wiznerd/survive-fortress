@@ -5,7 +5,6 @@ export class Sand implements EntityTypeDef {
     const id = createEntity(world)
     addComponent(world, id, 'entityType', { type: 'sand' })
     addComponent(world, id, 'position', { x, y, z })
-    addComponent(world, id, 'terrain', { type: 'sand' })
     return id
   }
 
