@@ -1,16 +1,50 @@
+const MOISTURE_THRESHOLD = 10
+
 export class Dirt implements EntityTypeDef {
   type = 'dirt'
 
-  import(world: World, x: number, y: number, z: number, _state: Record<string, unknown>): EntityId {
+  import(world: World, x: number, y: number, z: number, state: Record<string, unknown>): EntityId {
     const id = createEntity(world)
     addComponent(world, id, 'entityType', { type: 'dirt' })
     addComponent(world, id, 'position', { x, y, elevation: z })
     addComponent(world, id, 'terrain', { type: 'dirt' })
+    addComponent(world, id, 'moisture', {
+      current: (state.moisture as number) ?? 0,
+      threshold: MOISTURE_THRESHOLD,
+    })
     return id
   }
 
-  export(_world: World, _id: EntityId): Record<string, unknown> {
-    return {}
+  export(world: World, id: EntityId): Record<string, unknown> {
+    const moisture = getComponent(world, id, 'moisture')
+    return moisture && moisture.current > 0 ? { moisture: moisture.current } : {}
+  }
+
+  tick(world: World, id: EntityId): void {
+    const pos = getComponent(world, id, 'position')!
+    const moisture = getComponent(world, id, 'moisture')!
+
+    // Check orthogonal neighbors for entities with moisture.
+    const neighbors = [
+      [pos.x - 1, pos.y],
+      [pos.x + 1, pos.y],
+      [pos.x, pos.y - 1],
+      [pos.x, pos.y + 1],
+    ]
+    const hasMoistNeighbor = neighbors.some(([nx, ny]) =>
+      getEntitiesAt(world, nx, ny, pos.elevation).some(nid => hasComponent(world, nid, 'moisture'))
+    )
+
+    if (hasMoistNeighbor) {
+      moisture.current++
+    }
+
+    if (moisture.current >= moisture.threshold) {
+      // Convert to grass: swap entityType + terrain, remove moisture.
+      getComponent(world, id, 'entityType')!.type = 'grass'
+      getComponent(world, id, 'terrain')!.type = 'grass'
+      world.components.moisture.delete(id)
+    }
   }
 }
 

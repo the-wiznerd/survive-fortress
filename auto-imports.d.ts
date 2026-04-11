@@ -14,9 +14,11 @@ declare global {
   const exportComponents: typeof import('@sf/core/registry').exportComponents
   const exportManifest: typeof import('@sf/core/serialization').exportManifest
   const getComponent: typeof import('@sf/core/ecs').getComponent
+  const getEntitiesAt: typeof import('@sf/core/ecs').getEntitiesAt
   const getEntityTypeDef: typeof import('@sf/core/registry').getEntityTypeDef
   const getRegisteredTypes: typeof import('@sf/core/registry').getRegisteredTypes
   const hasComponent: typeof import('@sf/core/ecs').hasComponent
+  const hasTerrainAt: typeof import('@sf/core/ecs').hasTerrainAt
   const hungerSystem: typeof import('@sf/core/tick').hungerSystem
   const importChunk: typeof import('@sf/core/serialization').importChunk
   const importComponents: typeof import('@sf/core/registry').importComponents

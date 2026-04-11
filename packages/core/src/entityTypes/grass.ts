@@ -1,12 +1,11 @@
-export class Water implements EntityTypeDef {
-  type = 'water'
+export class Grass implements EntityTypeDef {
+  type = 'grass'
 
   import(world: World, x: number, y: number, z: number, _state: Record<string, unknown>): EntityId {
     const id = createEntity(world)
-    addComponent(world, id, 'entityType', { type: 'water' })
+    addComponent(world, id, 'entityType', { type: 'grass' })
     addComponent(world, id, 'position', { x, y, elevation: z })
-    addComponent(world, id, 'terrain', { type: 'water' })
-    addComponent(world, id, 'moisture', { current: 100, threshold: 100 })
+    addComponent(world, id, 'terrain', { type: 'grass' })
     return id
   }
 
@@ -15,4 +14,4 @@ export class Water implements EntityTypeDef {
   }
 }
 
-registerEntityType(new Water())
+registerEntityType(new Grass())

@@ -11,6 +11,7 @@ export interface ComponentTypes {
   playerControlled: PlayerControlled
   terrain: Terrain
   entityType: EntityType
+  moisture: Moisture
 }
 
 export type ComponentName = keyof ComponentTypes
@@ -52,6 +53,11 @@ export interface EntityType {
   type: string
 }
 
+export interface Moisture {
+  current: number
+  threshold: number
+}
+
 // ─── Actions ───
 
 export type Action =
@@ -81,6 +87,7 @@ export function createWorld(): World {
       playerControlled: new Map(),
       terrain: new Map(),
       entityType: new Map(),
+      moisture: new Map(),
     },
   }
 }
@@ -141,6 +148,17 @@ export function queryEntities(
   const result: EntityId[] = []
   for (const id of smallest.keys()) {
     if (required.every((name) => world.components[name].has(id))) {
+      result.push(id)
+    }
+  }
+  return result
+}
+
+/** Return all entity IDs at the given position. */
+export function getEntitiesAt(world: World, x: number, y: number, elevation: number): EntityId[] {
+  const result: EntityId[] = []
+  for (const [id, pos] of world.components.position) {
+    if (pos.x === x && pos.y === y && pos.elevation === elevation) {
       result.push(id)
     }
   }

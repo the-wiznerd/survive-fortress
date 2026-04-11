@@ -2,6 +2,7 @@
 // Must use @sf/core alias (not relative paths) so they share the same
 // module instances as the auto-imported @sf/core/* functions.
 import '@sf/core/entityTypes/dirt.js'
+import '@sf/core/entityTypes/grass.js'
 import '@sf/core/entityTypes/water.js'
 import '@sf/core/entityTypes/sand.js'
 import '@sf/core/entityTypes/player.js'

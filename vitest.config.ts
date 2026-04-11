@@ -12,6 +12,7 @@ export const coreImports: Record<string, string[]> = {
     'hasComponent',
     'removeEntity',
     'queryEntities',
+    'getEntitiesAt',
   ],
   '@sf/core/tick': [
     'movementSystem',
