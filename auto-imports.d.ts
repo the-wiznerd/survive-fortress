@@ -16,6 +16,7 @@ declare global {
   const getComponent: typeof import('@sf/core/ecs').getComponent
   const getEntitiesAt: typeof import('@sf/core/ecs').getEntitiesAt
   const getEntityTypeDef: typeof import('@sf/core/registry').getEntityTypeDef
+  const getNeighborCoords: typeof import('@sf/core/ecs').getNeighborCoords
   const getRegisteredTypes: typeof import('@sf/core/registry').getRegisteredTypes
   const hasComponent: typeof import('@sf/core/ecs').hasComponent
   const hasTerrainAt: typeof import('@sf/core/ecs').hasTerrainAt

@@ -13,6 +13,7 @@ export const coreImports: Record<string, string[]> = {
     'removeEntity',
     'queryEntities',
     'getEntitiesAt',
+    'getNeighborCoords',
   ],
   '@sf/core/tick': [
     'movementSystem',

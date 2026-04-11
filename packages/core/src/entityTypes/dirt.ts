@@ -24,13 +24,7 @@ export class Dirt implements EntityTypeDef {
     const moisture = getComponent(world, id, 'moisture')!
 
     // Check orthogonal neighbors for entities with moisture.
-    const neighbors = [
-      [pos.x - 1, pos.y],
-      [pos.x + 1, pos.y],
-      [pos.x, pos.y - 1],
-      [pos.x, pos.y + 1],
-    ]
-    const hasMoistNeighbor = neighbors.some(([nx, ny]) =>
+    const hasMoistNeighbor = getNeighborCoords(pos.x, pos.y).some(([nx, ny]) =>
       getEntitiesAt(world, nx, ny, pos.z).some(nid => {
         const m = getComponent(world, nid, 'moisture')
         return m !== undefined && m.current > 0

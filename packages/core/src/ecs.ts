@@ -158,3 +158,13 @@ export function getEntitiesAt(world: World, x: number, y: number, z: number): En
   }
   return result
 }
+
+/** Return orthogonal neighbor coordinates at the same z level. */
+export function getNeighborCoords(x: number, y: number): [number, number][] {
+  return [
+    [x - 1, y],
+    [x + 1, y],
+    [x, y - 1],
+    [x, y + 1],
+  ]
+}
