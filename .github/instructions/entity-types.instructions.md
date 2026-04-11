@@ -1,5 +1,5 @@
 ---
-applyTo: "packages/core/src/entity-types/**"
+applyTo: "packages/core/src/entityTypes/**"
 description: "Entity type definition pattern — how to create new entity types using composition, the EntityTypeDef interface, and self-registration. Use when creating, modifying, or reviewing entity type classes."
 ---
 
@@ -79,12 +79,12 @@ registerEntityType(new Player())
 
 Each entity type file calls `registerEntityType(new ClassName())` at **module scope** (bottom of file). This means:
 - No barrel file or manual registration list.
-- Consumers just add a **side-effect import** to trigger registration: `import '../../core/src/entity-types/mytype.js'`
+- Consumers just add a **side-effect import** to trigger registration: `import '../../core/src/entityTypes/mytype.js'`
 - The test file and dev-ui `main.ts` each import the entity types they need this way.
 
 ## Creating a New Entity Type
 
-1. Create `packages/core/src/entity-types/<name>.ts`.
+1. Create `packages/core/src/entityTypes/<name>.ts`.
 2. Define a class implementing `EntityTypeDef`.
 3. In `import()`, call `createEntity()` then `addComponent()` for each component the entity needs. Always include `entityType` and `position`.
 4. In `export()`, return the state that needs to be saved. Use `exportComponents()` helper for component round-tripping. Return `{}` if there's no type-specific state.

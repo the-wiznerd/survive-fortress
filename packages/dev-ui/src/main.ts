@@ -1,7 +1,7 @@
 // Side-effect imports: each module self-registers its entity type.
-import '../../core/src/entity-types/dirt.js'
-import '../../core/src/entity-types/water.js'
-import '../../core/src/entity-types/player.js'
+import '../../core/src/entityTypes/dirt.js'
+import '../../core/src/entityTypes/water.js'
+import '../../core/src/entityTypes/player.js'
 import { Renderer } from './renderer.js'
 
 // ─── Game State ───

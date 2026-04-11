@@ -13,7 +13,7 @@ This project uses `unplugin-auto-import` and a global `types.d.ts` so that **all
 
 ### What still needs explicit imports
 
-- **Side-effect imports** for entity type self-registration (e.g. `import '../../core/src/entity-types/dirt.js'`). These trigger the module so `registerEntityType()` runs.
+- **Side-effect imports** for entity type self-registration (e.g. `import '../../core/src/entityTypes/dirt.js'`). These trigger the module so `registerEntityType()` runs.
 - **Third-party libraries** like `vitest` (`import { describe, it, expect } from 'vitest'`).
 - **Local non-core modules** like `import { Renderer } from './renderer.js'`.
 
