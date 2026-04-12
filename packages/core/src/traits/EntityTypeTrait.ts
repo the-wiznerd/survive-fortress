@@ -1,5 +1,3 @@
-import { Trait } from './Trait.js'
-
 export class EntityTypeTrait extends Trait<'entityType'> {
   readonly component = 'entityType' as const
 

@@ -12,10 +12,15 @@ export default defineConfig({
   },
   plugins: [
     AutoImport({
+      imports: [
+        { '@sf/core/entityTypes/BaseEntityType': ['BaseEntityType'] },
+        { '@sf/core/traits/Trait': ['Trait'] },
+      ],
       dirs: [
         coreSrc,
         `${coreSrc}/traits`,
         `${coreSrc}/systems`,
+        `${coreSrc}/entityTypes`,
       ],
       dirsScanOptions: { types: false },
       dts: path.resolve(import.meta.dirname, 'src/auto-imports.d.ts'),

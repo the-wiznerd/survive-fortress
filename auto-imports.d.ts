@@ -6,13 +6,20 @@
 // biome-ignore lint: disable
 export {}
 declare global {
+  const BaseEntityType: typeof import('@sf/core/entityTypes/BaseEntityType').BaseEntityType
+  const Dirt: typeof import('./packages/core/src/entityTypes/Dirt').Dirt
   const EntityTypeTrait: typeof import('./packages/core/src/traits/EntityTypeTrait').EntityTypeTrait
+  const Grass: typeof import('./packages/core/src/entityTypes/Grass').Grass
   const HealthTrait: typeof import('./packages/core/src/traits/HealthTrait').HealthTrait
   const HungerTrait: typeof import('./packages/core/src/traits/HungerTrait').HungerTrait
   const MoistureTrait: typeof import('./packages/core/src/traits/MoistureTrait').MoistureTrait
+  const Player: typeof import('./packages/core/src/entityTypes/Player').Player
   const PlayerControlledTrait: typeof import('./packages/core/src/traits/PlayerControlledTrait').PlayerControlledTrait
   const PositionTrait: typeof import('./packages/core/src/traits/PositionTrait').PositionTrait
+  const Sand: typeof import('./packages/core/src/entityTypes/Sand').Sand
   const SpeedTrait: typeof import('./packages/core/src/traits/SpeedTrait').SpeedTrait
+  const Trait: typeof import('@sf/core/traits/Trait').Trait
+  const Water: typeof import('./packages/core/src/entityTypes/Water').Water
   const addComponent: typeof import('./packages/core/src/ecs').addComponent
   const buildFaces2d: typeof import('./packages/core/src/faces').buildFaces2d
   const buildFaces3d: typeof import('./packages/core/src/faces').buildFaces3d
@@ -63,4 +70,19 @@ declare global {
   // @ts-ignore
   export type { SpeedTrait } from './packages/core/src/traits/SpeedTrait'
   import('./packages/core/src/traits/SpeedTrait')
+  // @ts-ignore
+  export type { Dirt } from './packages/core/src/entityTypes/Dirt'
+  import('./packages/core/src/entityTypes/Dirt')
+  // @ts-ignore
+  export type { Grass } from './packages/core/src/entityTypes/Grass'
+  import('./packages/core/src/entityTypes/Grass')
+  // @ts-ignore
+  export type { Player } from './packages/core/src/entityTypes/Player'
+  import('./packages/core/src/entityTypes/Player')
+  // @ts-ignore
+  export type { Sand } from './packages/core/src/entityTypes/Sand'
+  import('./packages/core/src/entityTypes/Sand')
+  // @ts-ignore
+  export type { Water } from './packages/core/src/entityTypes/Water'
+  import('./packages/core/src/entityTypes/Water')
 }

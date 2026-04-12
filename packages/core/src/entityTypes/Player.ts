@@ -1,5 +1,3 @@
-import { BaseEntityType } from '../registry.js'
-
 export class Player extends BaseEntityType {
   type = 'player'
 

@@ -168,9 +168,8 @@ export class Player extends BaseEntityType {
 3. Set `type = '<name>'`.
 4. Implement `createTraits()` — return an array of trait instances.
 5. Optionally add `tick()` for per-entity behavior (Phase 2).
-6. Add `import { BaseEntityType } from '../registry.js'` — the only import needed (abstract classes aren't auto-imported).
-7. Register explicitly at startup: import the class and call `registerEntityType(new ClassName())` in `main.ts` and test files.
-8. **No other imports needed** — all `@sf/core` values and types are globally available.
+6. Register explicitly at startup: import the class and call `registerEntityType(new ClassName())` in `main.ts` and test files.
+7. **Do not add any import statements** — all `@sf/core` values and types are globally available.
 
 ## Registration
 
