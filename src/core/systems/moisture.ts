@@ -3,10 +3,10 @@ export function moistureSystem(world: World) {
 
   // Phase 1: compute per-face transfers from unmodified state.
   //
-  // Each tile's `rate` is its conductivity as an integer percentage (0–100).
+  // Each tile's `conductivity` is an integer percentage (0–100).
   // For each pair of adjacent tiles:
   //   1. Take the difference in their moisture levels.
-  //   2. Multiply by whichever tile has the lower rate (the bottleneck).
+  //   2. Multiply by whichever tile has the lower conductivity (the bottleneck).
   //   3. Divide by 200 (integer, truncated toward zero).
   //
   // The 200 combines halving the gradient (so two equal tiles meet in the
@@ -19,7 +19,7 @@ export function moistureSystem(world: World) {
     const diff = mA.current - mB.current
     if (diff === 0) { transfers.push(0); continue }
 
-    const transfer = intDiv(diff * Math.min(mA.rate, mB.rate), 200)
+    const transfer = intDiv(diff * Math.min(mA.conductivity, mB.conductivity), 200)
     transfers.push(transfer)
   }
 

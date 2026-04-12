@@ -2,7 +2,11 @@ const GRASS_THRESHOLD = 3
 
 export class Dirt extends BaseEntityType {
   type = 'dirt'
-  moisture = this.addTrait(new MoistureTrait(this.world, this.id, { current: 0, capacity: 50, rate: 10 }))
+  moisture = this.addTrait(new MoistureTrait(this.world, this.id, {
+    current: 2,
+    capacity: 10,
+    conductivity: 20
+  }))
 
   tick(): void {
     if (this.moisture.current < GRASS_THRESHOLD) return

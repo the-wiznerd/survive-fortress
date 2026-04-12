@@ -52,7 +52,7 @@ export interface EntityType {
 export interface Moisture {
   current: number
   capacity: number
-  rate: number
+  conductivity: number
 }
 
 export interface Instance {
