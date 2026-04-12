@@ -1,25 +1,35 @@
-// ─── Entity Type Definition ───
+// ─── Entity Type Constructor ───
 
-export interface EntityTypeDef {
-  type: string
-  sortOffset: number
-  export(world: World, id: EntityId): Record<string, unknown>
-  import(world: World, id: EntityId, state: Record<string, unknown>): void
-  tick?(world: World, id: EntityId): void
-}
+export type EntityTypeConstructor = new (world: World, id: EntityId) => import('./entityTypes/BaseEntityType.js').BaseEntityType
 
 // ─── Registry ───
 
-const registry = new Map<string, EntityTypeDef>()
+const registry = new Map<string, EntityTypeConstructor>()
 
-export function registerEntityType(def: EntityTypeDef): void {
-  registry.set(def.type, def)
+export function registerEntityType(type: string, ctor: EntityTypeConstructor): void {
+  registry.set(type, ctor)
 }
 
-export function getEntityTypeDef(type: string): EntityTypeDef | undefined {
+export function getEntityTypeConstructor(type: string): EntityTypeConstructor | undefined {
   return registry.get(type)
 }
 
 export function getRegisteredTypes(): string[] {
   return [...registry.keys()]
+}
+
+/** Create an entity, instantiate its class, initialize from state, and store the instance. */
+export function spawnEntity(
+  world: World,
+  type: string,
+  state: Record<string, unknown>,
+): import('./entityTypes/BaseEntityType.js').BaseEntityType {
+  const ctor = registry.get(type)
+  if (!ctor) throw new Error(`Unknown entity type "${type}"`)
+  const id = createEntity(world)
+  const instance = new ctor(world, id)
+  addComponent(world, id, 'entityType', { type })
+  instance.init(state)
+  addComponent(world, id, 'instance', { ref: instance })
+  return instance
 }

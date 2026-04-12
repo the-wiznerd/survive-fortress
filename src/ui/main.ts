@@ -1,10 +1,10 @@
 import { Renderer } from './renderer.js'
 
-registerEntityType(new Dirt())
-registerEntityType(new Grass())
-registerEntityType(new Water())
-registerEntityType(new Sand())
-registerEntityType(new Player())
+registerEntityType('dirt', Dirt)
+registerEntityType('grass', Grass)
+registerEntityType('water', Water)
+registerEntityType('sand', Sand)
+registerEntityType('player', Player)
 
 // ─── Game State ───
 

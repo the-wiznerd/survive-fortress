@@ -47,3 +47,8 @@ When you add a new public function or type to `src/core/`:
 ### Naming
 
 - **Include units in variable names** when the value has an implicit unit. `durationMs` not `duration`, `tickIntervalMs` not `tickInterval`, `distanceTiles` not `distance`. Unitless values (counts, ratios, enums) don't need suffixes.
+
+## Collaboration
+
+- **Discuss before implementing** when the user asks exploratory questions like "is there a way", "how should we", "what do you think", or "ideas?". Present options and tradeoffs, then wait for the user's go-ahead before writing code.
+- The user is an integral part of the software architecture. Treat design decisions as collaborative — don't pick an approach and implement it unilaterally.

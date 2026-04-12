@@ -1,41 +1,37 @@
-export abstract class BaseEntityType implements EntityTypeDef {
+export abstract class BaseEntityType {
   abstract type: string
   sortOffset = 0
 
-  private entities = new Map<EntityId, Trait<any>[]>()
+  protected traits: Trait<any>[] = []
+  position: Trait<'position'>
 
-  protected createTraits(_world: World, _id: EntityId): Trait<any>[] {
-    return []
+  constructor(public world: World, public id: EntityId) {
+    this.position = this.addTrait(new PositionTrait(world, id))
   }
 
-  import(world: World, id: EntityId, state: Record<string, unknown>): void {
-    const entityTypeTrait = new EntityTypeTrait(world, id, this.type)
-    const positionTrait = new PositionTrait(world, id)
-    const custom = this.createTraits(world, id)
-    const traits = [entityTypeTrait, positionTrait, ...custom]
+  /** Register a trait — stores it for auto-iteration and returns it for assignment. */
+  protected addTrait<T extends Trait<any>>(trait: T): T {
+    this.traits.push(trait)
+    return trait
+  }
 
-    for (const t of traits) {
+  /** Initialize all traits from saved state. */
+  init(state: Record<string, unknown>): void {
+    for (const t of this.traits) {
       t.init(state[t.component] as Record<string, unknown> | undefined)
     }
-    this.entities.set(id, traits)
   }
 
-  export(_world: World, id: EntityId): Record<string, unknown> {
-    const result: Record<string, unknown> = {}
-    const traits = this.entities.get(id)
-    if (!traits) return result
-    for (const t of traits) {
+  /** Auto-export: iterates all traits, no manual list needed. */
+  export(): Record<string, unknown> {
+    const result: Record<string, unknown> = { entityType: this.type }
+    for (const t of this.traits) {
       const saved = t.save()
       if (saved !== undefined) result[t.component] = saved
     }
     return result
   }
 
-  trait<K extends ComponentName>(id: EntityId, component: K): Trait<K> | undefined {
-    return this.entities.get(id)?.find(t => t.component === component) as Trait<K> | undefined
-  }
-
-  destroyTraits(id: EntityId): void {
-    this.entities.delete(id)
-  }
+  /** Called each tick for entity-specific behavior. Override in subclasses. */
+  tick(): void { }
 }

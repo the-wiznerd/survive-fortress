@@ -102,8 +102,8 @@ export class Renderer {
       const sx = pos.x - cameraX
       const sy = pos.y - cameraY
       if (sx < 0 || sx >= viewWidth || sy < 0 || sy >= viewHeight) continue
-      const typeName = getComponent(world, id, 'entityType')!.type
-      const offset = getEntityTypeDef(typeName)?.sortOffset ?? 0
+      const inst = getComponent(world, id, 'instance')
+      const offset = inst?.ref.sortOffset ?? 0
       rows[sy].push({ id, sx, sy, z: pos.z, sortOffset: offset })
     }
 

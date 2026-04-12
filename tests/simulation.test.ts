@@ -1,12 +1,10 @@
 import { describe, it, expect } from 'vitest'
 
-registerEntityType(new Player())
+registerEntityType('player', Player)
 
 /** Convenience: spawn a player at (x, y) using the registry. */
 function spawnPlayer(world: ReturnType<typeof createWorld>, x: number, y: number) {
-  const id = createEntity(world)
-  getEntityTypeDef('player')!.import(world, id, { entityType: 'player', position: { x, y, z: 0 } })
-  return id
+  return spawnEntity(world, 'player', { entityType: 'player', position: { x, y, z: 0 } }).id
 }
 
 describe('hunger system', () => {

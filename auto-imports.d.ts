@@ -31,6 +31,7 @@ declare global {
   const exportManifest: typeof import('@core/serialization').exportManifest
   const getComponent: typeof import('@core/ecs').getComponent
   const getEntitiesAt: typeof import('@core/ecs').getEntitiesAt
+  const getEntityTypeConstructor: typeof import('@core/registry').getEntityTypeConstructor
   const getEntityTypeDef: typeof import('@core/registry').getEntityTypeDef
   const getNeighborCoords: typeof import('@core/ecs').getNeighborCoords
   const getRegisteredTypes: typeof import('@core/registry').getRegisteredTypes
@@ -46,5 +47,6 @@ declare global {
   const registerEntityType: typeof import('@core/registry').registerEntityType
   const removeEntity: typeof import('@core/ecs').removeEntity
   const simulate: typeof import('@core/tick').simulate
+  const spawnEntity: typeof import('@core/registry').spawnEntity
   const tick: typeof import('@core/tick').tick
 }

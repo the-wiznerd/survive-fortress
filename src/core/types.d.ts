@@ -20,6 +20,7 @@ declare global {
   type PlayerControlled = Ecs.PlayerControlled
   type EntityType = Ecs.EntityType
   type Moisture = Ecs.Moisture
+  type Instance = Ecs.Instance
   type Action = Ecs.Action
   type World = Ecs.World
 
@@ -33,7 +34,7 @@ declare global {
   type EntitySave = Save.EntitySave
 
   // Registry
-  type EntityTypeDef = Registry.EntityTypeDef
+  type EntityTypeConstructor = Registry.EntityTypeConstructor
 
   // Traits
   type Trait<K extends ComponentName> = TraitBase.Trait<K>

@@ -11,6 +11,7 @@ export interface ComponentTypes {
   playerControlled: PlayerControlled
   entityType: EntityType
   moisture: Moisture
+  instance: Instance
 }
 
 export type ComponentName = keyof ComponentTypes
@@ -54,6 +55,10 @@ export interface Moisture {
   rate: number
 }
 
+export interface Instance {
+  ref: import('./entityTypes/BaseEntityType.js').BaseEntityType
+}
+
 // ─── Actions ───
 
 export type Action =
@@ -83,6 +88,7 @@ export function createWorld(): World {
       playerControlled: new Map(),
       entityType: new Map(),
       moisture: new Map(),
+      instance: new Map(),
     },
   }
 }

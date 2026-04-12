@@ -18,11 +18,10 @@ export function exportChunk(
     const ly = pos.y - originY
     if (lx < 0 || lx >= chunkSize || ly < 0 || ly >= chunkSize) continue
 
-    const typeName = getComponent(world, id, 'entityType')!.type
-    const def = getEntityTypeDef(typeName)
-    if (!def) continue
+    const inst = getComponent(world, id, 'instance')
+    if (!inst) continue
 
-    entities.push(def.export(world, id) as EntitySave)
+    entities.push(inst.ref.export() as EntitySave)
   }
 
   return { cx, cy, entities }
@@ -50,13 +49,11 @@ export function importChunk(
   chunk: ChunkData,
 ): void {
   for (const ent of chunk.entities) {
-    const def = getEntityTypeDef(ent.entityType)
-    if (!def) {
-      console.warn(`Unknown entity type "${ent.entityType}", skipping`)
+    if (!ent.entityType) {
+      console.warn('Entity missing entityType, skipping')
       continue
     }
-    const id = createEntity(world)
-    def.import(world, id, ent as Record<string, unknown>)
+    spawnEntity(world, ent.entityType, ent as Record<string, unknown>)
   }
 }
 

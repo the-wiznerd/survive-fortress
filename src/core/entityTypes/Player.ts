@@ -1,12 +1,7 @@
 export class Player extends BaseEntityType {
   type = 'player'
-
-  protected createTraits(world: World, id: EntityId) {
-    return [
-      new HealthTrait(world, id),
-      new HungerTrait(world, id),
-      new SpeedTrait(world, id),
-      new PlayerControlledTrait(world, id),
-    ]
-  }
+  health = this.addTrait(new HealthTrait(this.world, this.id))
+  hunger = this.addTrait(new HungerTrait(this.world, this.id))
+  speed = this.addTrait(new SpeedTrait(this.world, this.id))
+  playerControlled = this.addTrait(new PlayerControlledTrait(this.world, this.id))
 }

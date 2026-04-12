@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 
 beforeAll(() => {
-  registerEntityType(new Dirt())
-  registerEntityType(new Grass())
+  registerEntityType('dirt', Dirt)
+  registerEntityType('grass', Grass)
 })
 
 /** Place a tile with moisture at (x, y). */
@@ -165,12 +165,10 @@ describe('moisture system', () => {
 describe('dirt → grass spawning', () => {
   /** Place a dirt tile via the registry. */
   function placeDirt(world: World, x: number, y: number) {
-    const id = createEntity(world)
-    getEntityTypeDef('dirt')!.import(world, id, {
+    return spawnEntity(world, 'dirt', {
       entityType: 'dirt',
       position: { x, y, z: 0 },
-    })
-    return id
+    }).id
   }
 
   it('spawns grass at z+1 when moisture reaches threshold', () => {
