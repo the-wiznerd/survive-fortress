@@ -94,7 +94,7 @@ export class Renderer {
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
     // Collect visible entities into rows for back-to-front drawing.
-    const rows: { id: EntityId; sx: number; sy: number; z: number }[][] = []
+    const rows: { id: EntityId; sx: number; sy: number; z: number; sortOffset: number }[][] = []
     for (let i = 0; i < viewHeight; i++) rows.push([])
 
     for (const id of queryEntities(world, 'position', 'entityType')) {
@@ -102,13 +102,16 @@ export class Renderer {
       const sx = pos.x - cameraX
       const sy = pos.y - cameraY
       if (sx < 0 || sx >= viewWidth || sy < 0 || sy >= viewHeight) continue
-      rows[sy].push({ id, sx, sy, z: pos.z })
+      const typeName = getComponent(world, id, 'entityType')!.type
+      const offset = getEntityTypeDef(typeName)?.sortOffset ?? 0
+      rows[sy].push({ id, sx, sy, z: pos.z, sortOffset: offset })
     }
 
     // Draw back-to-front so near rows occlude the front face of far rows.
-    // Within a row, sort by z so ground cover (z+1) draws over terrain (z=0).
+    // Within a row, sort by z first, then by sortOffset so ground cover
+    // (negative offset) draws before standing entities at the same z.
     for (const row of rows) {
-      row.sort((a, b) => a.z - b.z)
+      row.sort((a, b) => a.z - b.z || a.sortOffset - b.sortOffset)
       for (const { id, sx, sy } of row) {
         const typeName = getComponent(world, id, 'entityType')!.type
         const sprite = ENTITY_SPRITES[typeName]

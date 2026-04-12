@@ -2,6 +2,7 @@
 
 export interface EntityTypeDef {
   type: string
+  sortOffset: number
   export(world: World, id: EntityId): Record<string, unknown>
   import(world: World, id: EntityId, state: Record<string, unknown>): void
   tick?(world: World, id: EntityId): void

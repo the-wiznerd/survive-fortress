@@ -1,5 +1,6 @@
 export abstract class BaseEntityType implements EntityTypeDef {
   abstract type: string
+  sortOffset = 0
 
   private entities = new Map<EntityId, Trait<any>[]>()
 
