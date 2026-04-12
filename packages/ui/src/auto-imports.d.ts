@@ -16,6 +16,8 @@ declare global {
   const SpeedTrait: typeof import('@sf/core/traits/SpeedTrait').SpeedTrait
   const Trait: typeof import('@sf/core/traits/Trait').Trait
   const addComponent: typeof import('@sf/core/ecs').addComponent
+  const buildFaces2d: typeof import('@sf/core/faces').buildFaces2d
+  const buildFaces3d: typeof import('@sf/core/faces').buildFaces3d
   const chunkKey: typeof import('@sf/core/save').chunkKey
   const createEntity: typeof import('@sf/core/ecs').createEntity
   const createWorld: typeof import('@sf/core/ecs').createWorld

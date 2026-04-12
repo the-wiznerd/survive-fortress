@@ -6,6 +6,7 @@ import type * as Tick from './tick.js'
 import type * as Save from './save.js'
 import type * as Registry from './registry.js'
 import type * as TraitBase from './traits/Trait.js'
+import type * as Faces from './faces.js'
 
 declare global {
   // ECS
@@ -36,4 +37,7 @@ declare global {
 
   // Traits
   type Trait<K extends ComponentName> = TraitBase.Trait<K>
+
+  // Faces
+  type Face = Faces.Face
 }

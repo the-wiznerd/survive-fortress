@@ -35,6 +35,10 @@ export const coreImports: Record<string, string[]> = {
     'chunkKey',
     'parseChunkKey',
   ],
+  '@sf/core/faces': [
+    'buildFaces2d',
+    'buildFaces3d',
+  ],
   '@sf/core/traits/Trait': ['Trait'],
   '@sf/core/traits/EntityTypeTrait': ['EntityTypeTrait'],
   '@sf/core/traits/PositionTrait': ['PositionTrait'],
