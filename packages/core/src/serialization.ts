@@ -22,13 +22,7 @@ export function exportChunk(
     const def = getEntityTypeDef(typeName)
     if (!def) continue
 
-    entities.push({
-      entityType: typeName,
-      x: pos.x,
-      y: pos.y,
-      z: pos.z,
-      ...def.export(world, id),
-    })
+    entities.push(def.export(world, id) as EntitySave)
   }
 
   return { cx, cy, entities }
@@ -61,11 +55,8 @@ export function importChunk(
       console.warn(`Unknown entity type "${ent.entityType}", skipping`)
       continue
     }
-    const { entityType: _, x, y, z, ...state } = ent
     const id = createEntity(world)
-    addComponent(world, id, 'entityType', { type: ent.entityType })
-    addComponent(world, id, 'position', { x, y, z })
-    def.import(world, id, state)
+    def.import(world, id, ent as Record<string, unknown>)
   }
 }
 

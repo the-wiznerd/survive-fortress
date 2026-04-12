@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitest/config'
-import path from 'path'
+import path from 'node:path'
 import AutoImport from 'unplugin-auto-import/vite'
 
 // Shared auto-import list for @sf/core public API.
@@ -36,6 +36,8 @@ export const coreImports: Record<string, string[]> = {
     'parseChunkKey',
   ],
   '@sf/core/traits/Trait': ['Trait'],
+  '@sf/core/traits/EntityTypeTrait': ['EntityTypeTrait'],
+  '@sf/core/traits/PositionTrait': ['PositionTrait'],
   '@sf/core/traits/MoistureTrait': ['MoistureTrait'],
   '@sf/core/traits/HealthTrait': ['HealthTrait'],
   '@sf/core/traits/HungerTrait': ['HungerTrait'],
@@ -50,14 +52,14 @@ export const coreImports: Record<string, string[]> = {
 export default defineConfig({
   resolve: {
     alias: {
-      '@sf/core': path.resolve(__dirname, 'packages/core/src'),
+      '@sf/core': path.resolve(import.meta.dirname, 'packages/core/src'),
     },
   },
   plugins: [
     AutoImport({
       imports: Object.entries(coreImports).map(([from, names]) => ({ [from]: names })),
-      dts: path.resolve(__dirname, 'auto-imports.d.ts'),
-    }),
+      dts: path.resolve(import.meta.dirname, 'auto-imports.d.ts'),
+    }) as any,
   ],
   test: {
     include: ['packages/*/tests/**/*.test.ts'],

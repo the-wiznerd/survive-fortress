@@ -7,10 +7,12 @@
 export {}
 declare global {
   const BaseEntityType: typeof import('@sf/core/registry').BaseEntityType
+  const EntityTypeTrait: typeof import('@sf/core/traits/EntityTypeTrait').EntityTypeTrait
   const HealthTrait: typeof import('@sf/core/traits/HealthTrait').HealthTrait
   const HungerTrait: typeof import('@sf/core/traits/HungerTrait').HungerTrait
   const MoistureTrait: typeof import('@sf/core/traits/MoistureTrait').MoistureTrait
   const PlayerControlledTrait: typeof import('@sf/core/traits/PlayerControlledTrait').PlayerControlledTrait
+  const PositionTrait: typeof import('@sf/core/traits/PositionTrait').PositionTrait
   const SpeedTrait: typeof import('@sf/core/traits/SpeedTrait').SpeedTrait
   const Trait: typeof import('@sf/core/traits/Trait').Trait
   const addComponent: typeof import('@sf/core/ecs').addComponent

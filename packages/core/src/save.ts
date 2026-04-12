@@ -27,14 +27,13 @@ export interface ChunkData {
 }
 
 /**
- * A saved entity. The serializer writes entityType, x, y, z.
- * The entity type's exporter spreads any additional fields it needs.
+ * A saved entity. Each key corresponds to a trait's serialized output.
+ * entityType is always a bare string. position is always an {x,y,z} object.
+ * Other traits save as objects only when they differ from defaults.
  */
 export interface EntitySave {
   entityType: string
-  x: number
-  y: number
-  z: number
+  position: { x: number; y: number; z: number }
   [key: string]: unknown
 }
 

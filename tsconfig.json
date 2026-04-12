@@ -15,7 +15,6 @@
     "composite": true
   },
   "references": [
-    { "path": "packages/core" },
-    { "path": "packages/ui" }
+    { "path": "packages/core" }
   ]
 }

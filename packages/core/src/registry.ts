@@ -10,16 +10,24 @@ export interface EntityTypeDef {
 // ─── Base Class ───
 
 import type { Trait } from './traits/Trait.js'
+import { EntityTypeTrait } from './traits/EntityTypeTrait.js'
+import { PositionTrait } from './traits/PositionTrait.js'
 
 export abstract class BaseEntityType implements EntityTypeDef {
   abstract type: string
 
   private entities = new Map<EntityId, Trait<any>[]>()
 
-  protected abstract createTraits(world: World, id: EntityId): Trait<any>[]
+  protected createTraits(_world: World, _id: EntityId): Trait<any>[] {
+    return []
+  }
 
   import(world: World, id: EntityId, state: Record<string, unknown>): void {
-    const traits = this.createTraits(world, id)
+    const entityTypeTrait = new EntityTypeTrait(world, id, this.type)
+    const positionTrait = new PositionTrait(world, id)
+    const custom = this.createTraits(world, id)
+    const traits = [entityTypeTrait, positionTrait, ...custom]
+
     for (const t of traits) {
       t.init(state[t.component] as Record<string, unknown> | undefined)
     }
@@ -32,7 +40,7 @@ export abstract class BaseEntityType implements EntityTypeDef {
     if (!traits) return result
     for (const t of traits) {
       const saved = t.save()
-      if (saved) result[t.component] = saved
+      if (saved !== undefined) result[t.component] = saved
     }
     return result
   }

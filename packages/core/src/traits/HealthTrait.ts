@@ -1,3 +1,5 @@
+import { Trait } from './Trait.js'
+
 export class HealthTrait extends Trait<'health'> {
   readonly component = 'health' as const
 

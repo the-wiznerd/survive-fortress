@@ -24,11 +24,11 @@ export abstract class Trait<K extends ComponentName> {
       saved ? { ...d, ...saved } as ComponentTypes[K] : d)
   }
 
-  save(): Record<string, unknown> | undefined {
+  save(): unknown {
     const data = this.data
     const d = this.defaults()
     const changed = Object.keys(d as object).some(
-      key => (data as Record<string, unknown>)[key] !== (d as Record<string, unknown>)[key],
+      key => (data as unknown as Record<string, unknown>)[key] !== (d as unknown as Record<string, unknown>)[key],
     )
     return changed ? { ...data } : undefined
   }

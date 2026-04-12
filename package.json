@@ -12,6 +12,7 @@
     "dev:kill": "lsof -ti :5173 -ti :5174 -ti :5175 | xargs kill -9 2>/dev/null; echo 'Dev servers killed'"
   },
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "tsx": "^4.19.0",
     "typescript": "^5.8.0",
     "unplugin-auto-import": "^21.0.0",
