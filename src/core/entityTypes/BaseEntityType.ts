@@ -4,7 +4,7 @@ export abstract class BaseEntityType {
   abstract type: string
   sortOffset = 0
 
-  protected traits: Trait<any>[] = []
+  readonly traits: Trait<any>[] = []
   position: PositionTraitType
 
   constructor(public world: World, public id: EntityId) {

@@ -48,6 +48,35 @@ renderer.onReady = () => { if (world) renderer.render(world); }
 
 // ─── Input ───
 
+let inspectedCell: { x: number; y: number } | null = null
+let hoveredCell: { x: number; y: number } | null = null
+
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect()
+  const scaleX = canvas.width / rect.width
+  const scaleY = canvas.height / rect.height
+  const cell = renderer.screenToWorld(
+    (e.clientX - rect.left) * scaleX,
+    (e.clientY - rect.top) * scaleY,
+  )
+  inspectedCell = cell
+  updateInspector()
+})
+
+canvas.addEventListener('mousemove', (e) => {
+  const rect = canvas.getBoundingClientRect()
+  const scaleX = canvas.width / rect.width
+  const scaleY = canvas.height / rect.height
+  hoveredCell = renderer.screenToWorld(
+    (e.clientX - rect.left) * scaleX,
+    (e.clientY - rect.top) * scaleY,
+  )
+})
+
+canvas.addEventListener('mouseleave', () => {
+  hoveredCell = null
+})
+
 document.addEventListener('keydown', (e) => {
   switch (e.key) {
     case 'ArrowUp': pendingInput = { type: 'move', dx: 0, dy: -1 }; break
@@ -94,12 +123,73 @@ function updateUI() {
     <div class="stat"><span class="label">Hunger:</span> ${hunger?.current}/${hunger?.max}</div>
     <div class="stat"><span class="label">AP:</span> ${speed?.ap}</div>
   `
+  updateInspector()
+}
+
+// ─── Inspector ───
+
+const inspectorEl = document.getElementById('inspector')!
+
+function getEntitiesAtColumn(x: number, y: number): EntityId[] {
+  const results: EntityId[] = []
+  for (const [id, pos] of world.components.position) {
+    if (pos.x === x && pos.y === y) results.push(id)
+  }
+  return results
+}
+
+function updateInspector() {
+  if (!world || !inspectedCell) {
+    inspectorEl.innerHTML = ''
+    return
+  }
+
+  const { x, y } = inspectedCell
+  const allAtXY = getEntitiesAtColumn(x, y)
+  if (allAtXY.length === 0) {
+    inspectorEl.innerHTML = `<h2>Tile (${x}, ${y})</h2><div class="stat">Empty</div>`
+    return
+  }
+
+  // Find the highest z, then show that z and z-1
+  let maxZ = -Infinity
+  for (const id of allAtXY) {
+    const z = getComponent(world, id, 'position')!.z
+    if (z > maxZ) maxZ = z
+  }
+  const visibleZ = new Set([maxZ, maxZ - 1])
+  const visible = allAtXY.filter(id => visibleZ.has(getComponent(world, id, 'position')!.z))
+  visible.sort((a, b) => getComponent(world, b, 'position')!.z - getComponent(world, a, 'position')!.z)
+
+  let html = `<h2>Tile (${x}, ${y})</h2>`
+  for (const id of visible) {
+    const pos = getComponent(world, id, 'position')!
+    const typeName = getComponent(world, id, 'entityType')?.type ?? 'unknown'
+    const inst = getComponent(world, id, 'instance')
+
+    html += `<div class="stat" style="margin-top:8px"><strong>${typeName}</strong> <span class="label">z=${pos.z}</span></div>`
+
+    if (inst) {
+      for (const trait of inst.ref.traits) {
+        const defaults = trait.defaults()
+        const keys = Object.keys(defaults as object)
+        const values = keys.map(k => `${k}: ${(trait as unknown as Record<string, unknown>)[k]}`).join(', ')
+        html += `<div class="stat"><span class="label">${trait.component}:</span> ${values}</div>`
+      }
+    }
+  }
+
+  inspectorEl.innerHTML = html
 }
 
 // ─── Animation Loop ───
 
 function animationLoop() {
-  if (world) renderer.render(world)
+  if (world) {
+    renderer.hoveredCell = hoveredCell
+    renderer.selectedCell = inspectedCell
+    renderer.render(world)
+  }
   requestAnimationFrame(animationLoop)
 }
 requestAnimationFrame(animationLoop)

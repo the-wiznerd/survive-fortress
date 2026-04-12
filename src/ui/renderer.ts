@@ -68,9 +68,21 @@ export class Renderer {
   /** Callback invoked when the sprite sheet finishes loading. */
   onReady: (() => void) | null = null
 
+  /** World-space coordinates for hover and selection highlights. */
+  hoveredCell: { x: number; y: number } | null = null
+  selectedCell: { x: number; y: number } | null = null
+
   setCamera(x: number, y: number) {
     this.cameraX = x - Math.floor(this.viewWidth / 2)
     this.cameraY = y - Math.floor(this.viewHeight / 2)
+  }
+
+  /** Convert canvas pixel coordinates to world (x, y). */
+  screenToWorld(canvasX: number, canvasY: number): { x: number; y: number } | null {
+    const sx = Math.floor(canvasX / this.destW)
+    const sy = Math.floor(canvasY / this.rowStep)
+    if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) return null
+    return { x: sx + this.cameraX, y: sy + this.cameraY }
   }
 
   /** Draw a sprite from the sheet at a screen-tile position. */
@@ -141,5 +153,27 @@ export class Renderer {
         }
       }
     }
+
+    // Draw tile highlights after all sprites so they overlay.
+    this.drawTileHighlight(ctx, this.hoveredCell, 'rgba(255, 255, 255, 0.35)')
+    this.drawTileHighlight(ctx, this.selectedCell, 'rgba(135, 206, 235, 0.6)')
+  }
+
+  private drawTileHighlight(
+    ctx: CanvasRenderingContext2D,
+    cell: { x: number; y: number } | null,
+    color: string,
+  ) {
+    if (!cell) return
+    const sx = cell.x - this.cameraX
+    const sy = cell.y - this.cameraY
+    if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) return
+
+    const px = sx * this.destW
+    const py = sy * this.rowStep
+
+    ctx.strokeStyle = color
+    ctx.lineWidth = 2
+    ctx.strokeRect(px + 1, py + 1, this.destW - 2, this.rowStep - 2)
   }
 }
