@@ -6,6 +6,6 @@ export class MoistureTrait extends Trait<'moisture'> {
   }
 
   defaults(): Moisture {
-    return { current: 0, capacity: 100, rate: 1, ...this.overrides }
+    return { current: 0, capacity: 100, rate: 10, ...this.overrides }
   }
 }

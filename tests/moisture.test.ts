@@ -6,7 +6,7 @@ beforeAll(() => {
 })
 
 /** Place a tile with moisture at (x, y). */
-function placeMoist(world: World, x: number, y: number, current: number, capacity = 100, rate = 1) {
+function placeMoist(world: World, x: number, y: number, current: number, capacity = 100, rate = 10) {
   const id = createEntity(world)
   addComponent(world, id, 'position', { x, y, z: 0 })
   addComponent(world, id, 'moisture', { current, capacity, rate })
@@ -16,14 +16,14 @@ function placeMoist(world: World, x: number, y: number, current: number, capacit
 describe('moisture system', () => {
   it('equalizes between two adjacent tiles', () => {
     const world = createWorld()
-    const a = placeMoist(world, 0, 0, 10)
-    const b = placeMoist(world, 1, 0, 0)
+    const a = placeMoist(world, 0, 0, 100, 100, 20)
+    const b = placeMoist(world, 1, 0, 0, 100, 20)
 
     moistureSystem(world)
 
-    // Transfer = min(|10-0|/2, rate=1) = 1  →  A loses 1, B gains 1
-    expect(getComponent(world, a, 'moisture')!.current).toBe(9)
-    expect(getComponent(world, b, 'moisture')!.current).toBe(1)
+    // diff=100, rate=min(20,20)=20, transfer = intDiv(100*20, 200) = 10
+    expect(getComponent(world, a, 'moisture')!.current).toBe(90)
+    expect(getComponent(world, b, 'moisture')!.current).toBe(10)
   })
 
   it('transfers nothing between equal tiles', () => {
@@ -39,38 +39,37 @@ describe('moisture system', () => {
 
   it('is rate-limited by the slower tile', () => {
     const world = createWorld()
-    const a = placeMoist(world, 0, 0, 80, 100, 5)
-    const b = placeMoist(world, 1, 0, 0, 100, 2)
+    const a = placeMoist(world, 0, 0, 80, 100, 50)
+    const b = placeMoist(world, 1, 0, 0, 100, 20)
 
     moistureSystem(world)
 
-    // rate = min(5, 2) = 2; diff/2 = 40; transfer = min(40, 2) = 2
-    expect(getComponent(world, a, 'moisture')!.current).toBe(78)
-    expect(getComponent(world, b, 'moisture')!.current).toBe(2)
+    // diff=80, rate=min(50,20)=20, transfer = intDiv(80*20, 200) = 8
+    expect(getComponent(world, a, 'moisture')!.current).toBe(72)
+    expect(getComponent(world, b, 'moisture')!.current).toBe(8)
   })
 
   it('clamps to capacity', () => {
     const world = createWorld()
     const a = placeMoist(world, 0, 0, 100, 100, 50)
-    const b = placeMoist(world, 1, 0, 90, 92, 50)
+    const b = placeMoist(world, 1, 0, 80, 85, 50)
 
-    // diff = 10, transfer = min(5, 50) = 5  →  B would go to 95 but capacity=92
+    // diff=20, rate=50, transfer = intDiv(20*50, 200) = 5  →  B would go to 85 but capacity=85
     moistureSystem(world)
 
-    expect(getComponent(world, b, 'moisture')!.current).toBe(92)
+    expect(getComponent(world, b, 'moisture')!.current).toBe(85)
   })
 
   it('clamps to zero (no negative moisture)', () => {
     const world = createWorld()
-    const a = placeMoist(world, 0, 0, 1, 100, 50)
-    const b = placeMoist(world, 1, 0, 99, 100, 50)
+    const a = placeMoist(world, 0, 0, 2, 100, 50)
+    const b = placeMoist(world, 1, 0, 100, 100, 50)
 
-    // diff = -98, transfer = min(49, 50) = -49  →  A would go to 50 (gains), but
-    // let's verify the low side: B loses 49 → 50, A gains 49 → 50
+    // diff=-98, transfer = intDiv(-98*50, 200) = -24  →  A gains 24 → 26, B loses 24 → 76
     moistureSystem(world)
 
-    expect(getComponent(world, a, 'moisture')!.current).toBe(50)
-    expect(getComponent(world, b, 'moisture')!.current).toBe(50)
+    expect(getComponent(world, a, 'moisture')!.current).toBe(26)
+    expect(getComponent(world, b, 'moisture')!.current).toBe(76)
   })
 
   it('does not transfer between non-adjacent tiles', () => {
@@ -84,53 +83,72 @@ describe('moisture system', () => {
     expect(getComponent(world, b, 'moisture')!.current).toBe(0)
   })
 
+  it('transfers proportionally to the gradient', () => {
+    const world = createWorld()
+    // Large gradient (isolated pair)
+    const a1 = placeMoist(world, 0, 0, 100, 100, 10)
+    const b1 = placeMoist(world, 1, 0, 0, 100, 10)
+    // Small gradient (isolated pair, far away)
+    const a2 = placeMoist(world, 0, 5, 20, 100, 10)
+    const b2 = placeMoist(world, 1, 5, 0, 100, 10)
+
+    moistureSystem(world)
+
+    // diff=100, transfer = intDiv(100*10, 200) = 5
+    expect(getComponent(world, a1, 'moisture')!.current).toBe(95)
+    expect(getComponent(world, b1, 'moisture')!.current).toBe(5)
+    // diff=20, transfer = intDiv(20*10, 200) = 1
+    expect(getComponent(world, a2, 'moisture')!.current).toBe(19)
+    expect(getComponent(world, b2, 'moisture')!.current).toBe(1)
+  })
+
   it('handles a 3-tile chain with Jacobi (simultaneous) updates', () => {
     const world = createWorld()
-    const a = placeMoist(world, 0, 0, 10, 100, 5)
-    const b = placeMoist(world, 1, 0, 0, 100, 5)
-    const c = placeMoist(world, 2, 0, 0, 100, 5)
+    const a = placeMoist(world, 0, 0, 100, 100, 20)
+    const b = placeMoist(world, 1, 0, 0, 100, 20)
+    const c = placeMoist(world, 2, 0, 0, 100, 20)
 
     moistureSystem(world)
 
-    // Face A↔B: diff=10, transfer = min(5, 5) = 5  → A:-5, B:+5
+    // Face A↔B: diff=100, transfer = intDiv(100*20, 200) = 10  → A:-10, B:+10
     // Face B↔C: diff=0, transfer = 0
-    // Net: A=5, B=5, C=0
-    expect(getComponent(world, a, 'moisture')!.current).toBe(5)
-    expect(getComponent(world, b, 'moisture')!.current).toBe(5)
+    expect(getComponent(world, a, 'moisture')!.current).toBe(90)
+    expect(getComponent(world, b, 'moisture')!.current).toBe(10)
     expect(getComponent(world, c, 'moisture')!.current).toBe(0)
 
-    // Second tick: A↔B diff=0, B↔C diff=5 → transfer=min(2.5, 5)=2.5
+    // Second tick: A↔B diff=80 → intDiv(80*20,200)=8; B↔C diff=10 → intDiv(10*20,200)=1
+    // Net: A: -8 = 82, B: +8-1 = 17, C: +1 = 1
     moistureSystem(world)
 
-    expect(getComponent(world, a, 'moisture')!.current).toBe(5)
-    expect(getComponent(world, b, 'moisture')!.current).toBe(2.5)
-    expect(getComponent(world, c, 'moisture')!.current).toBe(2.5)
+    expect(getComponent(world, a, 'moisture')!.current).toBe(82)
+    expect(getComponent(world, b, 'moisture')!.current).toBe(17)
+    expect(getComponent(world, c, 'moisture')!.current).toBe(1)
   })
 
   it('works on both axes (right and down neighbors)', () => {
     const world = createWorld()
-    //  A(10) — B(0)
+    //  A(100) — B(0)
     //  |
     //  C(0)
-    const a = placeMoist(world, 0, 0, 10)
-    const b = placeMoist(world, 1, 0, 0)
-    const c = placeMoist(world, 0, 1, 0)
+    const a = placeMoist(world, 0, 0, 100, 100, 20)
+    const b = placeMoist(world, 1, 0, 0, 100, 20)
+    const c = placeMoist(world, 0, 1, 0, 100, 20)
 
     moistureSystem(world)
 
-    // A has two faces: A↔B (diff=10, t=1) and A↔C (diff=10, t=1) → net A: -2
-    expect(getComponent(world, a, 'moisture')!.current).toBe(8)
-    expect(getComponent(world, b, 'moisture')!.current).toBe(1)
-    expect(getComponent(world, c, 'moisture')!.current).toBe(1)
+    // A↔B diff=100, transfer=10; A↔C diff=100, transfer=10 → A: -20
+    expect(getComponent(world, a, 'moisture')!.current).toBe(80)
+    expect(getComponent(world, b, 'moisture')!.current).toBe(10)
+    expect(getComponent(world, c, 'moisture')!.current).toBe(10)
   })
 
   it('is perfectly deterministic across runs', () => {
     function runSim() {
       const world = createWorld()
-      placeMoist(world, 0, 0, 100, 100, 3)
-      placeMoist(world, 1, 0, 0, 100, 3)
-      placeMoist(world, 0, 1, 50, 80, 2)
-      placeMoist(world, 1, 1, 20, 60, 4)
+      placeMoist(world, 0, 0, 100, 100, 30)
+      placeMoist(world, 1, 0, 0, 100, 30)
+      placeMoist(world, 0, 1, 50, 80, 20)
+      placeMoist(world, 1, 1, 20, 60, 40)
       for (let i = 0; i < 50; i++) moistureSystem(world)
       return world
     }

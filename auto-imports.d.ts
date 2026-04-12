@@ -38,6 +38,7 @@ declare global {
   const hungerSystem: typeof import('@core/systems/hunger').hungerSystem
   const importChunk: typeof import('@core/serialization').importChunk
   const importWorld: typeof import('@core/serialization').importWorld
+  const intDiv: typeof import('@core/math').intDiv
   const moistureSystem: typeof import('@core/systems/moisture').moistureSystem
   const movementSystem: typeof import('@core/systems/movement').movementSystem
   const parseChunkKey: typeof import('@core/save').parseChunkKey

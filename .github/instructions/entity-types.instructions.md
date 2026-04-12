@@ -129,7 +129,7 @@ export class Dirt extends BaseEntityType {
 
   protected createTraits(world: World, id: EntityId) {
     return [
-      new MoistureTrait(world, id, { current: 0, capacity: 50, rate: 1 }),
+      new MoistureTrait(world, id, { current: 0, capacity: 50, rate: 10 }),
     ]
   }
 

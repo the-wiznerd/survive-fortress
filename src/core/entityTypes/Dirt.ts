@@ -5,7 +5,7 @@ export class Dirt extends BaseEntityType {
 
   protected createTraits(world: World, id: EntityId) {
     return [
-      new MoistureTrait(world, id, { current: 0, capacity: 50, rate: 1 }),
+      new MoistureTrait(world, id, { current: 0, capacity: 50, rate: 10 }),
     ]
   }
 
@@ -15,7 +15,8 @@ export class Dirt extends BaseEntityType {
 
     const pos = getComponent(world, id, 'position')!
     // Don't spawn grass if one already exists above
-    if (getEntitiesAt(world, pos.x, pos.y, pos.z + 1).length > 0) return
+    const above = getEntitiesAt(world, pos.x, pos.y, pos.z + 1)
+    if (above.some(e => getComponent(world, e, 'entityType')?.type === 'grass')) return
 
     const grassId = createEntity(world)
     getEntityTypeDef('grass')!.import(world, grassId, {

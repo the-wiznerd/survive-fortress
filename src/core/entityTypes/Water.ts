@@ -3,7 +3,7 @@ export class Water extends BaseEntityType {
 
   protected createTraits(world: World, id: EntityId) {
     return [
-      new MoistureTrait(world, id, { current: 100, capacity: 100, rate: 10 }),
+      new MoistureTrait(world, id, { current: 100, capacity: 100, rate: 50 }),
     ]
   }
 }
