@@ -1,11 +1,11 @@
 // Side-effect imports: each module self-registers its entity type.
 // Must use @sf/core alias (not relative paths) so they share the same
 // module instances as the auto-imported @sf/core/* functions.
-import '@sf/core/entityTypes/dirt.js'
-import '@sf/core/entityTypes/grass.js'
-import '@sf/core/entityTypes/water.js'
-import '@sf/core/entityTypes/sand.js'
-import '@sf/core/entityTypes/player.js'
+import '@sf/core/entityTypes/Dirt.js'
+import '@sf/core/entityTypes/Grass.js'
+import '@sf/core/entityTypes/Water.js'
+import '@sf/core/entityTypes/Sand.js'
+import '@sf/core/entityTypes/Player.js'
 import { Renderer } from './renderer.js'
 
 // ─── Game State ───
@@ -15,7 +15,7 @@ let playerId: EntityId
 let pendingInput: Action | null = null
 
 const SAVE_PATH = '/saves/test-world'
-const TICK_INTERVAL = 1000 // ms per game tick
+const TICK_INTERVAL_MS = 1000
 
 async function init() {
   // Load world manifest.
@@ -77,7 +77,7 @@ function gameTick() {
   updateUI()
 }
 
-setInterval(gameTick, TICK_INTERVAL)
+setInterval(gameTick, TICK_INTERVAL_MS)
 
 // ─── UI ───
 

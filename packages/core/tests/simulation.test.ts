@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 
 // Side-effect imports: each module self-registers its entity type.
-import '../src/entityTypes/player.js'
+import '../src/entityTypes/Player.js'
 
 /** Convenience: spawn a player at (x, y) using the registry. */
 function spawnPlayer(world: ReturnType<typeof createWorld>, x: number, y: number) {

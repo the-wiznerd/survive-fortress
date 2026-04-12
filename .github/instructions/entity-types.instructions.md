@@ -84,7 +84,7 @@ export class MoistureTrait extends Trait<'moisture'> {
 
 ### Creating a new trait
 
-1. Create `packages/core/src/traits/<name>.ts`.
+1. Create `packages/core/src/traits/<Name>Trait.ts` (capitalized to match the class name).
 2. Extend `Trait<'componentName'>`.
 3. Set `readonly component = 'componentName' as const`.
 4. Implement `defaults()` returning the component's data shape.
@@ -103,7 +103,7 @@ Systems are global functions that process all entities with certain components. 
 
 ### Creating a new system
 
-1. Create `packages/core/src/systems/<name>.ts`.
+1. Create `packages/core/src/systems/<name>.ts` (camelCase — systems export functions, not classes).
 2. Export a `const mySystem: System = (world) => { ... }`.
 3. Add it to `defaultSystems` in `tick.ts` (order matters — systems before `entityTypeTickSystem`).
 4. Add the system to `coreImports` in `vitest.config.ts`.
@@ -171,7 +171,7 @@ registerEntityType(new Player())
 
 ### Creating a new entity type
 
-1. Create `packages/core/src/entityTypes/<name>.ts`.
+1. Create `packages/core/src/entityTypes/<Name>.ts` (capitalized to match the class name).
 2. Extend `BaseEntityType`.
 3. Set `type = '<name>'`.
 4. Implement `createTraits()` — return an array of trait instances.
@@ -185,7 +185,7 @@ registerEntityType(new Player())
 Each entity type file calls `registerEntityType(new ClassName())` at **module scope** (bottom of file). Consumers add a **side-effect import** to trigger registration:
 
 ```ts
-import '@sf/core/entityTypes/dirt.js'
+import '@sf/core/entityTypes/Dirt.js'
 ```
 
 ## Accessing traits from entity type ticks

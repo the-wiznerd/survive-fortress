@@ -1,4 +1,4 @@
-export const moistureSystem: System = (world) => {
+export function moistureSystem(world: World) {
   const processed = new Set<string>()
 
   for (const id of queryEntities(world, 'moisture', 'position')) {

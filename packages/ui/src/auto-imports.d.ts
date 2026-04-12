@@ -7,12 +7,12 @@
 export {}
 declare global {
   const BaseEntityType: typeof import('@sf/core/registry').BaseEntityType
-  const HealthTrait: typeof import('@sf/core/traits/health').HealthTrait
-  const HungerTrait: typeof import('@sf/core/traits/hunger').HungerTrait
-  const MoistureTrait: typeof import('@sf/core/traits/moisture').MoistureTrait
-  const PlayerControlledTrait: typeof import('@sf/core/traits/playerControlled').PlayerControlledTrait
-  const SpeedTrait: typeof import('@sf/core/traits/speed').SpeedTrait
-  const Trait: typeof import('@sf/core/traits/trait').Trait
+  const HealthTrait: typeof import('@sf/core/traits/HealthTrait').HealthTrait
+  const HungerTrait: typeof import('@sf/core/traits/HungerTrait').HungerTrait
+  const MoistureTrait: typeof import('@sf/core/traits/MoistureTrait').MoistureTrait
+  const PlayerControlledTrait: typeof import('@sf/core/traits/PlayerControlledTrait').PlayerControlledTrait
+  const SpeedTrait: typeof import('@sf/core/traits/SpeedTrait').SpeedTrait
+  const Trait: typeof import('@sf/core/traits/Trait').Trait
   const addComponent: typeof import('@sf/core/ecs').addComponent
   const chunkKey: typeof import('@sf/core/save').chunkKey
   const createEntity: typeof import('@sf/core/ecs').createEntity

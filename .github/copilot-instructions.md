@@ -35,3 +35,18 @@ When you add a new public function or type to `@sf/core`:
 
 - No trailing semicolons in `.ts` files.
 - Use `nvm use 22` before any yarn/node commands — the default system Node is too old.
+
+### File & Directory Organization
+
+- **Split unrelated but similar code into separate files** in a single directory. One class/system/trait per file. No barrel files (`index.ts`) — use sub-path exports or side-effect imports instead.
+- **File names match the class they contain**, including capitalization. `Dirt.ts` exports `class Dirt`, `MoistureTrait.ts` exports `class MoistureTrait`. Files that export only non-class values (functions, constants) use camelCase: `moisture.ts`, `movement.ts`.
+- **Directory names use camelCase or PascalCase**, matching JS naming conventions. No snake_case: `entityTypes/`, `traits/`, not `entity_types/`, `trait_files/`.
+
+### Functions
+
+- **Prefer `function` declarations** over arrow-const at the top scope: `export function foo()` not `export const foo = () =>`.
+- Arrow functions are fine for anonymous callbacks, inline lambdas, and functions defined inside another function.
+
+### Naming
+
+- **Include units in variable names** when the value has an implicit unit. `durationMs` not `duration`, `tickIntervalMs` not `tickInterval`, `distanceTiles` not `distance`. Unitless values (counts, ratios, enums) don't need suffixes.

@@ -5,7 +5,7 @@ import type * as Ecs from './ecs.js'
 import type * as Tick from './tick.js'
 import type * as Save from './save.js'
 import type * as Registry from './registry.js'
-import type * as TraitBase from './traits/trait.js'
+import type * as TraitBase from './traits/Trait.js'
 
 declare global {
   // ECS

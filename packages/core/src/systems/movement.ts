@@ -1,4 +1,4 @@
-export const movementSystem: System = (world) => {
+export function movementSystem(world: World) {
   const MOVE_COST = 10
 
   for (const id of queryEntities(world, 'speed', 'position')) {

@@ -1,4 +1,4 @@
-export const hungerSystem: System = (world) => {
+export function hungerSystem(world: World) {
   for (const id of queryEntities(world, 'hunger')) {
     const hunger = getComponent(world, id, 'hunger')!
     hunger.current = Math.max(0, hunger.current - hunger.drainPerTick)

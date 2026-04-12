@@ -9,7 +9,7 @@ export interface EntityTypeDef {
 
 // ─── Base Class ───
 
-import type { Trait } from './traits/trait.js'
+import type { Trait } from './traits/Trait.js'
 
 export abstract class BaseEntityType implements EntityTypeDef {
   abstract type: string
