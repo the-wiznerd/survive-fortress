@@ -2,34 +2,31 @@
 
 ## Auto-Imports & Global Types — No Explicit Imports
 
-This project uses `unplugin-auto-import` and a global `types.d.ts` so that **all `@sf/core` values and types are available globally** without any imports.
+This project uses `unplugin-auto-import` and a global `types.d.ts` so that **all core values and types are available globally** without any imports.
 
 ### Rules
 
-- **Do not add `import` statements for `@sf/core` values or types.** They are globally available via auto-imports and `types.d.ts` in all files (core, ui, and tests).
-- `@sf/core/*` sub-paths are excluded from Vite's dependency pre-bundling (`optimizeDeps.exclude`) so the auto-import plugin can transform them.
-- The generated `auto-imports.d.ts` files provide IDE support. They are generated automatically by vitest/vite — do not hand-edit them.
+- **Do not add `import` statements for core values or types.** They are globally available via auto-imports and `types.d.ts` in all files (core, ui, and tests).
+- The generated `auto-imports.d.ts` file provides IDE support. It is generated automatically by vitest/vite — do not hand-edit it.
 
 ### What still needs explicit imports
 
-- **Side-effect imports** for entity type self-registration (e.g. `import '../../core/src/entityTypes/dirt.js'`). These trigger the module so `registerEntityType()` runs.
 - **Third-party libraries** like `vitest` (`import { describe, it, expect } from 'vitest'`).
 - **Local non-core modules** like `import { Renderer } from './renderer.js'`.
 
 ### How it works
 
-- `vitest.config.ts` exports a `coreImports` map that lists every public value from `@sf/core/*` sub-paths.
-- Both `vitest.config.ts` and `packages/ui/vite.config.ts` feed this map to `unplugin-auto-import`.
-- `packages/core/src/types.d.ts` uses `declare global` to make all `@sf/core` types ambient.
-- `@sf/core` has no barrel `index.ts` — package.json `exports` map to sub-paths (`./ecs`, `./tick`, `./registry`, `./save`, `./serialization`).
+- `vite.config.ts` uses `scanExports()` to discover all exports from `src/core/` and its subdirectories.
+- The export map is fed to `unplugin-auto-import`, which injects imports automatically at build time.
+- `src/core/types.d.ts` uses `declare global` to make all core types ambient.
 
 ### Adding new exports
 
-When you add a new public function or type to `@sf/core`:
+When you add a new public function or type to `src/core/`:
 1. Export it from the relevant source file as usual.
-2. If it's a **value**: add it to the `coreImports` map in `vitest.config.ts`.
-3. If it's a **type**: add a corresponding `type X = Module.X` entry in `packages/core/src/types.d.ts`.
-4. Run `yarn test` once to regenerate the `auto-imports.d.ts` files.
+2. If it's a **type**: add a corresponding `type X = Module.X` entry in `src/core/types.d.ts`.
+3. **Values** are auto-discovered by `scanExports()` — no manual config changes needed.
+4. Run `yarn test` once to regenerate the `auto-imports.d.ts` file.
 
 ## Style
 

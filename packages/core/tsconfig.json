@@ -1,4 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "include": ["src", "../../auto-imports.d.ts"]
-}

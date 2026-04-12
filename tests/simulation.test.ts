@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest'
-import { Player } from '../src/entityTypes/Player.js'
 
 registerEntityType(new Player())
 

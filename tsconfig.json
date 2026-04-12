@@ -9,6 +9,10 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true
-  }
+    "noEmit": true,
+    "paths": {
+      "@core/*": ["./src/core/*"]
+    }
+  },
+  "include": ["src", "tests", "auto-imports.d.ts"]
 }

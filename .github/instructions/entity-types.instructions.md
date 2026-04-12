@@ -1,5 +1,5 @@
 ---
-applyTo: "packages/core/src/entityTypes/**"
+applyTo: "src/core/entityTypes/**"
 description: "Entity type definition pattern — how to create new entity types using composition, the EntityTypeDef interface, and self-registration. Use when creating, modifying, or reviewing entity type classes."
 ---
 
@@ -84,7 +84,7 @@ export class MoistureTrait extends Trait<'moisture'> {
 
 ### Creating a new trait
 
-1. Create `packages/core/src/traits/<Name>Trait.ts` (capitalized to match the class name).
+1. Create `src/core/traits/<Name>Trait.ts` (capitalized to match the class name).
 2. Extend `Trait<'componentName'>`.
 3. Set `readonly component = 'componentName' as const`.
 4. Implement `defaults()` returning the component's data shape.
@@ -102,7 +102,7 @@ Systems are global functions that process all entities with certain components. 
 
 ### Creating a new system
 
-1. Create `packages/core/src/systems/<name>.ts` (camelCase — systems export functions, not classes).
+1. Create `src/core/systems/<name>.ts` (camelCase — systems export functions, not classes).
 2. Export a `const mySystem: System = (world) => { ... }`.
 3. Add it to `defaultSystems` in `tick.ts` (order matters — systems before `entityTypeTickSystem`).
 4. **Do not add any import statements.**
@@ -163,7 +163,7 @@ export class Player extends BaseEntityType {
 
 ### Creating a new entity type
 
-1. Create `packages/core/src/entityTypes/<Name>.ts` (capitalized to match the class name).
+1. Create `src/core/entityTypes/<Name>.ts` (capitalized to match the class name).
 2. Extend `BaseEntityType`.
 3. Set `type = '<name>'`.
 4. Implement `createTraits()` — return an array of trait instances.
@@ -176,9 +176,10 @@ export class Player extends BaseEntityType {
 Entity types are registered explicitly at startup — **not** via side effects in the entity type file. Import the class and register it where needed:
 
 ```ts
-import { Dirt } from '@sf/core/entityTypes/Dirt.js'
 registerEntityType(new Dirt())
 ```
+
+(Entity type classes are auto-imported — no explicit import needed.)
 
 ## Accessing traits from entity type ticks
 
