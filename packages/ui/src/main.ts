@@ -1,8 +1,8 @@
-import { Dirt } from '@sf/core/entityTypes/Dirt.js'
-import { Grass } from '@sf/core/entityTypes/Grass.js'
-import { Water } from '@sf/core/entityTypes/Water.js'
-import { Sand } from '@sf/core/entityTypes/Sand.js'
-import { Player } from '@sf/core/entityTypes/Player.js'
+import { Dirt } from '@sf/core/entityTypes/Dirt'
+import { Grass } from '@sf/core/entityTypes/Grass'
+import { Water } from '@sf/core/entityTypes/Water'
+import { Sand } from '@sf/core/entityTypes/Sand'
+import { Player } from '@sf/core/entityTypes/Player'
 import { Renderer } from './renderer.js'
 
 registerEntityType(new Dirt())
