@@ -1,2 +1,2 @@
-import '../src/entityTypes/Player.js';
+export {};
 //# sourceMappingURL=simulation.test.d.ts.map

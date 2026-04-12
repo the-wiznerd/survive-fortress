@@ -1,12 +1,14 @@
-// Side-effect imports: each module self-registers its entity type.
-// Must use @sf/core alias (not relative paths) so they share the same
-// module instances as the auto-imported @sf/core/* functions.
-import '@sf/core/entityTypes/Dirt.js';
-import '@sf/core/entityTypes/Grass.js';
-import '@sf/core/entityTypes/Water.js';
-import '@sf/core/entityTypes/Sand.js';
-import '@sf/core/entityTypes/Player.js';
+import { Dirt } from '@sf/core/entityTypes/Dirt.js';
+import { Grass } from '@sf/core/entityTypes/Grass.js';
+import { Water } from '@sf/core/entityTypes/Water.js';
+import { Sand } from '@sf/core/entityTypes/Sand.js';
+import { Player } from '@sf/core/entityTypes/Player.js';
 import { Renderer } from './renderer.js';
+registerEntityType(new Dirt());
+registerEntityType(new Grass());
+registerEntityType(new Water());
+registerEntityType(new Sand());
+registerEntityType(new Player());
 // ─── Game State ───
 let world;
 let playerId;

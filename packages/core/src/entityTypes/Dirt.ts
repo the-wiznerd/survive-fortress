@@ -1,3 +1,5 @@
+import { BaseEntityType } from '../registry.js'
+
 const GRASS_THRESHOLD = 3
 
 export class Dirt extends BaseEntityType {
@@ -18,5 +20,3 @@ export class Dirt extends BaseEntityType {
     }
   }
 }
-
-registerEntityType(new Dirt())

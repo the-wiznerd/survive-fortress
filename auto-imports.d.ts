@@ -6,42 +6,61 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-  const BaseEntityType: typeof import('@sf/core/registry').BaseEntityType
-  const EntityTypeTrait: typeof import('@sf/core/traits/EntityTypeTrait').EntityTypeTrait
-  const HealthTrait: typeof import('@sf/core/traits/HealthTrait').HealthTrait
-  const HungerTrait: typeof import('@sf/core/traits/HungerTrait').HungerTrait
-  const MoistureTrait: typeof import('@sf/core/traits/MoistureTrait').MoistureTrait
-  const PlayerControlledTrait: typeof import('@sf/core/traits/PlayerControlledTrait').PlayerControlledTrait
-  const PositionTrait: typeof import('@sf/core/traits/PositionTrait').PositionTrait
-  const SpeedTrait: typeof import('@sf/core/traits/SpeedTrait').SpeedTrait
-  const Trait: typeof import('@sf/core/traits/Trait').Trait
-  const addComponent: typeof import('@sf/core/ecs').addComponent
-  const buildFaces2d: typeof import('@sf/core/faces').buildFaces2d
-  const buildFaces3d: typeof import('@sf/core/faces').buildFaces3d
-  const chunkKey: typeof import('@sf/core/save').chunkKey
-  const createEntity: typeof import('@sf/core/ecs').createEntity
-  const createWorld: typeof import('@sf/core/ecs').createWorld
-  const entityTypeTickSystem: typeof import('@sf/core/systems/entityTypeTick').entityTypeTickSystem
-  const exportChunk: typeof import('@sf/core/serialization').exportChunk
-  const exportComponents: typeof import('@sf/core/registry').exportComponents
-  const exportManifest: typeof import('@sf/core/serialization').exportManifest
-  const getComponent: typeof import('@sf/core/ecs').getComponent
-  const getEntitiesAt: typeof import('@sf/core/ecs').getEntitiesAt
-  const getEntityTypeDef: typeof import('@sf/core/registry').getEntityTypeDef
-  const getNeighborCoords: typeof import('@sf/core/ecs').getNeighborCoords
-  const getRegisteredTypes: typeof import('@sf/core/registry').getRegisteredTypes
-  const hasComponent: typeof import('@sf/core/ecs').hasComponent
-  const hasTerrainAt: typeof import('@sf/core/ecs').hasTerrainAt
-  const hungerSystem: typeof import('@sf/core/systems/hunger').hungerSystem
-  const importChunk: typeof import('@sf/core/serialization').importChunk
-  const importComponents: typeof import('@sf/core/registry').importComponents
-  const importWorld: typeof import('@sf/core/serialization').importWorld
-  const moistureSystem: typeof import('@sf/core/systems/moisture').moistureSystem
-  const movementSystem: typeof import('@sf/core/systems/movement').movementSystem
-  const parseChunkKey: typeof import('@sf/core/save').parseChunkKey
-  const queryEntities: typeof import('@sf/core/ecs').queryEntities
-  const registerEntityType: typeof import('@sf/core/registry').registerEntityType
-  const removeEntity: typeof import('@sf/core/ecs').removeEntity
-  const simulate: typeof import('@sf/core/tick').simulate
-  const tick: typeof import('@sf/core/tick').tick
+  const EntityTypeTrait: typeof import('./packages/core/src/traits/EntityTypeTrait').EntityTypeTrait
+  const HealthTrait: typeof import('./packages/core/src/traits/HealthTrait').HealthTrait
+  const HungerTrait: typeof import('./packages/core/src/traits/HungerTrait').HungerTrait
+  const MoistureTrait: typeof import('./packages/core/src/traits/MoistureTrait').MoistureTrait
+  const PlayerControlledTrait: typeof import('./packages/core/src/traits/PlayerControlledTrait').PlayerControlledTrait
+  const PositionTrait: typeof import('./packages/core/src/traits/PositionTrait').PositionTrait
+  const SpeedTrait: typeof import('./packages/core/src/traits/SpeedTrait').SpeedTrait
+  const addComponent: typeof import('./packages/core/src/ecs').addComponent
+  const buildFaces2d: typeof import('./packages/core/src/faces').buildFaces2d
+  const buildFaces3d: typeof import('./packages/core/src/faces').buildFaces3d
+  const chunkKey: typeof import('./packages/core/src/save').chunkKey
+  const createEntity: typeof import('./packages/core/src/ecs').createEntity
+  const createWorld: typeof import('./packages/core/src/ecs').createWorld
+  const entityTypeTickSystem: typeof import('./packages/core/src/systems/entityTypeTick').entityTypeTickSystem
+  const exportChunk: typeof import('./packages/core/src/serialization').exportChunk
+  const exportManifest: typeof import('./packages/core/src/serialization').exportManifest
+  const getComponent: typeof import('./packages/core/src/ecs').getComponent
+  const getEntitiesAt: typeof import('./packages/core/src/ecs').getEntitiesAt
+  const getEntityTypeDef: typeof import('./packages/core/src/registry').getEntityTypeDef
+  const getNeighborCoords: typeof import('./packages/core/src/ecs').getNeighborCoords
+  const getRegisteredTypes: typeof import('./packages/core/src/registry').getRegisteredTypes
+  const hasComponent: typeof import('./packages/core/src/ecs').hasComponent
+  const hungerSystem: typeof import('./packages/core/src/systems/hunger').hungerSystem
+  const importChunk: typeof import('./packages/core/src/serialization').importChunk
+  const importWorld: typeof import('./packages/core/src/serialization').importWorld
+  const moistureSystem: typeof import('./packages/core/src/systems/moisture').moistureSystem
+  const movementSystem: typeof import('./packages/core/src/systems/movement').movementSystem
+  const parseChunkKey: typeof import('./packages/core/src/save').parseChunkKey
+  const queryEntities: typeof import('./packages/core/src/ecs').queryEntities
+  const registerEntityType: typeof import('./packages/core/src/registry').registerEntityType
+  const removeEntity: typeof import('./packages/core/src/ecs').removeEntity
+  const simulate: typeof import('./packages/core/src/tick').simulate
+  const tick: typeof import('./packages/core/src/tick').tick
+}
+// for type re-export
+declare global {
+  // @ts-ignore
+  export type { EntityTypeTrait } from './packages/core/src/traits/EntityTypeTrait'
+  import('./packages/core/src/traits/EntityTypeTrait')
+  // @ts-ignore
+  export type { HealthTrait } from './packages/core/src/traits/HealthTrait'
+  import('./packages/core/src/traits/HealthTrait')
+  // @ts-ignore
+  export type { HungerTrait } from './packages/core/src/traits/HungerTrait'
+  import('./packages/core/src/traits/HungerTrait')
+  // @ts-ignore
+  export type { MoistureTrait } from './packages/core/src/traits/MoistureTrait'
+  import('./packages/core/src/traits/MoistureTrait')
+  // @ts-ignore
+  export type { PlayerControlledTrait } from './packages/core/src/traits/PlayerControlledTrait'
+  import('./packages/core/src/traits/PlayerControlledTrait')
+  // @ts-ignore
+  export type { PositionTrait } from './packages/core/src/traits/PositionTrait'
+  import('./packages/core/src/traits/PositionTrait')
+  // @ts-ignore
+  export type { SpeedTrait } from './packages/core/src/traits/SpeedTrait'
+  import('./packages/core/src/traits/SpeedTrait')
 }

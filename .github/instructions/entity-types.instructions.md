@@ -89,8 +89,7 @@ export class MoistureTrait extends Trait<'moisture'> {
 3. Set `readonly component = 'componentName' as const`.
 4. Implement `defaults()` returning the component's data shape.
 5. Add constructor overrides if different entity types need different defaults.
-6. Add the trait class to `coreImports` in `vitest.config.ts`.
-7. **Do not add any import statements** — all `@sf/core` values and types are globally available.
+6. **Do not add any import statements** — all `@sf/core` values and types are globally available via auto-import (`dirs` scanning) or `declare global` in `types.d.ts`.
 
 ## Systems
 
@@ -106,8 +105,7 @@ Systems are global functions that process all entities with certain components. 
 1. Create `packages/core/src/systems/<name>.ts` (camelCase — systems export functions, not classes).
 2. Export a `const mySystem: System = (world) => { ... }`.
 3. Add it to `defaultSystems` in `tick.ts` (order matters — systems before `entityTypeTickSystem`).
-4. Add the system to `coreImports` in `vitest.config.ts`.
-5. **Do not add any import statements.**
+4. **Do not add any import statements.**
 
 ## Entity Types
 
@@ -121,8 +119,6 @@ export class Grass extends BaseEntityType {
     return []
   }
 }
-
-registerEntityType(new Grass())
 ```
 
 ### Entity with traits
@@ -146,8 +142,6 @@ export class Dirt extends BaseEntityType {
     }
   }
 }
-
-registerEntityType(new Dirt())
 ```
 
 ### Complex entity with many traits
@@ -165,8 +159,6 @@ export class Player extends BaseEntityType {
     ]
   }
 }
-
-registerEntityType(new Player())
 ```
 
 ### Creating a new entity type
@@ -176,16 +168,17 @@ registerEntityType(new Player())
 3. Set `type = '<name>'`.
 4. Implement `createTraits()` — return an array of trait instances.
 5. Optionally add `tick()` for per-entity behavior (Phase 2).
-6. Call `registerEntityType(new ClassName())` at the bottom of the file.
-7. Add a side-effect import in consumers (`main.ts`, test files) that need this type.
-8. **Do not add any import statements** — all `@sf/core` values and types are globally available.
+6. Add `import { BaseEntityType } from '../registry.js'` — the only import needed (abstract classes aren't auto-imported).
+7. Register explicitly at startup: import the class and call `registerEntityType(new ClassName())` in `main.ts` and test files.
+8. **No other imports needed** — all `@sf/core` values and types are globally available.
 
-## Self-Registration
+## Registration
 
-Each entity type file calls `registerEntityType(new ClassName())` at **module scope** (bottom of file). Consumers add a **side-effect import** to trigger registration:
+Entity types are registered explicitly at startup — **not** via side effects in the entity type file. Import the class and register it where needed:
 
 ```ts
-import '@sf/core/entityTypes/Dirt.js'
+import { Dirt } from '@sf/core/entityTypes/Dirt.js'
+registerEntityType(new Dirt())
 ```
 
 ## Accessing traits from entity type ticks

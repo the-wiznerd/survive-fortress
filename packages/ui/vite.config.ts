@@ -1,23 +1,26 @@
 import { defineConfig } from 'vite'
 import path from 'node:path'
 import AutoImport from 'unplugin-auto-import/vite'
-import { coreImports } from '../../vitest.config'
+
+const coreSrc = path.resolve(import.meta.dirname, '../core/src')
 
 export default defineConfig({
   resolve: {
     alias: {
-      '@sf/core': path.resolve(import.meta.dirname, '../core/src'),
+      '@sf/core': coreSrc,
     },
   },
   plugins: [
     AutoImport({
-      imports: Object.entries(coreImports).map(([from, names]) => ({ [from]: names })),
+      dirs: [
+        coreSrc,
+        `${coreSrc}/traits`,
+        `${coreSrc}/systems`,
+      ],
+      dirsScanOptions: { types: false },
       dts: path.resolve(import.meta.dirname, 'src/auto-imports.d.ts'),
     }),
   ],
-  optimizeDeps: {
-    exclude: Object.keys(coreImports),
-  },
   server: {
     port: 5173,
     open: false,
