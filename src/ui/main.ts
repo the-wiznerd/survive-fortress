@@ -151,14 +151,15 @@ function updateInspector() {
     return
   }
 
-  // Find the highest z, then show that z and z-1
-  let maxZ = -Infinity
+  // Show the top terrain cube and everything on or above it.
+  // The top terrain is the lowest z in the column (the ground block).
+  // Once underground layers exist, this will filter out hidden sub-surface entities.
+  let groundZ = Infinity
   for (const id of allAtXY) {
     const z = getComponent(world, id, 'position')!.z
-    if (z > maxZ) maxZ = z
+    if (z < groundZ) groundZ = z
   }
-  const visibleZ = new Set([maxZ, maxZ - 1])
-  const visible = allAtXY.filter(id => visibleZ.has(getComponent(world, id, 'position')!.z))
+  const visible = allAtXY.filter(id => getComponent(world, id, 'position')!.z >= groundZ)
   visible.sort((a, b) => getComponent(world, b, 'position')!.z - getComponent(world, a, 'position')!.z)
 
   let html = `<h2>Tile (${x}, ${y})</h2>`
