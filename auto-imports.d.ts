@@ -6,7 +6,7 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-  const BaseEntityType: typeof import('@sf/core/entityTypes/BaseEntityType').BaseEntityType
+  const BaseEntityType: typeof import('./packages/core/src/entityTypes/BaseEntityType').BaseEntityType
   const Dirt: typeof import('./packages/core/src/entityTypes/Dirt').Dirt
   const EntityTypeTrait: typeof import('./packages/core/src/traits/EntityTypeTrait').EntityTypeTrait
   const Grass: typeof import('./packages/core/src/entityTypes/Grass').Grass
@@ -18,7 +18,7 @@ declare global {
   const PositionTrait: typeof import('./packages/core/src/traits/PositionTrait').PositionTrait
   const Sand: typeof import('./packages/core/src/entityTypes/Sand').Sand
   const SpeedTrait: typeof import('./packages/core/src/traits/SpeedTrait').SpeedTrait
-  const Trait: typeof import('@sf/core/traits/Trait').Trait
+  const Trait: typeof import('./packages/core/src/traits/Trait').Trait
   const Water: typeof import('./packages/core/src/entityTypes/Water').Water
   const addComponent: typeof import('./packages/core/src/ecs').addComponent
   const buildFaces2d: typeof import('./packages/core/src/faces').buildFaces2d
@@ -46,43 +46,4 @@ declare global {
   const removeEntity: typeof import('./packages/core/src/ecs').removeEntity
   const simulate: typeof import('./packages/core/src/tick').simulate
   const tick: typeof import('./packages/core/src/tick').tick
-}
-// for type re-export
-declare global {
-  // @ts-ignore
-  export type { EntityTypeTrait } from './packages/core/src/traits/EntityTypeTrait'
-  import('./packages/core/src/traits/EntityTypeTrait')
-  // @ts-ignore
-  export type { HealthTrait } from './packages/core/src/traits/HealthTrait'
-  import('./packages/core/src/traits/HealthTrait')
-  // @ts-ignore
-  export type { HungerTrait } from './packages/core/src/traits/HungerTrait'
-  import('./packages/core/src/traits/HungerTrait')
-  // @ts-ignore
-  export type { MoistureTrait } from './packages/core/src/traits/MoistureTrait'
-  import('./packages/core/src/traits/MoistureTrait')
-  // @ts-ignore
-  export type { PlayerControlledTrait } from './packages/core/src/traits/PlayerControlledTrait'
-  import('./packages/core/src/traits/PlayerControlledTrait')
-  // @ts-ignore
-  export type { PositionTrait } from './packages/core/src/traits/PositionTrait'
-  import('./packages/core/src/traits/PositionTrait')
-  // @ts-ignore
-  export type { SpeedTrait } from './packages/core/src/traits/SpeedTrait'
-  import('./packages/core/src/traits/SpeedTrait')
-  // @ts-ignore
-  export type { Dirt } from './packages/core/src/entityTypes/Dirt'
-  import('./packages/core/src/entityTypes/Dirt')
-  // @ts-ignore
-  export type { Grass } from './packages/core/src/entityTypes/Grass'
-  import('./packages/core/src/entityTypes/Grass')
-  // @ts-ignore
-  export type { Player } from './packages/core/src/entityTypes/Player'
-  import('./packages/core/src/entityTypes/Player')
-  // @ts-ignore
-  export type { Sand } from './packages/core/src/entityTypes/Sand'
-  import('./packages/core/src/entityTypes/Sand')
-  // @ts-ignore
-  export type { Water } from './packages/core/src/entityTypes/Water'
-  import('./packages/core/src/entityTypes/Water')
 }

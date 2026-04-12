@@ -9,12 +9,6 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "composite": true
-  },
-  "references": [
-    { "path": "packages/core" }
-  ]
+    "noEmit": true
+  }
 }

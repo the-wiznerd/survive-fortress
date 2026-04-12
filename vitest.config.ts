@@ -1,8 +1,16 @@
 import { defineConfig } from 'vitest/config'
 import path from 'node:path'
 import AutoImport from 'unplugin-auto-import/vite'
+import { scanExports } from './scanExports'
 
 const coreSrc = path.resolve(import.meta.dirname, 'packages/core/src')
+
+const coreImports = scanExports([
+  coreSrc,
+  `${coreSrc}/traits`,
+  `${coreSrc}/systems`,
+  `${coreSrc}/entityTypes`,
+], import.meta.dirname)
 
 export default defineConfig({
   resolve: {
@@ -12,17 +20,7 @@ export default defineConfig({
   },
   plugins: [
     AutoImport({
-      imports: [
-        { '@sf/core/entityTypes/BaseEntityType': ['BaseEntityType'] },
-        { '@sf/core/traits/Trait': ['Trait'] },
-      ],
-      dirs: [
-        coreSrc,
-        `${coreSrc}/traits`,
-        `${coreSrc}/systems`,
-        `${coreSrc}/entityTypes`,
-      ],
-      dirsScanOptions: { types: false },
+      imports: [coreImports],
       dts: path.resolve(import.meta.dirname, 'auto-imports.d.ts'),
     }) as any,
   ],

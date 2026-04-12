@@ -1,14 +1,9 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist",
-    "composite": false,
-    "declaration": false,
-    "declarationMap": false
+    "paths": {
+      "@sf/core/*": ["../core/src/*"]
+    }
   },
-  "include": ["src", "../core/src/types.d.ts"],
-  "references": [
-    { "path": "../core" }
-  ]
+  "include": ["src", "../core/src/types.d.ts", "../../auto-imports.d.ts"]
 }
