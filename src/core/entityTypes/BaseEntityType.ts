@@ -1,9 +1,11 @@
+import type { PositionTrait as PositionTraitType } from '../traits/PositionTrait.js'
+
 export abstract class BaseEntityType {
   abstract type: string
   sortOffset = 0
 
   protected traits: Trait<any>[] = []
-  position: Trait<'position'>
+  position: PositionTraitType
 
   constructor(public world: World, public id: EntityId) {
     this.position = this.addTrait(new PositionTrait(world, id))

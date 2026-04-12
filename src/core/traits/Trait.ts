@@ -10,26 +10,23 @@ export abstract class Trait<K extends ComponentName> {
 
   abstract defaults(): ComponentTypes[K]
 
-  get data(): ComponentTypes[K] {
-    return getComponent(this.world, this.entityId, this.component)!
-  }
-
-  get position(): Position {
-    return getComponent(this.world, this.entityId, 'position')!
-  }
-
   init(saved?: Record<string, unknown>): void {
     const d = this.defaults()
-    addComponent(this.world, this.entityId, this.component,
-      saved ? { ...d, ...saved } as ComponentTypes[K] : d)
+    Object.assign(this, d, saved)
+    addComponent(this.world, this.entityId, this.component, this as unknown as ComponentTypes[K])
   }
 
   save(): unknown {
-    const data = this.data
     const d = this.defaults()
-    const changed = Object.keys(d as object).some(
-      key => (data as unknown as Record<string, unknown>)[key] !== (d as unknown as Record<string, unknown>)[key],
+    const keys = Object.keys(d as object)
+    const changed = keys.some(
+      key => (this as unknown as Record<string, unknown>)[key] !== (d as unknown as Record<string, unknown>)[key],
     )
-    return changed ? { ...data } : undefined
+    if (!changed) return undefined
+    const result: Record<string, unknown> = {}
+    for (const key of keys) {
+      result[key] = (this as unknown as Record<string, unknown>)[key]
+    }
+    return result
   }
 }

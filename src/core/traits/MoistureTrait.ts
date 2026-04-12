@@ -1,5 +1,8 @@
 export class MoistureTrait extends Trait<'moisture'> {
   readonly component = 'moisture' as const
+  declare current: number
+  declare capacity: number
+  declare rate: number
 
   constructor(world: World, entityId: EntityId, private overrides: Partial<Moisture> = {}) {
     super(world, entityId)

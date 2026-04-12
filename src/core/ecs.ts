@@ -104,8 +104,9 @@ export function addComponent<K extends ComponentName>(
   entity: EntityId,
   name: K,
   data: ComponentTypes[K],
-): void {
+): ComponentTypes[K] {
   world.components[name].set(entity, data)
+  return data
 }
 
 export function getComponent<K extends ComponentName>(

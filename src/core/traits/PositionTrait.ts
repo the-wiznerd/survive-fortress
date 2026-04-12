@@ -1,5 +1,8 @@
 export class PositionTrait extends Trait<'position'> {
   readonly component = 'position' as const
+  declare x: number
+  declare y: number
+  declare z: number
 
   defaults(): Position {
     return { x: 0, y: 0, z: 0 }
