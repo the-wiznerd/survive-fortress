@@ -2,7 +2,6 @@ import { describe, it, expect, beforeAll } from 'vitest'
 
 beforeAll(() => {
   registerEntityType('dirt', Dirt)
-  registerEntityType('grass', Grass)
 })
 
 /** Place a tile with moisture at (x, y). */
@@ -162,7 +161,7 @@ describe('moisture system', () => {
   })
 })
 
-describe('dirt → grass spawning', () => {
+describe('dirt ground cover', () => {
   /** Place a dirt tile via the registry. */
   function placeDirt(world: World, x: number, y: number) {
     return spawnEntity(world, 'dirt', {
@@ -171,7 +170,7 @@ describe('dirt → grass spawning', () => {
     }).id
   }
 
-  it('spawns grass at z+1 when moisture reaches threshold', () => {
+  it('sets grass cover when moisture reaches threshold', () => {
     const world = createWorld()
     const dirt = placeDirt(world, 5, 5)
 
@@ -181,12 +180,10 @@ describe('dirt → grass spawning', () => {
     // Run one full tick (moisture system + entity type tick)
     tick(world)
 
-    const above = getEntitiesAt(world, 5, 5, 1)
-    expect(above).toHaveLength(1)
-    expect(getComponent(world, above[0], 'entityType')!.type).toBe('grass')
+    expect(getComponent(world, dirt, 'groundCover')!.cover).toBe('grass')
   })
 
-  it('does not spawn grass below threshold', () => {
+  it('does not set grass cover below threshold', () => {
     const world = createWorld()
     const dirt = placeDirt(world, 5, 5)
 
@@ -194,25 +191,23 @@ describe('dirt → grass spawning', () => {
 
     tick(world)
 
-    const above = getEntitiesAt(world, 5, 5, 1)
-    expect(above).toHaveLength(0)
+    expect(getComponent(world, dirt, 'groundCover')!.cover).toBeNull()
   })
 
-  it('does not spawn duplicate grass', () => {
+  it('removes grass cover when moisture drops below threshold', () => {
     const world = createWorld()
     const dirt = placeDirt(world, 5, 5)
 
-    getComponent(world, dirt, 'moisture')!.current = 10
+    getComponent(world, dirt, 'moisture')!.current = 5
+    tick(world)
+    expect(getComponent(world, dirt, 'groundCover')!.cover).toBe('grass')
 
+    getComponent(world, dirt, 'moisture')!.current = 1
     tick(world)
-    tick(world)
-    tick(world)
-
-    const above = getEntitiesAt(world, 5, 5, 1)
-    expect(above).toHaveLength(1)
+    expect(getComponent(world, dirt, 'groundCover')!.cover).toBeNull()
   })
 
-  it('dirt keeps its moisture after spawning grass', () => {
+  it('dirt keeps its moisture after gaining grass cover', () => {
     const world = createWorld()
     const dirt = placeDirt(world, 5, 5)
 

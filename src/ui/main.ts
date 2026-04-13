@@ -1,7 +1,6 @@
 import { Renderer } from './renderer.js'
 
 registerEntityType('dirt', Dirt)
-registerEntityType('grass', Grass)
 registerEntityType('water', Water)
 registerEntityType('sand', Sand)
 registerEntityType('player', Player)

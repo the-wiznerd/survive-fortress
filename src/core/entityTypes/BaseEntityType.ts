@@ -2,7 +2,6 @@ import type { PositionTrait as PositionTraitType } from '../traits/PositionTrait
 
 export abstract class BaseEntityType {
   abstract type: string
-  sortOffset = 0
 
   readonly traits: Trait<any>[] = []
   position: PositionTraitType

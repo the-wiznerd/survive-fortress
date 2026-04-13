@@ -11,6 +11,7 @@ export interface ComponentTypes {
   playerControlled: PlayerControlled
   entityType: EntityType
   moisture: Moisture
+  groundCover: GroundCover
   instance: Instance
 }
 
@@ -55,6 +56,10 @@ export interface Moisture {
   conductivity: number
 }
 
+export interface GroundCover {
+  cover: string | null
+}
+
 export interface Instance {
   ref: import('./entityTypes/BaseEntityType.js').BaseEntityType
 }
@@ -88,6 +93,7 @@ export function createWorld(): World {
       playerControlled: new Map(),
       entityType: new Map(),
       moisture: new Map(),
+      groundCover: new Map(),
       instance: new Map(),
     },
   }

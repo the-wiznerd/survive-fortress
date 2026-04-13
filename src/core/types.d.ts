@@ -20,6 +20,7 @@ declare global {
   type PlayerControlled = Ecs.PlayerControlled
   type EntityType = Ecs.EntityType
   type Moisture = Ecs.Moisture
+  type GroundCover = Ecs.GroundCover
   type Instance = Ecs.Instance
   type Action = Ecs.Action
   type World = Ecs.World

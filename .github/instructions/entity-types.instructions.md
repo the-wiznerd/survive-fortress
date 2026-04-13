@@ -29,7 +29,7 @@ Phase 1: Systems (the world acts on you)
   → You don't get a say. These resolve world state.
 
 Phase 2: Entity type ticks (you act in the world)
-  - Dirt checks moisture → spawn grass?
+  - Dirt checks moisture → set ground cover?
   - AI decides next action
   - FSM state transitions
   → Entity type orchestrates its traits based on resolved state.
@@ -103,7 +103,7 @@ Systems are global functions that process all entities with certain components. 
 ### When to use a system vs. an entity type tick
 
 - **System**: Cross-entity interactions that need deduplication or global resolution (moisture equalization, combat, fluid flow). "The world acts on you."
-- **Entity type tick**: Per-entity decisions based on resolved state (dirt→grass, AI behavior, FSM transitions). "You act in the world."
+- **Entity type tick**: Per-entity decisions based on resolved state (dirt→ground cover, AI behavior, FSM transitions). "You act in the world."
 
 ### Creating a new system
 
@@ -119,30 +119,29 @@ Each entity gets its own class instance. Traits are assigned as typed members vi
 ### Simple terrain (no extra traits)
 
 ```ts
-export class Grass extends BaseEntityType {
-  type = 'grass'
-  sortOffset = -1  // draws before entities at same z
+export class Sand extends BaseEntityType {
+  type = 'sand'
 }
 ```
 
-### Entity with traits
+### Entity with traits and ground cover
+
+Ground cover (grass, moss, etc.) is a trait on the parent tile, not a separate entity.
+The entity type's `tick()` sets the cover based on state (e.g. moisture threshold).
+The renderer reads the `groundCover` component and overlays the appropriate sprite.
 
 ```ts
 export class Dirt extends BaseEntityType {
   type = 'dirt'
-  moisture = this.addTrait(new MoistureTrait(this.world, this.id, { current: 0, capacity: 50, rate: 10 }))
+  moisture = this.addTrait(new MoistureTrait(this.world, this.id, { current: 2, capacity: 10, conductivity: 20 }))
+  groundCover = this.addTrait(new GroundCoverTrait(this.world, this.id))
 
   tick(): void {
-    if (this.moisture.current < GRASS_THRESHOLD) return
-
-    const { x, y, z } = this.position
-    const above = getEntitiesAt(this.world, x, y, z + 1)
-    if (above.some(e => getComponent(this.world, e, 'entityType')?.type === 'grass')) return
-
-    spawnEntity(this.world, 'grass', {
-      entityType: 'grass',
-      position: { x, y, z: z + 1 },
-    })
+    if (this.moisture.current >= GRASS_THRESHOLD) {
+      this.groundCover.cover = 'grass'
+    } else {
+      this.groundCover.cover = null
+    }
   }
 }
 ```

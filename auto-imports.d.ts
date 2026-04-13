@@ -10,6 +10,7 @@ declare global {
   const Dirt: typeof import('@core/entityTypes/Dirt').Dirt
   const EntityTypeTrait: typeof import('@core/traits/EntityTypeTrait').EntityTypeTrait
   const Grass: typeof import('@core/entityTypes/Grass').Grass
+  const GroundCoverTrait: typeof import('@core/traits/GroundCoverTrait').GroundCoverTrait
   const HealthTrait: typeof import('@core/traits/HealthTrait').HealthTrait
   const HungerTrait: typeof import('@core/traits/HungerTrait').HungerTrait
   const MoistureTrait: typeof import('@core/traits/MoistureTrait').MoistureTrait
