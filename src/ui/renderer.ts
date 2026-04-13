@@ -1,4 +1,4 @@
-d/** Registry of entity type name → renderer instance. */
+/** Registry of entity type name → renderer instance. */
 const ENTITY_RENDERERS: Record<string, EntityRenderer> = {
   dirt: new DirtRenderer(),
   sand: new SandRenderer(),
