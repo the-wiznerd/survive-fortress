@@ -19,6 +19,7 @@ declare global {
   const PositionTrait: typeof import('@core/traits/PositionTrait').PositionTrait
   const Sand: typeof import('@core/entityTypes/Sand').Sand
   const SpeedTrait: typeof import('@core/traits/SpeedTrait').SpeedTrait
+  const Stone: typeof import('@core/entityTypes/Stone').Stone
   const Trait: typeof import('@core/traits/Trait').Trait
   const Water: typeof import('@core/entityTypes/Water').Water
   const addComponent: typeof import('@core/ecs').addComponent

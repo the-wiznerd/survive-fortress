@@ -3,6 +3,7 @@ import { Renderer } from './renderer.js'
 registerEntityType('dirt', Dirt)
 registerEntityType('water', Water)
 registerEntityType('sand', Sand)
+registerEntityType('stone', Stone)
 registerEntityType('player', Player)
 
 // ─── Game State ───
