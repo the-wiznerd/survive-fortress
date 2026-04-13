@@ -7,7 +7,11 @@
 export {}
 declare global {
   const BaseEntityType: typeof import('@core/entityTypes/BaseEntityType').BaseEntityType
+  const CELL_H: typeof import('@ui/rendering/types').CELL_H
+  const CELL_W: typeof import('@ui/rendering/types').CELL_W
   const Dirt: typeof import('@core/entityTypes/Dirt').Dirt
+  const DirtRenderer: typeof import('@ui/rendering/entities/DirtRenderer').DirtRenderer
+  const EntityRenderer: typeof import('@ui/rendering/EntityRenderer').EntityRenderer
   const EntityTypeTrait: typeof import('@core/traits/EntityTypeTrait').EntityTypeTrait
   const Grass: typeof import('@core/entityTypes/Grass').Grass
   const GroundCoverTrait: typeof import('@core/traits/GroundCoverTrait').GroundCoverTrait
@@ -16,12 +20,16 @@ declare global {
   const MoistureTrait: typeof import('@core/traits/MoistureTrait').MoistureTrait
   const Player: typeof import('@core/entityTypes/Player').Player
   const PlayerControlledTrait: typeof import('@core/traits/PlayerControlledTrait').PlayerControlledTrait
+  const PlayerRenderer: typeof import('@ui/rendering/entities/PlayerRenderer').PlayerRenderer
   const PositionTrait: typeof import('@core/traits/PositionTrait').PositionTrait
   const Sand: typeof import('@core/entityTypes/Sand').Sand
+  const SandRenderer: typeof import('@ui/rendering/entities/SandRenderer').SandRenderer
   const SpeedTrait: typeof import('@core/traits/SpeedTrait').SpeedTrait
   const Stone: typeof import('@core/entityTypes/Stone').Stone
+  const StoneRenderer: typeof import('@ui/rendering/entities/StoneRenderer').StoneRenderer
   const Trait: typeof import('@core/traits/Trait').Trait
   const Water: typeof import('@core/entityTypes/Water').Water
+  const WaterRenderer: typeof import('@ui/rendering/entities/WaterRenderer').WaterRenderer
   const addComponent: typeof import('@core/ecs').addComponent
   const buildFaces2d: typeof import('@core/faces').buildFaces2d
   const buildFaces3d: typeof import('@core/faces').buildFaces3d
@@ -45,10 +53,12 @@ declare global {
   const moistureSystem: typeof import('@core/systems/moisture').moistureSystem
   const movementSystem: typeof import('@core/systems/movement').movementSystem
   const parseChunkKey: typeof import('@core/save').parseChunkKey
+  const posKey: typeof import('@ui/rendering/types').posKey
   const queryEntities: typeof import('@core/ecs').queryEntities
   const registerEntityType: typeof import('@core/registry').registerEntityType
   const removeEntity: typeof import('@core/ecs').removeEntity
   const simulate: typeof import('@core/tick').simulate
   const spawnEntity: typeof import('@core/registry').spawnEntity
   const tick: typeof import('@core/tick').tick
+  const zKey: typeof import('@ui/rendering/types').zKey
 }

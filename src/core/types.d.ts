@@ -7,6 +7,8 @@ import type * as Save from './save.js'
 import type * as Registry from './registry.js'
 import type * as TraitBase from './traits/Trait.js'
 import type * as Faces from './faces.js'
+import type * as RenderTypes from '../ui/rendering/types.js'
+import type { EntityRenderer as EntityRendererClass } from '../ui/rendering/EntityRenderer.js'
 
 declare global {
   // ECS
@@ -42,4 +44,11 @@ declare global {
 
   // Faces
   type Face = Faces.Face
+
+  // Rendering
+  type StaticSprite = RenderTypes.StaticSprite
+  type AnimatedSprite = RenderTypes.AnimatedSprite
+  type EdgeVariants = RenderTypes.EdgeVariants
+  type RenderContext = RenderTypes.RenderContext
+  type EntityRenderer = EntityRendererClass
 }

@@ -166,16 +166,24 @@ function updateInspector() {
   for (const id of visible) {
     const pos = getComponent(world, id, 'position')!
     const typeName = getComponent(world, id, 'entityType')?.type ?? 'unknown'
-    const inst = getComponent(world, id, 'instance')
 
     html += `<div class="stat" style="margin-top:8px"><strong>${typeName}</strong> <span class="label">z=${pos.z}</span></div>`
 
-    if (inst) {
-      for (const trait of inst.ref.traits) {
-        const defaults = trait.defaults()
-        const keys = Object.keys(defaults as object)
-        const values = keys.map(k => `${k}: ${(trait as unknown as Record<string, unknown>)[k]}`).join(', ')
-        html += `<div class="stat"><span class="label">${trait.component}:</span> ${values}</div>`
+    // Delegate to entity renderer's inspect() if available.
+    const er = renderer.getEntityRenderer(typeName)
+    const custom = er?.inspect(id, world)
+    if (custom != null) {
+      html += custom
+    } else {
+      // Fallback: dump all trait fields.
+      const inst = getComponent(world, id, 'instance')
+      if (inst) {
+        for (const trait of inst.ref.traits) {
+          const defaults = trait.defaults()
+          const keys = Object.keys(defaults as object)
+          const values = keys.map(k => `${k}: ${(trait as unknown as Record<string, unknown>)[k]}`).join(', ')
+          html += `<div class="stat"><span class="label">${trait.component}:</span> ${values}</div>`
+        }
       }
     }
   }
