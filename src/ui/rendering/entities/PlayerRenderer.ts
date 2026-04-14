@@ -1,7 +1,7 @@
 const SPRITE_COL = 0
 const SPRITE_ROW = 6
-const SPRITE_HEIGHT = 2 // cells tall
-const Y_OFFSET = -0.5 // half a cell up, centers on tile
+const SPRITE_HEIGHT = 2
+const Y_OFFSET = -0.25
 
 export class PlayerRenderer extends EntityRenderer {
   render(id: EntityId, dc: DrawContext) {
