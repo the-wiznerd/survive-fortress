@@ -1,9 +1,7 @@
 export function movementSystem(world: World) {
-  const MOVE_COST = 10
-
   for (const id of queryEntities(world, 'speed', 'position')) {
     const speed = getComponent(world, id, 'speed')!
-    speed.ap += speed.apPerTick
+    if (world.tick % speed.pace !== 0) continue
 
     let action: Action | null = null
 
@@ -13,11 +11,10 @@ export function movementSystem(world: World) {
       pc.pendingAction = null
     }
 
-    if (action?.type === 'move' && speed.ap >= MOVE_COST) {
+    if (action?.type === 'move') {
       const pos = getComponent(world, id, 'position')!
       pos.x += action.dx
       pos.y += action.dy
-      speed.ap -= MOVE_COST
     }
   }
 }

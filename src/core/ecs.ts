@@ -38,8 +38,8 @@ export interface Hunger {
 }
 
 export interface Speed {
-  ap: number
-  apPerTick: number
+  /** Move once every `pace` ticks. 1 = every tick, 3 = every 3rd tick. */
+  pace: number
 }
 
 export interface PlayerControlled {

@@ -74,34 +74,33 @@ describe('movement system', () => {
     expect(pos.y).toBe(10)
   })
 
-  it('accumulates AP for slow entities', () => {
+  it('respects pace for slow entities', () => {
     const world = createWorld()
     const player = spawnPlayer(world, 10, 10)
 
-    // Slow down the player: 3 AP per tick, move costs 10.
-    getComponent(world, player, 'speed')!.apPerTick = 3
+    // Slow down the player: move once every 3 ticks.
+    getComponent(world, player, 'speed')!.pace = 3
 
-    // Tick 1: AP=3, can't move.
+    // Tick 0 (world.tick starts at 0): 0 % 3 === 0, can move.
     const pc = getComponent(world, player, 'playerControlled')!
     pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
     tick(world)
-    expect(getComponent(world, player, 'position')!.x).toBe(10)
+    expect(getComponent(world, player, 'position')!.x).toBe(11)
 
-    // Tick 2: AP=6, can't move.
-    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
-    tick(world)
-    expect(getComponent(world, player, 'position')!.x).toBe(10)
-
-    // Tick 3: AP=9, can't move.
-    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
-    tick(world)
-    expect(getComponent(world, player, 'position')!.x).toBe(10)
-
-    // Tick 4: AP=12 ≥ 10, moves! AP goes to 2.
+    // Tick 1: 1 % 3 !== 0, can't move.
     pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
     tick(world)
     expect(getComponent(world, player, 'position')!.x).toBe(11)
-    expect(getComponent(world, player, 'speed')!.ap).toBe(2)
+
+    // Tick 2: 2 % 3 !== 0, can't move.
+    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
+    tick(world)
+    expect(getComponent(world, player, 'position')!.x).toBe(11)
+
+    // Tick 3: 3 % 3 === 0, moves again.
+    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
+    tick(world)
+    expect(getComponent(world, player, 'position')!.x).toBe(12)
   })
 
   it('clears pending action after processing', () => {

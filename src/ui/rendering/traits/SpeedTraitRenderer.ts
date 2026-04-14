@@ -3,7 +3,7 @@ export class SpeedTraitRenderer extends TraitRenderer {
     const s = getComponent(world, id, 'speed')
     const el = document.createElement('stat-text')
     el.setAttribute('label', 'speed')
-    el.setAttribute('value', s ? `${s.ap} ap` : '—')
+    el.setAttribute('value', s ? `1/${s.pace}` : '—')
     return el
   }
 }
