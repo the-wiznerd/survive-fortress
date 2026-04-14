@@ -12,6 +12,7 @@ export interface ComponentTypes {
   entityType: EntityType
   moisture: Moisture
   groundCover: GroundCover
+  name: Name
   instance: Instance
 }
 
@@ -60,6 +61,10 @@ export interface GroundCover {
   cover: string | null
 }
 
+export interface Name {
+  name: string
+}
+
 export interface Instance {
   ref: import('./entityTypes/BaseEntityType.js').BaseEntityType
 }
@@ -94,6 +99,7 @@ export function createWorld(): World {
       entityType: new Map(),
       moisture: new Map(),
       groundCover: new Map(),
+      name: new Map(),
       instance: new Map(),
     },
   }

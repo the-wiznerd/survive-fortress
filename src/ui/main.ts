@@ -126,8 +126,10 @@ const selectionEl = document.getElementById('selection')!
 
 function buildEntityCard(id: EntityId, world: World): HTMLElement {
   const typeName = getComponent(world, id, 'entityType')?.type ?? 'unknown'
+  const name = getComponent(world, id, 'name')?.name
+  const label = name ? `${name} (${typeName})` : typeName
   const card = document.createElement('entity-card')
-  card.setAttribute('label', typeName)
+  card.setAttribute('label', label)
 
   const er = renderer.getEntityRenderer(typeName)
   if (er) {

@@ -24,6 +24,7 @@ declare global {
   type EntityType = Ecs.EntityType
   type Moisture = Ecs.Moisture
   type GroundCover = Ecs.GroundCover
+  type Name = Ecs.Name
   type Instance = Ecs.Instance
   type Action = Ecs.Action
   type World = Ecs.World

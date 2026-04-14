@@ -23,6 +23,7 @@ declare global {
   const HungerTraitRenderer: typeof import('@ui/rendering/traits/HungerTraitRenderer').HungerTraitRenderer
   const MoistureTrait: typeof import('@core/traits/MoistureTrait').MoistureTrait
   const MoistureTraitRenderer: typeof import('@ui/rendering/traits/MoistureTraitRenderer').MoistureTraitRenderer
+  const NameTrait: typeof import('@core/traits/NameTrait').NameTrait
   const Player: typeof import('@core/entityTypes/Player').Player
   const PlayerControlledTrait: typeof import('@core/traits/PlayerControlledTrait').PlayerControlledTrait
   const PlayerRenderer: typeof import('@ui/rendering/entities/PlayerRenderer').PlayerRenderer
