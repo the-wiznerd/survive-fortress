@@ -12,7 +12,7 @@ declare global {
   const Dirt: typeof import('@core/entityTypes/Dirt').Dirt
   const DirtRenderer: typeof import('@ui/rendering/entities/DirtRenderer').DirtRenderer
   const DrawContext: typeof import('@ui/rendering/types').DrawContext
-  const EntityRenderer: typeof import('@ui/rendering/EntityRenderer').EntityRenderer
+  const EntityRenderer: typeof import('@ui/rendering/entities/EntityRenderer').EntityRenderer
   const EntityTypeTrait: typeof import('@core/traits/EntityTypeTrait').EntityTypeTrait
   const Grass: typeof import('@core/entityTypes/Grass').Grass
   const GroundCoverTrait: typeof import('@core/traits/GroundCoverTrait').GroundCoverTrait

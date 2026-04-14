@@ -8,7 +8,7 @@ import type * as Registry from './registry.js'
 import type * as TraitBase from './traits/Trait.js'
 import type * as Faces from './faces.js'
 import type * as RenderTypes from '../ui/rendering/types.js'
-import type { EntityRenderer as EntityRendererClass } from '../ui/rendering/EntityRenderer.js'
+import type { EntityRenderer as EntityRendererClass } from '../ui/rendering/entities/EntityRenderer.js'
 import type { TraitRenderer as TraitRendererClass } from '../ui/rendering/traits/TraitRenderer.js'
 
 declare global {
