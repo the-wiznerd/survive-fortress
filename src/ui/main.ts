@@ -1,5 +1,6 @@
 import { Renderer } from './renderer.js'
 import './components/entity-card.js'
+import './components/stat-text.js'
 
 registerEntityType('dirt', Dirt)
 registerEntityType('water', Water)
@@ -109,7 +110,13 @@ setInterval(gameTick, TICK_INTERVAL_MS)
 
 // ─── Trait Renderer Registry ───
 
-const TRAIT_RENDERERS: Record<string, TraitRenderer> = {}
+const TRAIT_RENDERERS: Record<string, TraitRenderer> = {
+  health: new HealthTraitRenderer(),
+  hunger: new HungerTraitRenderer(),
+  speed: new SpeedTraitRenderer(),
+  moisture: new MoistureTraitRenderer(),
+  groundCover: new GroundCoverTraitRenderer(),
+}
 
 // ─── UI ───
 

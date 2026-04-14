@@ -16,9 +16,13 @@ declare global {
   const EntityTypeTrait: typeof import('@core/traits/EntityTypeTrait').EntityTypeTrait
   const Grass: typeof import('@core/entityTypes/Grass').Grass
   const GroundCoverTrait: typeof import('@core/traits/GroundCoverTrait').GroundCoverTrait
+  const GroundCoverTraitRenderer: typeof import('@ui/rendering/traits/GroundCoverTraitRenderer').GroundCoverTraitRenderer
   const HealthTrait: typeof import('@core/traits/HealthTrait').HealthTrait
+  const HealthTraitRenderer: typeof import('@ui/rendering/traits/HealthTraitRenderer').HealthTraitRenderer
   const HungerTrait: typeof import('@core/traits/HungerTrait').HungerTrait
+  const HungerTraitRenderer: typeof import('@ui/rendering/traits/HungerTraitRenderer').HungerTraitRenderer
   const MoistureTrait: typeof import('@core/traits/MoistureTrait').MoistureTrait
+  const MoistureTraitRenderer: typeof import('@ui/rendering/traits/MoistureTraitRenderer').MoistureTraitRenderer
   const Player: typeof import('@core/entityTypes/Player').Player
   const PlayerControlledTrait: typeof import('@core/traits/PlayerControlledTrait').PlayerControlledTrait
   const PlayerRenderer: typeof import('@ui/rendering/entities/PlayerRenderer').PlayerRenderer
@@ -26,6 +30,7 @@ declare global {
   const Sand: typeof import('@core/entityTypes/Sand').Sand
   const SandRenderer: typeof import('@ui/rendering/entities/SandRenderer').SandRenderer
   const SpeedTrait: typeof import('@core/traits/SpeedTrait').SpeedTrait
+  const SpeedTraitRenderer: typeof import('@ui/rendering/traits/SpeedTraitRenderer').SpeedTraitRenderer
   const Stone: typeof import('@core/entityTypes/Stone').Stone
   const StoneRenderer: typeof import('@ui/rendering/entities/StoneRenderer').StoneRenderer
   const Trait: typeof import('@core/traits/Trait').Trait
