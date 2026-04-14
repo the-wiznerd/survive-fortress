@@ -1,7 +1,3 @@
-import { Renderer } from './renderer.js'
-import { init, getGame, getView, startTickLoop } from './game.js'
-import { bindInput, getPendingInput, getHoveredCell, getInspectedCell } from './input.js'
-import { updateUI, updateSelection } from './sidebar.js'
 import './components/entity-card.js'
 import './components/stat-text.js'
 

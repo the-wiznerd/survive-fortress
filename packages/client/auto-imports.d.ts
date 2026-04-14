@@ -30,6 +30,7 @@ declare global {
   const getInspectedCell: typeof import('~client/input').getInspectedCell
   const getPendingInput: typeof import('~client/input').getPendingInput
   const getView: typeof import('~client/game').getView
+  const init: typeof import('~client/game').init
   const posKey: typeof import('~client/rendering/types').posKey
   const startTickLoop: typeof import('~client/game').startTickLoop
   const updateSelection: typeof import('~client/sidebar').updateSelection

@@ -11,7 +11,7 @@ export interface PackageExports {
 }
 
 function scanDir(dir: string): PackageExports {
-  const valueRe = /export\s+(?:abstract\s+)?(?:class|function|const|let|var|enum)\s+(\w+)/g
+  const valueRe = /export\s+(?:abstract\s+)?(?:async\s+)?(?:class|function|const|let|var|enum)\s+(\w+)/g
   const typeRe = /export\s+(?:interface|type)\s+(\w+)/g
   const values: string[] = []
   const types: string[] = []
@@ -94,7 +94,7 @@ export function buildAutoImports(
 }
 
 function scanFileContent(content: string): PackageExports {
-  const valueRe = /export\s+(?:abstract\s+)?(?:class|function|const|let|var|enum)\s+(\w+)/g
+  const valueRe = /export\s+(?:abstract\s+)?(?:async\s+)?(?:class|function|const|let|var|enum)\s+(\w+)/g
   const typeRe = /export\s+(?:interface|type)\s+(\w+)/g
   const values: string[] = []
   const types: string[] = []
