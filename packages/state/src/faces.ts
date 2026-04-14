@@ -1,12 +1,4 @@
-import {
-  type EntityId,
-  type ComponentName,
-  type World,
-  queryEntities,
-  getComponent,
-  hasComponent,
-  getEntitiesAt,
-} from './ecs.js'
+import type { EntityId, ComponentName, World } from './ecs.js'
 
 export interface Face {
   entityA: EntityId

@@ -1,5 +1,4 @@
 import type { PlayerAction } from '@repo/server/sdk'
-import { Renderer } from './renderer.js'
 
 // ─── State ───
 

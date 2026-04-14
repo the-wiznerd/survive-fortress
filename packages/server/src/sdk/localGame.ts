@@ -13,7 +13,6 @@ import {
   importWorld,
   type BaseEntityType,
 } from '@repo/engine'
-import type { Game, GameView, ViewEntity, PlayerAction, InspectResult } from './types.js'
 
 /** Trait names the client is allowed to see when inspecting entities. */
 const VISIBLE_TRAITS = ['health', 'hunger', 'speed', 'moisture', 'groundCover'] as const

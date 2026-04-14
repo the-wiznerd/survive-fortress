@@ -1,11 +1,4 @@
 import type { GameView, ViewEntity } from '@repo/server/sdk'
-import { CELL_W, CELL_H, DrawContext, type RenderContext, zKey, posKey } from './rendering/types.js'
-import { EntityRenderer } from './rendering/entities/EntityRenderer.js'
-import { DirtRenderer } from './rendering/entities/DirtRenderer.js'
-import { SandRenderer } from './rendering/entities/SandRenderer.js'
-import { StoneRenderer } from './rendering/entities/StoneRenderer.js'
-import { WaterRenderer } from './rendering/entities/WaterRenderer.js'
-import { PlayerRenderer } from './rendering/entities/PlayerRenderer.js'
 
 /** Registry of entity type name → renderer instance. */
 const ENTITY_RENDERERS: Record<string, EntityRenderer> = {

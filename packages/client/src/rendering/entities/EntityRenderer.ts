@@ -1,5 +1,4 @@
 import type { ViewEntity } from '@repo/server/sdk'
-import type { DrawContext } from '../types.js'
 
 /**
  * Base class for per-entity-type renderers.

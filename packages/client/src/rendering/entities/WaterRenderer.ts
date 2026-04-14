@@ -1,6 +1,4 @@
 import type { ViewEntity } from '@repo/server/sdk'
-import { type DrawContext, posKey } from '../types.js'
-import { EntityRenderer } from './EntityRenderer.js'
 
 const EDGE_ROWS = [2, 3, 4, 5] // 4 animation frames, same col layout per row
 const EDGE_TOP_COLS = [0, 1, 2, 3, 5, 4, 6, 3]

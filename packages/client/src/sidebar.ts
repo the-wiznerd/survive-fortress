@@ -1,11 +1,4 @@
 import type { Game, GameView, ViewEntity, InspectResult } from '@repo/server/sdk'
-import { Renderer } from './renderer.js'
-import { TraitRenderer } from './rendering/traits/TraitRenderer.js'
-import { HealthTraitRenderer } from './rendering/traits/HealthTraitRenderer.js'
-import { HungerTraitRenderer } from './rendering/traits/HungerTraitRenderer.js'
-import { SpeedTraitRenderer } from './rendering/traits/SpeedTraitRenderer.js'
-import { MoistureTraitRenderer } from './rendering/traits/MoistureTraitRenderer.js'
-import { GroundCoverTraitRenderer } from './rendering/traits/GroundCoverTraitRenderer.js'
 
 // ─── Trait Renderer Registry ───
 

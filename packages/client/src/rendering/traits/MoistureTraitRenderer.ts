@@ -1,5 +1,3 @@
-import { TraitRenderer } from './TraitRenderer.js'
-
 export class MoistureTraitRenderer extends TraitRenderer {
   render(data: Record<string, unknown>): HTMLElement {
     const el = document.createElement('stat-text')

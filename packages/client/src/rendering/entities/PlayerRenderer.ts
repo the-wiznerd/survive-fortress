@@ -1,6 +1,4 @@
 import type { ViewEntity } from '@repo/server/sdk'
-import type { DrawContext } from '../types.js'
-import { EntityRenderer } from './EntityRenderer.js'
 
 const SPRITE_COL = 0
 const SPRITE_ROW = 6
