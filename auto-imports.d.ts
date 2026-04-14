@@ -29,6 +29,7 @@ declare global {
   const Stone: typeof import('@core/entityTypes/Stone').Stone
   const StoneRenderer: typeof import('@ui/rendering/entities/StoneRenderer').StoneRenderer
   const Trait: typeof import('@core/traits/Trait').Trait
+  const TraitRenderer: typeof import('@ui/rendering/traits/TraitRenderer').TraitRenderer
   const Water: typeof import('@core/entityTypes/Water').Water
   const WaterRenderer: typeof import('@ui/rendering/entities/WaterRenderer').WaterRenderer
   const addComponent: typeof import('@core/ecs').addComponent

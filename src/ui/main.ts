@@ -1,4 +1,5 @@
 import { Renderer } from './renderer.js'
+import './components/entity-card.js'
 
 registerEntityType('dirt', Dirt)
 registerEntityType('water', Water)
@@ -60,7 +61,7 @@ canvas.addEventListener('click', (e) => {
     (e.clientY - rect.top) * scaleY,
   )
   inspectedCell = cell
-  updateInspector()
+  updateSelection()
 })
 
 canvas.addEventListener('mousemove', (e) => {
@@ -106,29 +107,47 @@ function gameTick() {
 
 setInterval(gameTick, TICK_INTERVAL_MS)
 
+// ─── Trait Renderer Registry ───
+
+const TRAIT_RENDERERS: Record<string, TraitRenderer> = {}
+
 // ─── UI ───
 
-const statsEl = document.getElementById('stats')!
+const gameStateEl = document.getElementById('game-state')!
+const playerCardEl = document.getElementById('player-card')!
+const selectionEl = document.getElementById('selection')!
 
-function updateUI() {
-  const health = getComponent(world, playerId, 'health')
-  const hunger = getComponent(world, playerId, 'hunger')
-  const pos = getComponent(world, playerId, 'position')
-  const speed = getComponent(world, playerId, 'speed')
+function buildEntityCard(id: EntityId, world: World): HTMLElement {
+  const typeName = getComponent(world, id, 'entityType')?.type ?? 'unknown'
+  const card = document.createElement('entity-card')
+  card.setAttribute('label', typeName)
 
-  statsEl.innerHTML = `
-    <div class="stat"><span class="label">Tick:</span> ${world.tick}</div>
-    <div class="stat"><span class="label">Pos:</span> ${pos?.x}, ${pos?.y}</div>
-    <div class="stat"><span class="label">HP:</span> ${health?.current}/${health?.max}</div>
-    <div class="stat"><span class="label">Hunger:</span> ${hunger?.current}/${hunger?.max}</div>
-    <div class="stat"><span class="label">AP:</span> ${speed?.ap}</div>
-  `
-  updateInspector()
+  const er = renderer.getEntityRenderer(typeName)
+  if (er) {
+    for (const traitName of er.describe(id, world)) {
+      const tr = TRAIT_RENDERERS[traitName]
+      if (tr) card.appendChild(tr.render(id, world))
+    }
+  }
+
+  return card
 }
 
-// ─── Inspector ───
+function updateUI() {
+  // Game state.
+  gameStateEl.innerHTML = `
+    <div class="stat"><span class="label">Tick:</span> ${world.tick}</div>
+  `
 
-const inspectorEl = document.getElementById('inspector')!
+  // Player card (always visible).
+  playerCardEl.innerHTML = ''
+  playerCardEl.appendChild(buildEntityCard(playerId, world))
+
+  // Selected tile.
+  updateSelection()
+}
+
+// ─── Selection ───
 
 function getEntitiesAtColumn(x: number, y: number): EntityId[] {
   const results: EntityId[] = []
@@ -138,22 +157,20 @@ function getEntitiesAtColumn(x: number, y: number): EntityId[] {
   return results
 }
 
-function updateInspector() {
+function updateSelection() {
   if (!world || !inspectedCell) {
-    inspectorEl.innerHTML = ''
+    selectionEl.innerHTML = ''
     return
   }
 
   const { x, y } = inspectedCell
   const allAtXY = getEntitiesAtColumn(x, y)
   if (allAtXY.length === 0) {
-    inspectorEl.innerHTML = `<h2>Tile (${x}, ${y})</h2><div class="stat">Empty</div>`
+    selectionEl.innerHTML = `<h2>Tile (${x}, ${y})</h2><div class="stat">Empty</div>`
     return
   }
 
-  // Show the top terrain cube and everything on or above it.
-  // The top terrain is the lowest z in the column (the ground block).
-  // Once underground layers exist, this will filter out hidden sub-surface entities.
+  // Show entities at or above ground level.
   let groundZ = Infinity
   for (const id of allAtXY) {
     const z = getComponent(world, id, 'position')!.z
@@ -162,33 +179,14 @@ function updateInspector() {
   const visible = allAtXY.filter(id => getComponent(world, id, 'position')!.z >= groundZ)
   visible.sort((a, b) => getComponent(world, b, 'position')!.z - getComponent(world, a, 'position')!.z)
 
-  let html = `<h2>Tile (${x}, ${y})</h2>`
+  selectionEl.innerHTML = ''
+  const heading = document.createElement('h2')
+  heading.textContent = `Tile (${x}, ${y})`
+  selectionEl.appendChild(heading)
+
   for (const id of visible) {
-    const pos = getComponent(world, id, 'position')!
-    const typeName = getComponent(world, id, 'entityType')?.type ?? 'unknown'
-
-    html += `<div class="stat" style="margin-top:8px"><strong>${typeName}</strong> <span class="label">z=${pos.z}</span></div>`
-
-    // Delegate to entity renderer's inspect() if available.
-    const er = renderer.getEntityRenderer(typeName)
-    const custom = er?.inspect(id, world)
-    if (custom != null) {
-      html += custom
-    } else {
-      // Fallback: dump all trait fields.
-      const inst = getComponent(world, id, 'instance')
-      if (inst) {
-        for (const trait of inst.ref.traits) {
-          const defaults = trait.defaults()
-          const keys = Object.keys(defaults as object)
-          const values = keys.map(k => `${k}: ${(trait as unknown as Record<string, unknown>)[k]}`).join(', ')
-          html += `<div class="stat"><span class="label">${trait.component}:</span> ${values}</div>`
-        }
-      }
-    }
+    selectionEl.appendChild(buildEntityCard(id, world))
   }
-
-  inspectorEl.innerHTML = html
 }
 
 // ─── Animation Loop ───

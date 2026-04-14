@@ -13,6 +13,7 @@ const rawImports = scanExports([
   `${coreSrc}/entityTypes`,
   `${uiSrc}/rendering`,
   `${uiSrc}/rendering/entities`,
+  `${uiSrc}/rendering/traits`,
 ], import.meta.dirname)
 
 // Rewrite ./src/core/... → @core/... and ./src/ui/... → @ui/... so imports resolve via alias

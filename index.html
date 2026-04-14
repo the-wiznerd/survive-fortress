@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Survive Fortress — Dev UI</title>
+  <title>Survive!</title>
   <style>
     * {
       margin: 0;
@@ -17,7 +17,9 @@
       color: #e0e0e0;
       font-family: 'Courier New', monospace;
       display: flex;
-      height: 100vh;
+      height: 100%;
+      width: 100%;
+      min-height: 100svh;
       overflow: hidden;
     }
 
@@ -26,6 +28,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
 
     canvas {
@@ -34,22 +37,18 @@
 
     #sidebar {
       width: 280px;
-      padding: 16px;
+      padding: 1.5rem;
       background: #16213e;
-      border-left: 1px solid #333;
       overflow-y: auto;
       font-size: 13px;
       line-height: 1.5;
     }
 
+    #sidebar h1,
     #sidebar h2 {
       color: #87ceeb;
-      margin-bottom: 8px;
+      margin-bottom: 0.5em;
       font-size: 14px;
-    }
-
-    #sidebar .stat {
-      margin-bottom: 4px;
     }
 
     #sidebar .label {
@@ -59,12 +58,6 @@
     #sidebar .section {
       margin-top: 16px;
     }
-
-    #controls {
-      color: #666;
-      margin-top: 16px;
-      font-size: 11px;
-    }
   </style>
 </head>
 
@@ -73,16 +66,10 @@
     <canvas id="canvas"></canvas>
   </div>
   <div id="sidebar">
-    <h2>Survive Fortress</h2>
-    <div id="stats"></div>
-    <div id="inspector" class="section"></div>
-    <div id="controls">
-      <h2>Controls</h2>
-      Arrow keys: move<br>
-      Space: wait one tick<br>
-      P: auto-play / pause<br>
-      R: restart
-    </div>
+    <h1>Survive Fortress</h1>
+    <div id="game-state" class="section"></div>
+    <div id="player-card" class="section"></div>
+    <div id="selection" class="section"></div>
   </div>
   <script type="module" src="/src/ui/main.ts"></script>
 </body>

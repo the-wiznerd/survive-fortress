@@ -11,9 +11,7 @@ export class SandRenderer extends EntityRenderer {
     dc.drawEdgeTerrain(EDGE)
   }
 
-  inspect(id: EntityId, world: World): string | null {
-    const moisture = getComponent(world, id, 'moisture')
-    if (!moisture) return ''
-    return `<div class="stat"><span class="label">moisture:</span> ${moisture.current}/${moisture.capacity} (cond: ${moisture.conductivity})</div>`
+  describe(id: EntityId, world: World): string[] {
+    return ['moisture']
   }
 }

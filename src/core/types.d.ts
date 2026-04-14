@@ -9,6 +9,7 @@ import type * as TraitBase from './traits/Trait.js'
 import type * as Faces from './faces.js'
 import type * as RenderTypes from '../ui/rendering/types.js'
 import type { EntityRenderer as EntityRendererClass } from '../ui/rendering/EntityRenderer.js'
+import type { TraitRenderer as TraitRendererClass } from '../ui/rendering/traits/TraitRenderer.js'
 
 declare global {
   // ECS
@@ -52,4 +53,5 @@ declare global {
   type RenderContext = RenderTypes.RenderContext
   type DrawContext = RenderTypes.DrawContext
   type EntityRenderer = EntityRendererClass
+  type TraitRenderer = TraitRendererClass
 }

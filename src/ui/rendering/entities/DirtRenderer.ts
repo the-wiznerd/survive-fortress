@@ -25,16 +25,7 @@ export class DirtRenderer extends EntityRenderer {
     }
   }
 
-  inspect(id: EntityId, world: World): string | null {
-    const moisture = getComponent(world, id, 'moisture')
-    const cover = getComponent(world, id, 'groundCover')
-    let html = ''
-    if (moisture) {
-      html += `<div class="stat"><span class="label">moisture:</span> ${moisture.current}/${moisture.capacity} (cond: ${moisture.conductivity})</div>`
-    }
-    if (cover?.cover) {
-      html += `<div class="stat"><span class="label">cover:</span> ${cover.cover}</div>`
-    }
-    return html
+  describe(id: EntityId, world: World): string[] {
+    return ['moisture', 'groundCover']
   }
 }

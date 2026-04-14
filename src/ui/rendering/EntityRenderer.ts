@@ -1,6 +1,6 @@
 /**
  * Base class for per-entity-type renderers.
- * Subclasses override render() and optionally inspect().
+ * Subclasses override render() and optionally describe().
  */
 export abstract class EntityRenderer {
   /** Whether this entity is terrain (front face occluded by next row). */
@@ -12,8 +12,8 @@ export abstract class EntityRenderer {
   /** Render this entity using the given draw context. */
   abstract render(id: EntityId, dc: DrawContext): void
 
-  /** Return HTML for the inspector panel, or null for default trait dump. */
-  inspect(id: EntityId, world: World): string | null {
-    return null
+  /** Return trait names to display on the entity card, in order. */
+  describe(id: EntityId, world: World): string[] {
+    return []
   }
 }
