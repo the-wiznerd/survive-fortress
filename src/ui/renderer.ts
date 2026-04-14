@@ -98,11 +98,11 @@ export class Renderer {
     const maxZ = new Map<number, number>()
     const terrainAt = new Set<number>()
     for (const row of terrainRows) {
-      for (const { wx, wy, z } of row) {
+      for (const { wx, wy, z, renderer } of row) {
         const k = zKey(wx, wy)
         const prev = maxZ.get(k)
         if (prev === undefined || z > prev) maxZ.set(k, z)
-        terrainAt.add(posKey(wx, wy, z))
+        if (renderer.occluding) terrainAt.add(posKey(wx, wy, z))
       }
     }
     const rc: RenderContext = { world, maxZ, terrainAt, now: performance.now() }

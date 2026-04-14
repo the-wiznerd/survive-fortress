@@ -7,6 +7,9 @@ export abstract class EntityRenderer {
   /** Whether this entity is terrain (front face occluded by next row). */
   readonly terrain: boolean = false
 
+  /** Whether this terrain occludes the front face of the row above it. */
+  readonly occluding: boolean = true
+
   /** Render this entity at the given screen position. */
   abstract render(
     ctx: CanvasRenderingContext2D,

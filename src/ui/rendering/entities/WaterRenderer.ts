@@ -4,8 +4,12 @@ const EDGE: EdgeVariants = {
   frontCols: [9, 8, 10, 7],
 }
 
+/** Water sits 3 source pixels lower than surrounding terrain. */
+const Y_OFFSET = 3
+
 export class WaterRenderer extends EntityRenderer {
   readonly terrain = true
+  readonly occluding = false
 
   render(
     ctx: CanvasRenderingContext2D, sheet: HTMLImageElement, scale: number,
@@ -17,10 +21,23 @@ export class WaterRenderer extends EntityRenderer {
     const e = this.hasNonWaterNeighbor(rc.world, wx + 1, wy, z) ? 1 : 0
     const w = this.hasNonWaterNeighbor(rc.world, wx - 1, wy, z) ? 1 : 0
     const frontOccluded = rc.terrainAt.has(posKey(wx, wy + 1, z))
+    const yOff = Y_OFFSET * scale
 
-    this.drawTopFace(ctx, sheet, scale, EDGE.topCols[n * 4 + e * 2 + w], EDGE.row, sx, sy, z)
+    const destW = CELL_W * scale
+    const rowStep = CELL_H * scale
+    const topCol = EDGE.topCols[n * 4 + e * 2 + w]
+    const destX = sx * destW
+    const destY = sy * rowStep - z * rowStep + yOff
+
+    ctx.drawImage(sheet,
+      topCol * CELL_W, EDGE.row * CELL_H, CELL_W, CELL_H,
+      destX, destY, destW, rowStep)
+
     if (!frontOccluded) {
-      this.drawFrontFace(ctx, sheet, scale, EDGE.frontCols[e * 2 + w], EDGE.row, sx, sy, z)
+      const frontCol = EDGE.frontCols[e * 2 + w]
+      ctx.drawImage(sheet,
+        frontCol * CELL_W, EDGE.row * CELL_H, CELL_W, CELL_H,
+        destX, destY + rowStep, destW, rowStep)
     }
   }
 
