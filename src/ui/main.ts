@@ -142,8 +142,10 @@ function buildEntityCard(id: EntityId, world: World): HTMLElement {
 
 function updateUI() {
   // Game state.
+  const day = Math.floor(world.tick / TICKS_PER_DAY) + 1
+  const tickOfDay = world.tick % TICKS_PER_DAY
   gameStateEl.innerHTML = `
-    <div class="stat"><span class="label">Tick:</span> ${world.tick}</div>
+    <div class="stat"><span class="label">Day:</span> ${day}.${String(tickOfDay).padStart(2, '0')}</div>
   `
 
   // Player card (always visible).

@@ -1,5 +1,7 @@
 export type System = (world: World) => void
 
+export const TICKS_PER_DAY = 100
+
 // ─── Tick Engine ───
 
 const defaultSystems: System[] = [movementSystem, hungerSystem, moistureSystem, entityTypeTickSystem]

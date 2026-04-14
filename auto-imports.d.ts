@@ -33,6 +33,7 @@ declare global {
   const SpeedTraitRenderer: typeof import('@ui/rendering/traits/SpeedTraitRenderer').SpeedTraitRenderer
   const Stone: typeof import('@core/entityTypes/Stone').Stone
   const StoneRenderer: typeof import('@ui/rendering/entities/StoneRenderer').StoneRenderer
+  const TICKS_PER_DAY: typeof import('@core/tick').TICKS_PER_DAY
   const Trait: typeof import('@core/traits/Trait').Trait
   const TraitRenderer: typeof import('@ui/rendering/traits/TraitRenderer').TraitRenderer
   const Water: typeof import('@core/entityTypes/Water').Water
