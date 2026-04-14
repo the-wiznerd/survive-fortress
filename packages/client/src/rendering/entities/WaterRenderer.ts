@@ -1,0 +1,48 @@
+const EDGE_ROWS = [2, 3, 4, 5] // 4 animation frames, same col layout per row
+const EDGE_TOP_COLS = [0, 1, 2, 3, 5, 4, 6, 3]
+const EDGE_FRONT_COLS = [9, 8, 10, 7]
+
+/** Water sits 0.25 cells lower than surrounding terrain. */
+const Y_OFFSET = 0.25
+const ANIM_INTERVAL = 250 // ms per frame
+
+export class WaterRenderer extends EntityRenderer {
+  readonly terrain = true
+  readonly occluding = false
+
+  render(id: EntityId, dc: DrawContext) {
+    const { wx, wy, z, rc } = dc
+
+    // Water borders appear where a same-z neighbor is non-water.
+    const n = this.hasNonWaterNeighbor(rc.world, wx, wy - 1, z) ? 1 : 0
+    const e = this.hasNonWaterNeighbor(rc.world, wx + 1, wy, z) ? 1 : 0
+    const w = this.hasNonWaterNeighbor(rc.world, wx - 1, wy, z) ? 1 : 0
+
+    // Animation: stagger by world position so tiles don't all sync.
+    const frame = (Math.floor(rc.now / ANIM_INTERVAL) + wx + wy) % EDGE_ROWS.length
+    const row = EDGE_ROWS[frame]
+
+    const topCol = EDGE_TOP_COLS[n * 4 + e * 2 + w]
+    dc.draw(topCol, row, 1, 1, Y_OFFSET)
+
+    if (!dc.frontOccluded) {
+      const frontCol = EDGE_FRONT_COLS[e * 2 + w]
+      dc.draw(frontCol, row, 1, 1, 1 + Y_OFFSET)
+    }
+  }
+
+  /** Check if a cell has terrain at the given z that isn't water. */
+  private hasNonWaterNeighbor(world: World, x: number, y: number, z: number): boolean {
+    for (const [id, pos] of world.components.position) {
+      if (pos.x === x && pos.y === y && pos.z === z) {
+        const et = getComponent(world, id, 'entityType')
+        if (et && et.type !== 'water') return true
+      }
+    }
+    return false
+  }
+
+  describe(id: EntityId, world: World): string[] {
+    return ['moisture']
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "paths": {
+      "~engine/*": ["../engine/src/*"],
+      "~ui/*": ["../ui/src/*"]
+    }
+  },
+  "include": ["src", "auto-imports.d.ts", "../engine/src/types.d.ts", "../ui/src/types.d.ts"]
+}

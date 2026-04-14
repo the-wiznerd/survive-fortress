@@ -1,0 +1,10 @@
+{
+  "name": "@sf/server",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@sf/engine": "workspace:*",
+    "@sf/net": "workspace:*",
+    "@sf/state": "workspace:*"
+  }
+}

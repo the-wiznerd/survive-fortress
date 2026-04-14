@@ -1,0 +1,11 @@
+{
+  "name": "@sf/net",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/messages.ts"
+  },
+  "dependencies": {
+    "@sf/state": "workspace:*"
+  }
+}

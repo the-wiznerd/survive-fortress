@@ -1,0 +1,22 @@
+{
+  "name": "@sf/engine",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run --testTimeout 15000",
+    "test:watch": "vitest --testTimeout 15000",
+    "typecheck": "tsc --noEmit",
+    "generate": "vite build --mode generate"
+  },
+  "dependencies": {
+    "@sf/state": "workspace:*"
+  },
+  "devDependencies": {
+    "unplugin-auto-import": "^21.0.0",
+    "vite": "^6.3.0",
+    "vitest": "^3.1.0"
+  }
+}
