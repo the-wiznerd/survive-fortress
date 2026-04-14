@@ -15,17 +15,13 @@ const GRASS_EDGE: EdgeVariants = {
 export class DirtRenderer extends EntityRenderer {
   readonly terrain = true
 
-  render(
-    ctx: CanvasRenderingContext2D, sheet: HTMLImageElement, scale: number,
-    id: EntityId, sx: number, sy: number, z: number,
-    wx: number, wy: number, rc: RenderContext,
-  ) {
-    this.drawEdgeTerrain(ctx, sheet, scale, EDGE, sx, sy, z, wx, wy, rc)
+  render(id: EntityId, dc: DrawContext) {
+    dc.drawEdgeTerrain(EDGE)
 
     // Ground cover overlay (e.g. grass).
-    const cover = getComponent(rc.world, id, 'groundCover')
+    const cover = getComponent(dc.rc.world, id, 'groundCover')
     if (cover?.cover === 'grass') {
-      this.drawEdgeTerrain(ctx, sheet, scale, GRASS_EDGE, sx, sy, z, wx, wy, rc)
+      dc.drawEdgeTerrain(GRASS_EDGE)
     }
   }
 

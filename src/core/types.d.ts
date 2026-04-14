@@ -50,5 +50,6 @@ declare global {
   type AnimatedSprite = RenderTypes.AnimatedSprite
   type EdgeVariants = RenderTypes.EdgeVariants
   type RenderContext = RenderTypes.RenderContext
+  type DrawContext = RenderTypes.DrawContext
   type EntityRenderer = EntityRendererClass
 }

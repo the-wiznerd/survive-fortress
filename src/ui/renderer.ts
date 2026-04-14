@@ -111,7 +111,7 @@ export class Renderer {
     for (const row of terrainRows) {
       row.sort((a, b) => a.z - b.z)
       for (const { id, sx, sy, z, wx, wy, renderer } of row) {
-        renderer.render(ctx, this.spriteSheet, this.scale, id, sx, sy, z, wx, wy, rc)
+        renderer.render(id, new DrawContext(ctx, this.spriteSheet, this.scale, sx, sy, wx, wy, z, rc))
       }
     }
 
@@ -119,7 +119,7 @@ export class Renderer {
     for (const row of uprightRows) {
       row.sort((a, b) => a.z - b.z)
       for (const { id, sx, sy, z, wx, wy, renderer } of row) {
-        renderer.render(ctx, this.spriteSheet, this.scale, id, sx, sy, z, wx, wy, rc)
+        renderer.render(id, new DrawContext(ctx, this.spriteSheet, this.scale, sx, sy, wx, wy, z, rc))
       }
     }
 

@@ -1,22 +1,11 @@
-export class PlayerRenderer extends EntityRenderer {
-  render(
-    ctx: CanvasRenderingContext2D, sheet: HTMLImageElement, scale: number,
-    id: EntityId, sx: number, sy: number, z: number,
-    wx: number, wy: number, rc: RenderContext,
-  ) {
-    const destW = CELL_W * scale
-    const rowStep = CELL_H * scale
-    const destX = sx * destW
-    const destY = sy * rowStep - z * rowStep - rowStep / 2
+const SPRITE_COL = 0
+const SPRITE_ROW = 6
+const SPRITE_HEIGHT = 2 // cells tall
+const Y_OFFSET = -0.5 // half a cell up, centers on tile
 
-    // Upper face (row 6)
-    ctx.drawImage(sheet,
-      0, 6 * CELL_H, CELL_W, CELL_H,
-      destX, destY, destW, rowStep)
-    // Lower face (row 7)
-    ctx.drawImage(sheet,
-      0, 7 * CELL_H, CELL_W, CELL_H,
-      destX, destY + rowStep, destW, rowStep)
+export class PlayerRenderer extends EntityRenderer {
+  render(id: EntityId, dc: DrawContext) {
+    dc.draw(SPRITE_COL, SPRITE_ROW, 1, SPRITE_HEIGHT, Y_OFFSET)
   }
 
   inspect(id: EntityId, world: World): string | null {

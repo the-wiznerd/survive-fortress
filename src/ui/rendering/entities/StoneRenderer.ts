@@ -7,11 +7,7 @@ const EDGE: EdgeVariants = {
 export class StoneRenderer extends EntityRenderer {
   readonly terrain = true
 
-  render(
-    ctx: CanvasRenderingContext2D, sheet: HTMLImageElement, scale: number,
-    id: EntityId, sx: number, sy: number, z: number,
-    wx: number, wy: number, rc: RenderContext,
-  ) {
-    this.drawEdgeTerrain(ctx, sheet, scale, EDGE, sx, sy, z, wx, wy, rc)
+  render(id: EntityId, dc: DrawContext) {
+    dc.drawEdgeTerrain(EDGE)
   }
 }
