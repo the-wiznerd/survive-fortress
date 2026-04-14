@@ -4,7 +4,19 @@ export class PlayerRenderer extends EntityRenderer {
     id: EntityId, sx: number, sy: number, z: number,
     wx: number, wy: number, rc: RenderContext,
   ) {
-    this.drawSprite(ctx, sheet, scale, 9, 6, sx, sy, z)
+    const destW = CELL_W * scale
+    const rowStep = CELL_H * scale
+    const destX = sx * destW
+    const destY = sy * rowStep - z * rowStep - rowStep / 2
+
+    // Upper face (row 6)
+    ctx.drawImage(sheet,
+      0, 6 * CELL_H, CELL_W, CELL_H,
+      destX, destY, destW, rowStep)
+    // Lower face (row 7)
+    ctx.drawImage(sheet,
+      0, 7 * CELL_H, CELL_W, CELL_H,
+      destX, destY + rowStep, destW, rowStep)
   }
 
   inspect(id: EntityId, world: World): string | null {

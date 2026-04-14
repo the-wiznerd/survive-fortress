@@ -1,11 +1,10 @@
-const EDGE: EdgeVariants = {
-  row: 2,
-  topCols: [0, 1, 2, 3, 5, 4, 6, 3],
-  frontCols: [9, 8, 10, 7],
-}
+const EDGE_ROWS = [2, 3, 4, 5] // 4 animation frames, same col layout per row
+const EDGE_TOP_COLS = [0, 1, 2, 3, 5, 4, 6, 3]
+const EDGE_FRONT_COLS = [9, 8, 10, 7]
 
 /** Water sits 3 source pixels lower than surrounding terrain. */
 const Y_OFFSET = 3
+const ANIM_INTERVAL = 250 // ms per frame
 
 export class WaterRenderer extends EntityRenderer {
   readonly terrain = true
@@ -23,20 +22,24 @@ export class WaterRenderer extends EntityRenderer {
     const frontOccluded = rc.terrainAt.has(posKey(wx, wy + 1, z))
     const yOff = Y_OFFSET * scale
 
+    // Animation: stagger by world position so tiles don't all sync.
+    const frame = (Math.floor(rc.now / ANIM_INTERVAL) + wx + wy) % EDGE_ROWS.length
+    const row = EDGE_ROWS[frame]
+
     const destW = CELL_W * scale
     const rowStep = CELL_H * scale
-    const topCol = EDGE.topCols[n * 4 + e * 2 + w]
+    const topCol = EDGE_TOP_COLS[n * 4 + e * 2 + w]
     const destX = sx * destW
     const destY = sy * rowStep - z * rowStep + yOff
 
     ctx.drawImage(sheet,
-      topCol * CELL_W, EDGE.row * CELL_H, CELL_W, CELL_H,
+      topCol * CELL_W, row * CELL_H, CELL_W, CELL_H,
       destX, destY, destW, rowStep)
 
     if (!frontOccluded) {
-      const frontCol = EDGE.frontCols[e * 2 + w]
+      const frontCol = EDGE_FRONT_COLS[e * 2 + w]
       ctx.drawImage(sheet,
-        frontCol * CELL_W, EDGE.row * CELL_H, CELL_W, CELL_H,
+        frontCol * CELL_W, row * CELL_H, CELL_W, CELL_H,
         destX, destY + rowStep, destW, rowStep)
     }
   }
