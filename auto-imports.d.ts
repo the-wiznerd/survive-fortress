@@ -40,6 +40,8 @@ declare global {
   const Water: typeof import('@core/entityTypes/Water').Water
   const WaterRenderer: typeof import('@ui/rendering/entities/WaterRenderer').WaterRenderer
   const addComponent: typeof import('@core/ecs').addComponent
+  const addToSpatialIndex: typeof import('@core/ecs').addToSpatialIndex
+  const bootstrap: typeof import('@core/bootstrap').bootstrap
   const buildFaces2d: typeof import('@core/faces').buildFaces2d
   const buildFaces3d: typeof import('@core/faces').buildFaces3d
   const chunkKey: typeof import('@core/save').chunkKey
@@ -50,6 +52,7 @@ declare global {
   const exportManifest: typeof import('@core/serialization').exportManifest
   const getComponent: typeof import('@core/ecs').getComponent
   const getEntitiesAt: typeof import('@core/ecs').getEntitiesAt
+  const getEntitiesInColumn: typeof import('@core/ecs').getEntitiesInColumn
   const getEntityTypeConstructor: typeof import('@core/registry').getEntityTypeConstructor
   const getEntityTypeDef: typeof import('@core/registry').getEntityTypeDef
   const getNeighborCoords: typeof import('@core/ecs').getNeighborCoords
@@ -66,6 +69,8 @@ declare global {
   const queryEntities: typeof import('@core/ecs').queryEntities
   const registerEntityType: typeof import('@core/registry').registerEntityType
   const removeEntity: typeof import('@core/ecs').removeEntity
+  const removeFromSpatialIndex: typeof import('@core/ecs').removeFromSpatialIndex
+  const setPosition: typeof import('@core/ecs').setPosition
   const simulate: typeof import('@core/tick').simulate
   const spawnEntity: typeof import('@core/registry').spawnEntity
   const tick: typeof import('@core/tick').tick

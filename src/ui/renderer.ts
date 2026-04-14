@@ -49,10 +49,6 @@ export class Renderer {
   /** Callback invoked when the sprite sheet finishes loading. */
   onReady: (() => void) | null = null
 
-  /** World-space coordinates for hover and selection highlights. */
-  hoveredCell: { x: number; y: number } | null = null
-  selectedCell: { x: number; y: number } | null = null
-
   setCamera(x: number, y: number) {
     this.cameraX = x - Math.floor(this.viewWidth / 2)
     this.cameraY = y - Math.floor(this.viewHeight / 2)
@@ -66,7 +62,7 @@ export class Renderer {
     return { x: sx + this.cameraX, y: sy + this.cameraY }
   }
 
-  render(world: World) {
+  render(world: World, hoveredCell?: { x: number; y: number } | null, selectedCell?: { x: number; y: number } | null) {
     const { ctx, destW, rowStep, viewWidth, viewHeight, cameraX, cameraY } = this
 
     if (!this.spriteReady) return
@@ -124,8 +120,8 @@ export class Renderer {
     }
 
     // Draw tile highlights after all sprites so they overlay.
-    this.drawTileHighlight(ctx, this.hoveredCell, 'rgba(255, 255, 255, 0.35)')
-    this.drawTileHighlight(ctx, this.selectedCell, 'rgba(135, 206, 235, 0.6)')
+    this.drawTileHighlight(ctx, hoveredCell ?? null, 'rgba(255, 255, 255, 0.35)')
+    this.drawTileHighlight(ctx, selectedCell ?? null, 'rgba(135, 206, 235, 0.6)')
   }
 
   /** Get the EntityRenderer for a given type name (used by inspector). */

@@ -7,7 +7,7 @@ beforeAll(() => {
 /** Place a tile with moisture at (x, y). */
 function placeMoist(world: World, x: number, y: number, current: number, capacity = 100, conductivity = 10) {
   const id = createEntity(world)
-  addComponent(world, id, 'position', { x, y, z: 0 })
+  setPosition(world, id, x, y, 0)
   addComponent(world, id, 'moisture', { current, capacity, conductivity })
   return id
 }

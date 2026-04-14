@@ -84,6 +84,8 @@ export interface World {
   components: {
     [K in ComponentName]: Map<EntityId, ComponentTypes[K]>
   }
+  /** Spatial index: "x,y,z" → set of entity IDs at that position. */
+  spatialIndex: Map<string, Set<EntityId>>
 }
 
 export function createWorld(): World {
@@ -102,6 +104,7 @@ export function createWorld(): World {
       name: new Map(),
       instance: new Map(),
     },
+    spatialIndex: new Map(),
   }
 }
 
@@ -138,6 +141,9 @@ export function hasComponent(
 }
 
 export function removeEntity(world: World, entity: EntityId): void {
+  // Clean up spatial index before removing components.
+  const pos = world.components.position.get(entity)
+  if (pos) removeFromSpatialIndex(world, entity, pos.x, pos.y, pos.z)
   for (const store of Object.values(world.components)) {
     (store as Map<EntityId, unknown>).delete(entity)
   }
@@ -168,15 +174,62 @@ export function queryEntities(
   return result
 }
 
-/** Return all entity IDs at the given position. */
+/** Return all entity IDs at the given position (O(1) via spatial index). */
 export function getEntitiesAt(world: World, x: number, y: number, z: number): EntityId[] {
+  const set = world.spatialIndex.get(spatialKey(x, y, z))
+  return set ? [...set] : []
+}
+
+/** Return all entity IDs in a column (all z levels at x, y). */
+export function getEntitiesInColumn(world: World, x: number, y: number): EntityId[] {
   const result: EntityId[] = []
   for (const [id, pos] of world.components.position) {
-    if (pos.x === x && pos.y === y && pos.z === z) {
-      result.push(id)
-    }
+    if (pos.x === x && pos.y === y) result.push(id)
   }
   return result
+}
+
+// ─── Spatial Index ───
+
+function spatialKey(x: number, y: number, z: number): string {
+  return `${x},${y},${z}`
+}
+
+/** Add an entity to the spatial index at the given position. */
+export function addToSpatialIndex(world: World, entity: EntityId, x: number, y: number, z: number): void {
+  const key = spatialKey(x, y, z)
+  let set = world.spatialIndex.get(key)
+  if (!set) { set = new Set(); world.spatialIndex.set(key, set) }
+  set.add(entity)
+}
+
+/** Remove an entity from the spatial index at the given position. */
+export function removeFromSpatialIndex(world: World, entity: EntityId, x: number, y: number, z: number): void {
+  const key = spatialKey(x, y, z)
+  const set = world.spatialIndex.get(key)
+  if (set) {
+    set.delete(entity)
+    if (set.size === 0) world.spatialIndex.delete(key)
+  }
+}
+
+/**
+ * Place an entity at the given position, updating the spatial index.
+ * For entities with a PositionTrait, prefer direct field mutation (setters maintain the index).
+ * This function exists for raw entities (e.g. tests) that bypass traits.
+ */
+export function setPosition(world: World, entity: EntityId, x: number, y: number, z: number): void {
+  const positions = world.components.position
+  const old = positions.get(entity)
+
+  if (old) {
+    removeFromSpatialIndex(world, entity, old.x, old.y, old.z)
+    old.x = x; old.y = y; old.z = z
+  } else {
+    positions.set(entity, { x, y, z })
+  }
+
+  addToSpatialIndex(world, entity, x, y, z)
 }
 
 /** Return orthogonal neighbor coordinates at the same z level. */

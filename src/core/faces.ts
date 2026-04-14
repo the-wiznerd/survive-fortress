@@ -10,21 +10,16 @@ export interface Face {
  * By only checking +x and +y neighbors, each pair is found exactly once.
  */
 export function buildFaces2d(world: World, component: ComponentName): Face[] {
-  const index = new Map<string, EntityId>()
+  const faces: Face[] = []
   for (const id of queryEntities(world, component, 'position')) {
     const pos = getComponent(world, id, 'position')!
-    index.set(`${pos.x},${pos.y},${pos.z}`, id)
+    for (const neighborId of getEntitiesAt(world, pos.x + 1, pos.y, pos.z)) {
+      if (hasComponent(world, neighborId, component)) faces.push({ entityA: id, entityB: neighborId })
+    }
+    for (const neighborId of getEntitiesAt(world, pos.x, pos.y + 1, pos.z)) {
+      if (hasComponent(world, neighborId, component)) faces.push({ entityA: id, entityB: neighborId })
+    }
   }
-
-  const faces: Face[] = []
-  for (const [key, id] of index) {
-    const [x, y, z] = key.split(',').map(Number)
-    const right = index.get(`${x + 1},${y},${z}`)
-    if (right !== undefined) faces.push({ entityA: id, entityB: right })
-    const down = index.get(`${x},${y + 1},${z}`)
-    if (down !== undefined) faces.push({ entityA: id, entityB: down })
-  }
-
   return faces
 }
 
@@ -33,22 +28,18 @@ export function buildFaces2d(world: World, component: ComponentName): Face[] {
  * (+x, +y, +z) that have the given component.
  */
 export function buildFaces3d(world: World, component: ComponentName): Face[] {
-  const index = new Map<string, EntityId>()
+  const faces: Face[] = []
   for (const id of queryEntities(world, component, 'position')) {
     const pos = getComponent(world, id, 'position')!
-    index.set(`${pos.x},${pos.y},${pos.z}`, id)
+    for (const neighborId of getEntitiesAt(world, pos.x + 1, pos.y, pos.z)) {
+      if (hasComponent(world, neighborId, component)) faces.push({ entityA: id, entityB: neighborId })
+    }
+    for (const neighborId of getEntitiesAt(world, pos.x, pos.y + 1, pos.z)) {
+      if (hasComponent(world, neighborId, component)) faces.push({ entityA: id, entityB: neighborId })
+    }
+    for (const neighborId of getEntitiesAt(world, pos.x, pos.y, pos.z + 1)) {
+      if (hasComponent(world, neighborId, component)) faces.push({ entityA: id, entityB: neighborId })
+    }
   }
-
-  const faces: Face[] = []
-  for (const [key, id] of index) {
-    const [x, y, z] = key.split(',').map(Number)
-    const right = index.get(`${x + 1},${y},${z}`)
-    if (right !== undefined) faces.push({ entityA: id, entityB: right })
-    const down = index.get(`${x},${y + 1},${z}`)
-    if (down !== undefined) faces.push({ entityA: id, entityB: down })
-    const below = index.get(`${x},${y},${z + 1}`)
-    if (below !== undefined) faces.push({ entityA: id, entityB: below })
-  }
-
   return faces
 }
