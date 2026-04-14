@@ -60,9 +60,6 @@ declare global {
 // for type re-export
 declare global {
   // @ts-ignore
-  export type { EntityId, ComponentTypes, ComponentName, Position, Health, Hunger, Speed, PlayerControlled, EntityType, Moisture, GroundCover, Name, Instance, Action, World, Face, WorldManifest, ChunkRef, ChunkData, EntitySave } from '@sf/state'
-  import('@sf/state')
-  // @ts-ignore
   export type { EntityTypeConstructor } from '~engine/registry'
   import('~engine/registry')
   // @ts-ignore

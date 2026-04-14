@@ -1,3 +1,5 @@
+import { addComponent, type World, type EntityId, type EntityType } from '@sf/state'
+
 export class EntityTypeTrait extends Trait<'entityType'> {
   readonly component = 'entityType' as const
   declare type: string

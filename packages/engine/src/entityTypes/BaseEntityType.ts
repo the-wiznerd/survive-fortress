@@ -1,3 +1,5 @@
+import type { World, EntityId } from '@sf/state'
+
 export abstract class BaseEntityType {
   abstract type: string
 

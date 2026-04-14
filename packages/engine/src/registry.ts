@@ -1,3 +1,5 @@
+import { createEntity, addComponent, type World, type EntityId } from '@sf/state'
+
 // ─── Entity Type Constructor ───
 
 export type EntityTypeConstructor = new (world: World, id: EntityId) => BaseEntityType

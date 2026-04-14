@@ -1,3 +1,5 @@
+import type { World, EntityId, Moisture } from '@sf/state'
+
 export class MoistureTrait extends Trait<'moisture'> {
   readonly component = 'moisture' as const
   declare current: number

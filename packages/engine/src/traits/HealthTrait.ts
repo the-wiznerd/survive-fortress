@@ -1,3 +1,5 @@
+import type { Health } from '@sf/state'
+
 export class HealthTrait extends Trait<'health'> {
   readonly component = 'health' as const
   declare current: number

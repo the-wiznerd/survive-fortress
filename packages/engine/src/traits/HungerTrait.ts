@@ -1,3 +1,5 @@
+import type { Hunger } from '@sf/state'
+
 export class HungerTrait extends Trait<'hunger'> {
   readonly component = 'hunger' as const
   declare current: number

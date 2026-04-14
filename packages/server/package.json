@@ -3,14 +3,26 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./sdk": "./src/sdk/index.ts"
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./sdk": {
+      "import": "./dist/sdk/index.js",
+      "types": "./dist/sdk/index.d.ts"
+    }
   },
   "scripts": {
+    "build": "vite build",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@sf/engine": "workspace:*",
     "@sf/state": "workspace:*"
+  },
+  "devDependencies": {
+    "unplugin-auto-import": "^21.0.0",
+    "vite": "^6.3.0",
+    "vite-plugin-dts": "^4.5.0"
   }
 }

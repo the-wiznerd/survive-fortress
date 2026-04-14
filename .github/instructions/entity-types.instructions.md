@@ -88,13 +88,13 @@ export class MoistureTrait extends Trait<'moisture'> {
 
 ### Creating a new trait
 
-1. Create `src/core/traits/<Name>Trait.ts` (capitalized to match the class name).
+1. Create `packages/engine/src/traits/<Name>Trait.ts` (capitalized to match the class name).
 2. Extend `Trait<'componentName'>`.
 3. Set `readonly component = 'componentName' as const`.
 4. Add `declare` fields matching the component interface.
 5. Implement `defaults()` returning the component's data shape.
 6. Add constructor overrides if different entity types need different defaults.
-7. **Do not add any import statements** — all core values and types are globally available.
+7. Add an explicit import for the `@sf/state` type used as the return type of `defaults()` (e.g., `import type { Moisture } from '@sf/state'`). Engine-internal types like `Trait` are auto-imported.
 
 ## Systems
 
@@ -107,10 +107,10 @@ Systems are global functions that process all entities with certain components. 
 
 ### Creating a new system
 
-1. Create `src/core/systems/<name>.ts` (camelCase — systems export functions, not classes).
+1. Create `packages/engine/src/systems/<name>.ts` (camelCase — systems export functions, not classes).
 2. Export a `const mySystem: System = (world) => { ... }`.
 3. Add it to `defaultSystems` in `tick.ts` (order matters — systems before `entityTypeTickSystem`).
-4. **Do not add any import statements.**
+4. Add explicit imports for `@sf/state` values used (e.g., `import { queryEntities, getComponent, type World } from '@sf/state'`). Engine-internal types like `System` and `BaseEntityType` are auto-imported.
 
 ## Entity Types
 
@@ -160,13 +160,13 @@ export class Player extends BaseEntityType {
 
 ### Creating a new entity type
 
-1. Create `src/core/entityTypes/<Name>.ts` (capitalized to match the class name).
+1. Create `packages/engine/src/entityTypes/<Name>.ts` (capitalized to match the class name).
 2. Extend `BaseEntityType`.
 3. Set `type = '<name>'`.
 4. Add traits as members via `this.addTrait(new SomeTrait(this.world, this.id))`.
 5. Optionally override `tick()` for per-entity behavior (Phase 2). `tick()` takes no arguments — use `this.world`, `this.id`, and trait members.
-6. Register the class constructor at startup in `main.ts` and test files.
-7. **Do not add any import statements** — all core values and types are globally available.
+6. Register the class constructor at startup in `bootstrap.ts` and test files.
+7. Add explicit imports for `@sf/state` types if needed (e.g., `import type { World, EntityId } from '@sf/state'`). Engine-internal types like `BaseEntityType` and all traits are auto-imported.
 
 ### What an entity type class does NOT do
 

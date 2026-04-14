@@ -1,3 +1,16 @@
+import {
+  queryEntities,
+  getComponent,
+  chunkKey,
+  createWorld,
+  type World,
+  type EntityId,
+  type ChunkData,
+  type ChunkRef,
+  type EntitySave,
+  type WorldManifest,
+} from '@sf/state'
+
 // ─── Export: ECS → Save Format ───
 
 /** Build a ChunkData from all entities in a given chunk region. */

@@ -1,3 +1,5 @@
+import type { World, EntityId, Speed } from '@sf/state'
+
 export class SpeedTrait extends Trait<'speed'> {
   readonly component = 'speed' as const
   declare pace: number

@@ -1,3 +1,5 @@
+import type { PlayerControlled, Action } from '@sf/state'
+
 export class PlayerControlledTrait extends Trait<'playerControlled'> {
   readonly component = 'playerControlled' as const
   declare pendingAction: Action | null

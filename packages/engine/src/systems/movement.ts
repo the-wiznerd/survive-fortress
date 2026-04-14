@@ -1,3 +1,5 @@
+import { queryEntities, getComponent, type World, type Action } from '@sf/state'
+
 export function movementSystem(world: World) {
   for (const id of queryEntities(world, 'speed', 'position')) {
     const speed = getComponent(world, id, 'speed')!

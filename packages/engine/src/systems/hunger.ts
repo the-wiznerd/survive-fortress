@@ -1,3 +1,5 @@
+import { queryEntities, getComponent, type World } from '@sf/state'
+
 export function hungerSystem(world: World) {
   for (const id of queryEntities(world, 'hunger')) {
     const hunger = getComponent(world, id, 'hunger')!

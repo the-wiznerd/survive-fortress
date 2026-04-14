@@ -11,8 +11,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "paths": {
-      "~engine/*": ["../engine/src/*"]
+      "~server/*": ["./src/*"]
     }
   },
-  "include": ["src", "../engine/src/types.d.ts", "../engine/auto-imports.d.ts"]
+  "include": ["src", "auto-imports.d.ts"]
 }

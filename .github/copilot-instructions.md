@@ -1,41 +1,66 @@
 # Survive Fortress — Copilot Instructions
 
-## Auto-Imports & Global Types — No Explicit Imports
+## Monorepo Structure
 
-This project uses `unplugin-auto-import` and a global `types.d.ts` so that **all core values and types are available globally** without any imports.
+This is a Yarn 4 workspaces monorepo with Turborepo orchestration. Four packages under `packages/`:
+
+- **`@sf/state`** — ECS, spatial index, save types. No dependencies.
+- **`@sf/engine`** — Traits, systems, entity types, registry, serialization. Depends on `@sf/state`.
+- **`@sf/server`** — Server internals + client SDK (dual export: `.` and `./sdk`). Depends on `@sf/state` + `@sf/engine`.
+- **`@sf/client`** — Vite app: renderer, sidebar, input, web components. Depends on `@sf/server`.
+
+Each library package (state, engine, server) builds to `dist/` with Vite lib mode + `vite-plugin-dts`. Package.json exports point to `dist/` (both `import` and `types`). `turbo build` runs them in dependency order.
+
+## Auto-Imports — Internal Only
+
+Each package uses `unplugin-auto-import` to auto-import **its own internal** exports. Cross-package imports are always explicit.
 
 ### Rules
 
-- **Do not add `import` statements for core values or types.** They are globally available via auto-imports and `types.d.ts` in all files (core, ui, and tests).
-- The generated `auto-imports.d.ts` file provides IDE support. It is generated automatically by vitest/vite — do not hand-edit it.
+- **Do not add imports for same-package values or types.** They are auto-imported via the `~pkg` alias (e.g., `~engine`, `~client`).
+- **Do add explicit imports for cross-package dependencies.** Example: `import { createWorld, type World } from '@sf/state'` in engine code.
+- The generated `auto-imports.d.ts` in each package provides IDE support. Do not hand-edit.
+- Each package also has a `~pkg` path alias in both vite.config.ts and tsconfig.json (e.g., `~engine/*` → `./src/*`).
 
 ### What still needs explicit imports
 
+- **Cross-package dependencies** like `import { World } from '@sf/state'` in engine files.
 - **Third-party libraries** like `vitest` (`import { describe, it, expect } from 'vitest'`).
-- **Local non-core modules** like `import { Renderer } from './renderer.js'`.
-
-### How it works
-
-- `vite.config.ts` uses `scanExports()` to discover all exports from `src/core/` and its subdirectories.
-- The export map is fed to `unplugin-auto-import`, which injects imports automatically at build time.
-- `src/core/types.d.ts` uses `declare global` to make all core types ambient.
+- **Side-effect imports** for web components (`import './components/entity-card.js'`).
 
 ### Adding new exports
 
-When you add a new public function or type to `src/core/`:
+When you add a new public function or type to a package:
 1. Export it from the relevant source file as usual.
-2. If it's a **type**: add a corresponding `type X = Module.X` entry in `src/core/types.d.ts`.
-3. **Values** are auto-discovered by `scanExports()` — no manual config changes needed.
-4. Run `yarn test` once to regenerate the `auto-imports.d.ts` file.
+2. **Same-package values** are auto-discovered by `scanExports()` — no manual config changes needed.
+3. If it's a **class used as a type annotation** in engine, add a corresponding entry in `src/types.d.ts`.
+4. Run `turbo build` to regenerate `auto-imports.d.ts` files.
+
+## Server SDK
+
+The client interacts with the game exclusively through `@sf/server/sdk`:
+
+- `Game` interface: `onViewUpdate`, `sendAction`, `inspect`, `start`, `stop`, `getView`
+- `ViewEntity`: plain data (no ECS classes) — `id`, `type`, `x`, `y`, `z`, `traits`
+- `createLocalGame(loadSave)` accepts raw JSON `{ manifest, chunks }`, handles engine internals
+- The client never imports from `@sf/state` or `@sf/engine` directly
+
+## Key Commands
+
+- `nvm use 22` before any yarn/node commands — default system Node is v16, breaks Vite.
+- `yarn dev` — builds deps + starts client dev server (Turborepo)
+- `yarn build` — full production build all packages
+- `yarn test` — engine tests (vitest, 20 tests)
+- `yarn typecheck` — tsc --noEmit all packages
+- `yarn dev:kill` — kill dev servers on ports 5173-5175
 
 ## Style
 
 - No trailing semicolons in `.ts` files.
-- Use `nvm use 22` before any yarn/node commands — the default system Node is too old.
 
 ### File & Directory Organization
 
-- **Split unrelated but similar code into separate files** in a single directory. One class/system/trait per file. No barrel files (`index.ts`) — use sub-path exports or side-effect imports instead.
+- **Split unrelated but similar code into separate files** in a single directory. One class/system/trait per file.
 - **File names match the class they contain**, including capitalization. `Dirt.ts` exports `class Dirt`, `MoistureTrait.ts` exports `class MoistureTrait`. Files that export only non-class values (functions, constants) use camelCase: `moisture.ts`, `movement.ts`.
 - **Directory names use camelCase or PascalCase**, matching JS naming conventions. No snake_case: `entityTypes/`, `traits/`, not `entity_types/`, `trait_files/`.
 

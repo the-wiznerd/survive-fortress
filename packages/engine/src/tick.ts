@@ -1,3 +1,5 @@
+import type { World } from '@sf/state'
+
 export type System = (world: World) => void
 
 // ─── Tick Engine ───

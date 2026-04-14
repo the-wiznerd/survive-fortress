@@ -1,3 +1,5 @@
+import { buildFaces2d, getComponent, intDiv, type World, type EntityId } from '@sf/state'
+
 export function moistureSystem(world: World) {
   const faces = buildFaces2d(world, 'moisture')
 
