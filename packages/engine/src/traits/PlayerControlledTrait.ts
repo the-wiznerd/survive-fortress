@@ -1,4 +1,4 @@
-import type { PlayerControlled, Action } from '@sf/state'
+import type { PlayerControlled, Action } from '@repo/state'
 
 export class PlayerControlledTrait extends Trait<'playerControlled'> {
   readonly component = 'playerControlled' as const

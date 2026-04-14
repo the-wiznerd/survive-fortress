@@ -1,4 +1,4 @@
-import { addComponent, type World, type EntityId, type ComponentName, type ComponentTypes } from '@sf/state'
+import { addComponent, type World, type EntityId, type ComponentName, type ComponentTypes } from '@repo/state'
 
 export abstract class Trait<K extends ComponentName> {
   abstract readonly component: K

@@ -1,4 +1,4 @@
-import { queryEntities, getComponent, type World, type Action } from '@sf/state'
+import { queryEntities, getComponent, type World, type Action } from '@repo/state'
 
 export function movementSystem(world: World) {
   for (const id of queryEntities(world, 'speed', 'position')) {

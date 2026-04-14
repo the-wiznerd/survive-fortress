@@ -1,4 +1,4 @@
-import type { GameView, ViewEntity } from '@sf/server/sdk'
+import type { GameView, ViewEntity } from '@repo/server/sdk'
 import { CELL_W, CELL_H, DrawContext, type RenderContext, zKey, posKey } from './rendering/types.js'
 import { EntityRenderer } from './rendering/entities/EntityRenderer.js'
 import { DirtRenderer } from './rendering/entities/DirtRenderer.js'

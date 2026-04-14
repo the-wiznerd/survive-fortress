@@ -1,4 +1,4 @@
-import { createEntity, addComponent, type World, type EntityId } from '@sf/state'
+import { createEntity, addComponent, type World, type EntityId } from '@repo/state'
 
 // ─── Entity Type Constructor ───
 

@@ -9,7 +9,7 @@ import {
   type ChunkRef,
   type EntitySave,
   type WorldManifest,
-} from '@sf/state'
+} from '@repo/state'
 
 // ─── Export: ECS → Save Format ───
 

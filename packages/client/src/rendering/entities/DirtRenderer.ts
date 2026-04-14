@@ -1,4 +1,4 @@
-import type { ViewEntity } from '@sf/server/sdk'
+import type { ViewEntity } from '@repo/server/sdk'
 import type { DrawContext, EdgeVariants } from '../types.js'
 import { EntityRenderer } from './EntityRenderer.js'
 

@@ -1,5 +1,5 @@
 {
-  "name": "@sf/engine",
+  "name": "@repo/engine",
   "private": true,
   "type": "module",
   "exports": {
@@ -16,7 +16,7 @@
     "generate": "vite build --mode generate"
   },
   "dependencies": {
-    "@sf/state": "workspace:*"
+    "@repo/state": "workspace:*"
   },
   "devDependencies": {
     "unplugin-auto-import": "^21.0.0",

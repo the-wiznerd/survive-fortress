@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest'
-import { createWorld, createEntity, setPosition, addComponent, getComponent, type World } from '@sf/state'
+import { createWorld, createEntity, setPosition, addComponent, getComponent, type World } from '@repo/state'
 
 beforeAll(() => {
   registerEntityType('dirt', Dirt)

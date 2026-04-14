@@ -1,5 +1,5 @@
 {
-  "name": "@sf/client",
+  "name": "@repo/client",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@sf/server": "workspace:*"
+    "@repo/server": "workspace:*"
   },
   "devDependencies": {
     "unplugin-auto-import": "^21.0.0",

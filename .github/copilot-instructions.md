@@ -4,10 +4,10 @@
 
 This is a Yarn 4 workspaces monorepo with Turborepo orchestration. Four packages under `packages/`:
 
-- **`@sf/state`** — ECS, spatial index, save types. No dependencies.
-- **`@sf/engine`** — Traits, systems, entity types, registry, serialization. Depends on `@sf/state`.
-- **`@sf/server`** — Server internals + client SDK (dual export: `.` and `./sdk`). Depends on `@sf/state` + `@sf/engine`.
-- **`@sf/client`** — Vite app: renderer, sidebar, input, web components. Depends on `@sf/server`.
+- **`@repo/state`** — ECS, spatial index, save types. No dependencies.
+- **`@repo/engine`** — Traits, systems, entity types, registry, serialization. Depends on `@repo/state`.
+- **`@repo/server`** — Server internals + client SDK (dual export: `.` and `./sdk`). Depends on `@repo/state` + `@repo/engine`.
+- **`@repo/client`** — Vite app: renderer, sidebar, input, web components. Depends on `@repo/server`.
 
 Each library package (state, engine, server) builds to `dist/` with Vite lib mode + `vite-plugin-dts`. Package.json exports point to `dist/` (both `import` and `types`). `turbo build` runs them in dependency order.
 
@@ -18,13 +18,13 @@ Each package uses `unplugin-auto-import` to auto-import **its own internal** exp
 ### Rules
 
 - **Do not add imports for same-package values or types.** They are auto-imported via the `~pkg` alias (e.g., `~engine`, `~client`).
-- **Do add explicit imports for cross-package dependencies.** Example: `import { createWorld, type World } from '@sf/state'` in engine code.
+- **Do add explicit imports for cross-package dependencies.** Example: `import { createWorld, type World } from '@repo/state'` in engine code.
 - The generated `auto-imports.d.ts` in each package provides IDE support. Do not hand-edit.
 - Each package also has a `~pkg` path alias in both vite.config.ts and tsconfig.json (e.g., `~engine/*` → `./src/*`).
 
 ### What still needs explicit imports
 
-- **Cross-package dependencies** like `import { World } from '@sf/state'` in engine files.
+- **Cross-package dependencies** like `import { World } from '@repo/state'` in engine files.
 - **Third-party libraries** like `vitest` (`import { describe, it, expect } from 'vitest'`).
 - **Side-effect imports** for web components (`import './components/entity-card.js'`).
 
@@ -38,12 +38,12 @@ When you add a new public function or type to a package:
 
 ## Server SDK
 
-The client interacts with the game exclusively through `@sf/server/sdk`:
+The client interacts with the game exclusively through `@repo/server/sdk`:
 
 - `Game` interface: `onViewUpdate`, `sendAction`, `inspect`, `start`, `stop`, `getView`
 - `ViewEntity`: plain data (no ECS classes) — `id`, `type`, `x`, `y`, `z`, `traits`
 - `createLocalGame(loadSave)` accepts raw JSON `{ manifest, chunks }`, handles engine internals
-- The client never imports from `@sf/state` or `@sf/engine` directly
+- The client never imports from `@repo/state` or `@repo/engine` directly
 
 ## Key Commands
 

@@ -1,4 +1,4 @@
-import type { Name } from '@sf/state'
+import type { Name } from '@repo/state'
 
 export class NameTrait extends Trait<'name'> {
   readonly component = 'name' as const

@@ -1,4 +1,4 @@
-import type { World } from '@sf/state'
+import type { World } from '@repo/state'
 
 export type System = (world: World) => void
 

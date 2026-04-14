@@ -1,4 +1,4 @@
-import { createLocalGame, type Game, type GameView } from '@sf/server/sdk'
+import { createLocalGame, type Game, type GameView } from '@repo/server/sdk'
 import { Renderer } from './renderer.js'
 
 // ─── Game State ───

@@ -6,13 +6,13 @@ import {
   getComponent,
   queryEntities,
   getEntitiesInColumn,
-} from '@sf/state'
+} from '@repo/state'
 import {
   bootstrap,
   tick,
   importWorld,
   type BaseEntityType,
-} from '@sf/engine'
+} from '@repo/engine'
 import type { Game, GameView, ViewEntity, PlayerAction, InspectResult } from './types.js'
 
 /** Trait names the client is allowed to see when inspecting entities. */

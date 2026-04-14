@@ -1,4 +1,4 @@
-import type { World, EntityId } from '@sf/state'
+import type { World, EntityId } from '@repo/state'
 
 export abstract class BaseEntityType {
   abstract type: string

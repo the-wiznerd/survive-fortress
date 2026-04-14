@@ -1,4 +1,4 @@
-import { queryEntities, getComponent, type World } from '@sf/state'
+import { queryEntities, getComponent, type World } from '@repo/state'
 
 export function entityTypeTickSystem(world: World) {
   for (const id of queryEntities(world, 'instance')) {

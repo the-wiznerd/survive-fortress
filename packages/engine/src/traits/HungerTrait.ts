@@ -1,4 +1,4 @@
-import type { Hunger } from '@sf/state'
+import type { Hunger } from '@repo/state'
 
 export class HungerTrait extends Trait<'hunger'> {
   readonly component = 'hunger' as const

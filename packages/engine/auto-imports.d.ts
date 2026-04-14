@@ -20,39 +20,39 @@ declare global {
   const Sand: typeof import('~engine/entityTypes/Sand').Sand
   const SpeedTrait: typeof import('~engine/traits/SpeedTrait').SpeedTrait
   const Stone: typeof import('~engine/entityTypes/Stone').Stone
-  const TICKS_PER_DAY: typeof import('@sf/state').TICKS_PER_DAY
+  const TICKS_PER_DAY: typeof import('@repo/state').TICKS_PER_DAY
   const Trait: typeof import('~engine/traits/Trait').Trait
   const Water: typeof import('~engine/entityTypes/Water').Water
-  const addComponent: typeof import('@sf/state').addComponent
-  const addToSpatialIndex: typeof import('@sf/state').addToSpatialIndex
+  const addComponent: typeof import('@repo/state').addComponent
+  const addToSpatialIndex: typeof import('@repo/state').addToSpatialIndex
   const bootstrap: typeof import('~engine/bootstrap').bootstrap
-  const buildFaces2d: typeof import('@sf/state').buildFaces2d
-  const buildFaces3d: typeof import('@sf/state').buildFaces3d
-  const chunkKey: typeof import('@sf/state').chunkKey
-  const createEntity: typeof import('@sf/state').createEntity
-  const createWorld: typeof import('@sf/state').createWorld
+  const buildFaces2d: typeof import('@repo/state').buildFaces2d
+  const buildFaces3d: typeof import('@repo/state').buildFaces3d
+  const chunkKey: typeof import('@repo/state').chunkKey
+  const createEntity: typeof import('@repo/state').createEntity
+  const createWorld: typeof import('@repo/state').createWorld
   const entityTypeTickSystem: typeof import('~engine/systems/entityTypeTick').entityTypeTickSystem
   const exportChunk: typeof import('~engine/serialization').exportChunk
   const exportManifest: typeof import('~engine/serialization').exportManifest
-  const getComponent: typeof import('@sf/state').getComponent
-  const getEntitiesAt: typeof import('@sf/state').getEntitiesAt
-  const getEntitiesInColumn: typeof import('@sf/state').getEntitiesInColumn
+  const getComponent: typeof import('@repo/state').getComponent
+  const getEntitiesAt: typeof import('@repo/state').getEntitiesAt
+  const getEntitiesInColumn: typeof import('@repo/state').getEntitiesInColumn
   const getEntityTypeConstructor: typeof import('~engine/registry').getEntityTypeConstructor
-  const getNeighborCoords: typeof import('@sf/state').getNeighborCoords
+  const getNeighborCoords: typeof import('@repo/state').getNeighborCoords
   const getRegisteredTypes: typeof import('~engine/registry').getRegisteredTypes
-  const hasComponent: typeof import('@sf/state').hasComponent
+  const hasComponent: typeof import('@repo/state').hasComponent
   const hungerSystem: typeof import('~engine/systems/hunger').hungerSystem
   const importChunk: typeof import('~engine/serialization').importChunk
   const importWorld: typeof import('~engine/serialization').importWorld
-  const intDiv: typeof import('@sf/state').intDiv
+  const intDiv: typeof import('@repo/state').intDiv
   const moistureSystem: typeof import('~engine/systems/moisture').moistureSystem
   const movementSystem: typeof import('~engine/systems/movement').movementSystem
-  const parseChunkKey: typeof import('@sf/state').parseChunkKey
-  const queryEntities: typeof import('@sf/state').queryEntities
+  const parseChunkKey: typeof import('@repo/state').parseChunkKey
+  const queryEntities: typeof import('@repo/state').queryEntities
   const registerEntityType: typeof import('~engine/registry').registerEntityType
-  const removeEntity: typeof import('@sf/state').removeEntity
-  const removeFromSpatialIndex: typeof import('@sf/state').removeFromSpatialIndex
-  const setPosition: typeof import('@sf/state').setPosition
+  const removeEntity: typeof import('@repo/state').removeEntity
+  const removeFromSpatialIndex: typeof import('@repo/state').removeFromSpatialIndex
+  const setPosition: typeof import('@repo/state').setPosition
   const simulate: typeof import('~engine/tick').simulate
   const spawnEntity: typeof import('~engine/registry').spawnEntity
   const tick: typeof import('~engine/tick').tick

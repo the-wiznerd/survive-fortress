@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createWorld, getComponent } from '@sf/state'
+import { createWorld, getComponent } from '@repo/state'
 
 registerEntityType('player', Player)
 

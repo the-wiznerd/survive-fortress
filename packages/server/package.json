@@ -1,5 +1,5 @@
 {
-  "name": "@sf/server",
+  "name": "@repo/server",
   "private": true,
   "type": "module",
   "exports": {
@@ -17,8 +17,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@sf/engine": "workspace:*",
-    "@sf/state": "workspace:*"
+    "@repo/engine": "workspace:*",
+    "@repo/state": "workspace:*"
   },
   "devDependencies": {
     "unplugin-auto-import": "^21.0.0",

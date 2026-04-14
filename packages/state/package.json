@@ -1,5 +1,5 @@
 {
-  "name": "@sf/state",
+  "name": "@repo/state",
   "private": true,
   "type": "module",
   "exports": {

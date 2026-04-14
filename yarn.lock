@@ -547,6 +547,50 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@repo/client@workspace:packages/client":
+  version: 0.0.0-use.local
+  resolution: "@repo/client@workspace:packages/client"
+  dependencies:
+    "@repo/server": "workspace:*"
+    unplugin-auto-import: "npm:^21.0.0"
+    vite: "npm:^6.3.0"
+  languageName: unknown
+  linkType: soft
+
+"@repo/engine@workspace:*, @repo/engine@workspace:packages/engine":
+  version: 0.0.0-use.local
+  resolution: "@repo/engine@workspace:packages/engine"
+  dependencies:
+    "@repo/state": "workspace:*"
+    unplugin-auto-import: "npm:^21.0.0"
+    vite: "npm:^6.3.0"
+    vite-plugin-dts: "npm:^4.5.0"
+    vitest: "npm:^3.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@repo/server@workspace:*, @repo/server@workspace:packages/server":
+  version: 0.0.0-use.local
+  resolution: "@repo/server@workspace:packages/server"
+  dependencies:
+    "@repo/engine": "workspace:*"
+    "@repo/state": "workspace:*"
+    unplugin-auto-import: "npm:^21.0.0"
+    vite: "npm:^6.3.0"
+    vite-plugin-dts: "npm:^4.5.0"
+  languageName: unknown
+  linkType: soft
+
+"@repo/state@workspace:*, @repo/state@workspace:packages/state":
+  version: 0.0.0-use.local
+  resolution: "@repo/state@workspace:packages/state"
+  dependencies:
+    unplugin-auto-import: "npm:^21.0.0"
+    vite: "npm:^6.3.0"
+    vite-plugin-dts: "npm:^4.5.0"
+  languageName: unknown
+  linkType: soft
+
 "@rollup/pluginutils@npm:^5.1.4":
   version: 5.3.0
   resolution: "@rollup/pluginutils@npm:5.3.0"
@@ -808,50 +852,6 @@ __metadata:
   checksum: 10c0/f65cf629e64e853cc99d6dcc2ebfcdfe1c17e58d1d4de4ebf10e36c0b850712f394eb0d4d7651a5fc5936d24ad0da30cd3364ab96c1b4f5f4aadb6a5146574fb
   languageName: node
   linkType: hard
-
-"@sf/client@workspace:packages/client":
-  version: 0.0.0-use.local
-  resolution: "@sf/client@workspace:packages/client"
-  dependencies:
-    "@sf/server": "workspace:*"
-    unplugin-auto-import: "npm:^21.0.0"
-    vite: "npm:^6.3.0"
-  languageName: unknown
-  linkType: soft
-
-"@sf/engine@workspace:*, @sf/engine@workspace:packages/engine":
-  version: 0.0.0-use.local
-  resolution: "@sf/engine@workspace:packages/engine"
-  dependencies:
-    "@sf/state": "workspace:*"
-    unplugin-auto-import: "npm:^21.0.0"
-    vite: "npm:^6.3.0"
-    vite-plugin-dts: "npm:^4.5.0"
-    vitest: "npm:^3.1.0"
-  languageName: unknown
-  linkType: soft
-
-"@sf/server@workspace:*, @sf/server@workspace:packages/server":
-  version: 0.0.0-use.local
-  resolution: "@sf/server@workspace:packages/server"
-  dependencies:
-    "@sf/engine": "workspace:*"
-    "@sf/state": "workspace:*"
-    unplugin-auto-import: "npm:^21.0.0"
-    vite: "npm:^6.3.0"
-    vite-plugin-dts: "npm:^4.5.0"
-  languageName: unknown
-  linkType: soft
-
-"@sf/state@workspace:*, @sf/state@workspace:packages/state":
-  version: 0.0.0-use.local
-  resolution: "@sf/state@workspace:packages/state"
-  dependencies:
-    unplugin-auto-import: "npm:^21.0.0"
-    vite: "npm:^6.3.0"
-    vite-plugin-dts: "npm:^4.5.0"
-  languageName: unknown
-  linkType: soft
 
 "@turbo/darwin-64@npm:2.9.6":
   version: 2.9.6

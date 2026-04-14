@@ -1,4 +1,4 @@
-import type { Game, GameView, ViewEntity, InspectResult } from '@sf/server/sdk'
+import type { Game, GameView, ViewEntity, InspectResult } from '@repo/server/sdk'
 import { Renderer } from './renderer.js'
 import { TraitRenderer } from './rendering/traits/TraitRenderer.js'
 import { HealthTraitRenderer } from './rendering/traits/HealthTraitRenderer.js'

@@ -1,4 +1,4 @@
-import type { World, EntityId, Speed } from '@sf/state'
+import type { World, EntityId, Speed } from '@repo/state'
 
 export class SpeedTrait extends Trait<'speed'> {
   readonly component = 'speed' as const

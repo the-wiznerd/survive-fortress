@@ -1,4 +1,4 @@
-import { removeFromSpatialIndex, addToSpatialIndex, type World, type EntityId, type Position } from '@sf/state'
+import { removeFromSpatialIndex, addToSpatialIndex, type World, type EntityId, type Position } from '@repo/state'
 
 export class PositionTrait extends Trait<'position'> {
   readonly component = 'position' as const
