@@ -1,6 +1,4 @@
 import { createLocalGame, type Game, type GameView } from '@sf/server/sdk'
-import type { WorldManifest, ChunkData } from '@sf/state'
-import { importWorld } from '@sf/engine'
 import { Renderer } from './renderer.js'
 
 // ─── Game State ───
@@ -16,15 +14,15 @@ export function getView(): GameView { return currentView }
 export async function init(renderer: Renderer) {
   game = await createLocalGame(async () => {
     const manifestResp = await fetch(`${SAVE_PATH}/world.json`)
-    const manifest: WorldManifest = await manifestResp.json()
+    const manifest = await manifestResp.json()
 
-    const chunks: ChunkData[] = []
+    const chunks: unknown[] = []
     for (const ref of Object.values(manifest.chunks)) {
-      const chunkResp = await fetch(`${SAVE_PATH}/chunks/${ref.cx}_${ref.cy}.json`)
+      const chunkResp = await fetch(`${SAVE_PATH}/chunks/${(ref as any).cx}_${(ref as any).cy}.json`)
       chunks.push(await chunkResp.json())
     }
 
-    return importWorld(manifest, chunks)
+    return { manifest, chunks }
   })
 
   currentView = game.getView()

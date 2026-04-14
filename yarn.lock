@@ -638,6 +638,7 @@ __metadata:
   resolution: "@sf/client@workspace:packages/client"
   dependencies:
     "@sf/server": "workspace:*"
+    unplugin-auto-import: "npm:^21.0.0"
     vite: "npm:^6.3.0"
   languageName: unknown
   linkType: soft

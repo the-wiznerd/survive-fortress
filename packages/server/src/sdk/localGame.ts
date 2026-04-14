@@ -1,6 +1,8 @@
 import {
   type World,
   type EntityId,
+  type WorldManifest,
+  type ChunkData,
   getComponent,
   queryEntities,
   getEntitiesInColumn,
@@ -18,11 +20,15 @@ const VISIBLE_TRAITS = ['health', 'hunger', 'speed', 'moisture', 'groundCover'] 
 
 /**
  * Create a local (in-process) game. Engine runs directly — no networking.
+ * Accepts raw save data (JSON fetched from save files) — the SDK handles import.
  * Returns the same Game interface that a remote connection would.
  */
-export async function createLocalGame(loadWorld: () => Promise<{ world: World; playerIds: EntityId[] }>): Promise<Game> {
+export async function createLocalGame(
+  loadSave: () => Promise<{ manifest: unknown; chunks: unknown[] }>,
+): Promise<Game> {
   bootstrap()
-  const { world, playerIds } = await loadWorld()
+  const raw = await loadSave()
+  const { world, playerIds } = importWorld(raw.manifest as WorldManifest, raw.chunks as ChunkData[])
   const playerId = playerIds[0]
 
   let pendingAction: PlayerAction | null = null
