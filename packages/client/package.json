@@ -5,16 +5,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "typecheck": "tsc --noEmit",
-    "generate": "vite build"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@sf/engine": "workspace:*",
-    "@sf/state": "workspace:*",
-    "@sf/ui": "workspace:*"
+    "@sf/server": "workspace:*"
   },
   "devDependencies": {
-    "unplugin-auto-import": "^21.0.0",
     "vite": "^6.3.0"
   }
 }

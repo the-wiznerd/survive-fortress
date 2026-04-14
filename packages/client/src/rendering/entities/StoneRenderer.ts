@@ -1,3 +1,7 @@
+import type { ViewEntity } from '@sf/server/sdk'
+import type { DrawContext, EdgeVariants } from '../types.js'
+import { EntityRenderer } from './EntityRenderer.js'
+
 const EDGE: EdgeVariants = {
   row: 1,
   topCols: [11, 12, 13, 14, 16, 15, 17, 14],
@@ -7,7 +11,7 @@ const EDGE: EdgeVariants = {
 export class StoneRenderer extends EntityRenderer {
   readonly terrain = true
 
-  render(id: EntityId, dc: DrawContext) {
+  render(entity: ViewEntity, dc: DrawContext) {
     dc.drawEdgeTerrain(EDGE)
   }
 }

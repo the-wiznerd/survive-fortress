@@ -1,3 +1,7 @@
+import type { ViewEntity } from '@sf/server/sdk'
+import type { DrawContext, EdgeVariants } from '../types.js'
+import { EntityRenderer } from './EntityRenderer.js'
+
 const EDGE: EdgeVariants = {
   row: 0,
   //           none  W   E  E+W   N  N+W  N+E N+E+W
@@ -15,17 +19,17 @@ const GRASS_EDGE: EdgeVariants = {
 export class DirtRenderer extends EntityRenderer {
   readonly terrain = true
 
-  render(id: EntityId, dc: DrawContext) {
+  render(entity: ViewEntity, dc: DrawContext) {
     dc.drawEdgeTerrain(EDGE)
 
     // Ground cover overlay (e.g. grass).
-    const cover = getComponent(dc.rc.world, id, 'groundCover')
-    if (cover?.cover === 'grass') {
+    const cover = entity.traits.groundCover?.cover as string | null | undefined
+    if (cover === 'grass') {
       dc.drawEdgeTerrain(GRASS_EDGE)
     }
   }
 
-  describe(id: EntityId, world: World): string[] {
+  describeTraits(entity: ViewEntity): string[] {
     return ['moisture', 'groundCover']
   }
 }

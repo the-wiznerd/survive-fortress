@@ -19,11 +19,12 @@ export interface EdgeVariants {
 
 /** Per-frame context passed to entity renderers. */
 export interface RenderContext {
-  world: World
   /** Max terrain z at each world (x, y). */
   maxZ: Map<number, number>
   /** Set of packed (x, y, z) keys where terrain exists. */
   terrainAt: Set<number>
+  /** Entity type at each (x, y, z) for neighbor checks. */
+  typeAt: Map<number, string>
   /** Current timestamp from performance.now(). */
   now: number
 }
@@ -45,7 +46,7 @@ export class DrawContext {
     readonly wy: number,
     /** Elevation. */
     readonly z: number,
-    /** Per-frame render context (maxZ, terrainAt, world, now). */
+    /** Per-frame render context. */
     readonly rc: RenderContext,
   ) { }
 

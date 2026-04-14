@@ -1,9 +1,10 @@
+import { TraitRenderer } from './TraitRenderer.js'
+
 export class MoistureTraitRenderer extends TraitRenderer {
-  render(id: EntityId, world: World): HTMLElement {
-    const m = getComponent(world, id, 'moisture')
+  render(data: Record<string, unknown>): HTMLElement {
     const el = document.createElement('stat-text')
     el.setAttribute('label', 'moisture')
-    el.setAttribute('value', m ? `${m.current}/${m.capacity}` : '—')
+    el.setAttribute('value', `${data.current}/${data.capacity}`)
     return el
   }
 }

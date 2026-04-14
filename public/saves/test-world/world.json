@@ -1,8 +1,0 @@
-{
-  "seed": 42,
-  "tick": 0,
-  "chunkSize": 20,
-  "chunks": {
-    "0_0": { "cx": 0, "cy": 0, "state": "frozen", "freezeTick": 0 }
-  }
-}

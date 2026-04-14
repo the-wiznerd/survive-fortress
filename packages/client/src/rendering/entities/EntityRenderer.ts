@@ -1,6 +1,9 @@
+import type { ViewEntity } from '@sf/server/sdk'
+import type { DrawContext } from '../types.js'
+
 /**
  * Base class for per-entity-type renderers.
- * Subclasses override render() and optionally describe().
+ * Subclasses override render() and optionally describeTraits().
  */
 export abstract class EntityRenderer {
   /** Whether this entity is terrain (front face occluded by next row). */
@@ -10,10 +13,10 @@ export abstract class EntityRenderer {
   readonly occluding: boolean = true
 
   /** Render this entity using the given draw context. */
-  abstract render(id: EntityId, dc: DrawContext): void
+  abstract render(entity: ViewEntity, dc: DrawContext): void
 
   /** Return trait names to display on the entity card, in order. */
-  describe(id: EntityId, world: World): string[] {
+  describeTraits(entity: ViewEntity): string[] {
     return []
   }
 }

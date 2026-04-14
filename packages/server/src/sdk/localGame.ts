@@ -1,0 +1,109 @@
+import {
+  type World,
+  type EntityId,
+  getComponent,
+  queryEntities,
+  getEntitiesInColumn,
+} from '@sf/state'
+import {
+  bootstrap,
+  tick,
+  importWorld,
+  type BaseEntityType,
+} from '@sf/engine'
+import type { Game, GameView, ViewEntity, PlayerAction, InspectResult } from './types.js'
+
+/** Trait names the client is allowed to see when inspecting entities. */
+const VISIBLE_TRAITS = ['health', 'hunger', 'speed', 'moisture', 'groundCover'] as const
+
+/**
+ * Create a local (in-process) game. Engine runs directly — no networking.
+ * Returns the same Game interface that a remote connection would.
+ */
+export async function createLocalGame(loadWorld: () => Promise<{ world: World; playerIds: EntityId[] }>): Promise<Game> {
+  bootstrap()
+  const { world, playerIds } = await loadWorld()
+  const playerId = playerIds[0]
+
+  let pendingAction: PlayerAction | null = null
+  let viewCallback: ((view: GameView) => void) | null = null
+  let intervalId: ReturnType<typeof setInterval> | null = null
+  const TICK_INTERVAL_MS = 1000
+
+  function buildViewEntity(id: EntityId): ViewEntity {
+    const pos = getComponent(world, id, 'position')!
+    const et = getComponent(world, id, 'entityType')!
+    const nameComp = getComponent(world, id, 'name')
+    const traits: Record<string, Record<string, unknown>> = {}
+
+    for (const traitName of VISIBLE_TRAITS) {
+      const data = getComponent(world, id, traitName as any)
+      if (data) {
+        // Clone the trait data as a plain object (strip class prototype)
+        const plain: Record<string, unknown> = {}
+        for (const [k, v] of Object.entries(data)) {
+          if (typeof v !== 'function') plain[k] = v
+        }
+        traits[traitName] = plain
+      }
+    }
+
+    return {
+      id,
+      type: et.type,
+      x: pos.x,
+      y: pos.y,
+      z: pos.z,
+      name: nameComp?.name,
+      traits,
+    }
+  }
+
+  function buildView(): GameView {
+    const entities: ViewEntity[] = []
+    for (const id of queryEntities(world, 'position', 'entityType')) {
+      entities.push(buildViewEntity(id))
+    }
+    return { tick: world.tick, playerId: String(playerId), entities }
+  }
+
+  function gameTick() {
+    const pc = getComponent(world, playerId, 'playerControlled')
+    if (pc) {
+      pc.pendingAction = pendingAction
+        ? { type: pendingAction.type, ...(pendingAction.type === 'move' ? { dx: pendingAction.dx, dy: pendingAction.dy } : {}) } as any
+        : { type: 'wait' }
+    }
+    pendingAction = null
+    tick(world)
+    viewCallback?.(buildView())
+  }
+
+  return {
+    onViewUpdate(cb) {
+      viewCallback = cb
+    },
+
+    sendAction(action) {
+      pendingAction = action
+    },
+
+    inspect(x, y): InspectResult {
+      const ids = getEntitiesInColumn(world, x, y)
+      return { entities: ids.map(buildViewEntity) }
+    },
+
+    start() {
+      if (intervalId) return
+      intervalId = setInterval(gameTick, TICK_INTERVAL_MS)
+    },
+
+    stop() {
+      if (intervalId) { clearInterval(intervalId); intervalId = null }
+    },
+
+    getView() {
+      return buildView()
+    },
+  }
+}

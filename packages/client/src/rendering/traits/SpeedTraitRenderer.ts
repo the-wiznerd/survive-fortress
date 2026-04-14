@@ -1,9 +1,10 @@
+import { TraitRenderer } from './TraitRenderer.js'
+
 export class SpeedTraitRenderer extends TraitRenderer {
-  render(id: EntityId, world: World): HTMLElement {
-    const s = getComponent(world, id, 'speed')
+  render(data: Record<string, unknown>): HTMLElement {
     const el = document.createElement('stat-text')
     el.setAttribute('label', 'speed')
-    el.setAttribute('value', s ? `1/${s.pace}` : '—')
+    el.setAttribute('value', `1/${data.pace}`)
     return el
   }
 }

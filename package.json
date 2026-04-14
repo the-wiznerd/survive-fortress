@@ -2,13 +2,17 @@
   "name": "survive-fortress",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
-    "dev": "vite",
-    "build": "vite build",
-    "dev:kill": "lsof -ti :5173 -ti :5174 -ti :5175 | xargs kill -9 2>/dev/null; echo 'Dev servers killed'"
+    "test": "yarn workspace @sf/engine test",
+    "test:watch": "yarn workspace @sf/engine test:watch",
+    "typecheck": "yarn workspaces foreach -A run typecheck",
+    "dev": "yarn workspace @sf/client dev",
+    "build": "yarn workspace @sf/client build",
+    "dev:kill": "lsof -ti :5173 -ti :5174 -ti :5175 | xargs kill -9 2>/dev/null; echo 'Dev servers killed'",
+    "generate": "yarn workspaces foreach -A run generate"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",

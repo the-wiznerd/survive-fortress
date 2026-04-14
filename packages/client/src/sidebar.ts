@@ -1,4 +1,11 @@
+import type { Game, GameView, ViewEntity, InspectResult } from '@sf/server/sdk'
 import { Renderer } from './renderer.js'
+import { TraitRenderer } from './rendering/traits/TraitRenderer.js'
+import { HealthTraitRenderer } from './rendering/traits/HealthTraitRenderer.js'
+import { HungerTraitRenderer } from './rendering/traits/HungerTraitRenderer.js'
+import { SpeedTraitRenderer } from './rendering/traits/SpeedTraitRenderer.js'
+import { MoistureTraitRenderer } from './rendering/traits/MoistureTraitRenderer.js'
+import { GroundCoverTraitRenderer } from './rendering/traits/GroundCoverTraitRenderer.js'
 
 // ─── Trait Renderer Registry ───
 
@@ -16,20 +23,23 @@ const gameStateEl = document.getElementById('game-state')!
 const playerCardEl = document.getElementById('player-card')!
 const selectionEl = document.getElementById('selection')!
 
+// ─── Constants ───
+
+const TICKS_PER_DAY = 100
+
 // ─── Entity Cards ───
 
-function buildEntityCard(id: EntityId, world: World, renderer: Renderer): HTMLElement {
-  const typeName = getComponent(world, id, 'entityType')?.type ?? 'unknown'
-  const name = getComponent(world, id, 'name')?.name
-  const label = name ? `${name} (${typeName})` : typeName
+function buildEntityCard(entity: ViewEntity, renderer: Renderer): HTMLElement {
+  const label = entity.name ? `${entity.name} (${entity.type})` : entity.type
   const card = document.createElement('entity-card')
   card.setAttribute('label', label)
 
-  const er = renderer.getEntityRenderer(typeName)
+  const er = renderer.getEntityRenderer(entity.type)
   if (er) {
-    for (const traitName of er.describe(id, world)) {
+    for (const traitName of er.describeTraits(entity)) {
+      const data = entity.traits[traitName]
       const tr = TRAIT_RENDERERS[traitName]
-      if (tr) card.appendChild(tr.render(id, world))
+      if (tr && data) card.appendChild(tr.render(data))
     }
   }
 
@@ -38,48 +48,43 @@ function buildEntityCard(id: EntityId, world: World, renderer: Renderer): HTMLEl
 
 // ─── Updates ───
 
-export function updateUI(world: World, playerId: EntityId, renderer: Renderer) {
+export function updateUI(view: GameView, renderer: Renderer) {
   // Game state.
-  const day = Math.floor(world.tick / TICKS_PER_DAY) + 1
-  const tickOfDay = world.tick % TICKS_PER_DAY
+  const day = Math.floor(view.tick / TICKS_PER_DAY) + 1
+  const tickOfDay = view.tick % TICKS_PER_DAY
   gameStateEl.innerHTML = `
     <div class="stat"><span class="label">Day:</span> ${day}.${String(tickOfDay).padStart(2, '0')}</div>
   `
 
   // Player card (always visible).
+  const player = view.entities.find(e => String(e.id) === view.playerId)
   playerCardEl.innerHTML = ''
-  playerCardEl.appendChild(buildEntityCard(playerId, world, renderer))
+  if (player) playerCardEl.appendChild(buildEntityCard(player, renderer))
 }
 
-export function updateSelection(world: World, inspectedCell: { x: number; y: number } | null, renderer: Renderer) {
-  if (!world || !inspectedCell) {
+export function updateSelection(inspectResult: InspectResult | null, inspectedCell: { x: number; y: number } | null, renderer: Renderer) {
+  if (!inspectResult || !inspectedCell) {
     selectionEl.innerHTML = ''
     return
   }
 
   const { x, y } = inspectedCell
-  const allAtXY = getEntitiesInColumn(world, x, y)
+  const entities = inspectResult.entities
 
-  if (allAtXY.length === 0) {
+  if (entities.length === 0) {
     selectionEl.innerHTML = `<h2>Tile (${x}, ${y})</h2><div class="stat">Empty</div>`
     return
   }
 
-  // Show entities at or above ground level.
-  let groundZ = Infinity
-  for (const id of allAtXY) {
-    const z = getComponent(world, id, 'position')!.z
-    if (z < groundZ) groundZ = z
-  }
-  const visible = allAtXY.filter(id => getComponent(world, id, 'position')!.z >= groundZ)
-  visible.sort((a, b) => getComponent(world, b, 'position')!.z - getComponent(world, a, 'position')!.z)
+  // Show entities sorted by z descending.
+  const sorted = [...entities].sort((a, b) => b.z - a.z)
 
   selectionEl.innerHTML = ''
   const heading = document.createElement('h2')
   heading.textContent = `Tile (${x}, ${y})`
   selectionEl.appendChild(heading)
 
-  for (const id of visible) {
-    selectionEl.appendChild(buildEntityCard(id, world, renderer))
+  for (const entity of sorted) {
+    selectionEl.appendChild(buildEntityCard(entity, renderer))
   }
 }

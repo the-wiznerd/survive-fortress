@@ -1,3 +1,12 @@
+import type { GameView, ViewEntity } from '@sf/server/sdk'
+import { CELL_W, CELL_H, DrawContext, type RenderContext, zKey, posKey } from './rendering/types.js'
+import { EntityRenderer } from './rendering/entities/EntityRenderer.js'
+import { DirtRenderer } from './rendering/entities/DirtRenderer.js'
+import { SandRenderer } from './rendering/entities/SandRenderer.js'
+import { StoneRenderer } from './rendering/entities/StoneRenderer.js'
+import { WaterRenderer } from './rendering/entities/WaterRenderer.js'
+import { PlayerRenderer } from './rendering/entities/PlayerRenderer.js'
+
 /** Registry of entity type name → renderer instance. */
 const ENTITY_RENDERERS: Record<string, EntityRenderer> = {
   dirt: new DirtRenderer(),
@@ -62,7 +71,7 @@ export class Renderer {
     return { x: sx + this.cameraX, y: sy + this.cameraY }
   }
 
-  render(world: World, hoveredCell?: { x: number; y: number } | null, selectedCell?: { x: number; y: number } | null) {
+  render(view: GameView, hoveredCell?: { x: number; y: number } | null, selectedCell?: { x: number; y: number } | null) {
     const { ctx, destW, rowStep, viewWidth, viewHeight, cameraX, cameraY } = this
 
     if (!this.spriteReady) return
@@ -72,50 +81,49 @@ export class Renderer {
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
     // Collect visible entities into rows for back-to-front drawing.
-    // Separate terrain from upright entities that draw on top of all terrain.
-    type Entry = { id: EntityId; sx: number; sy: number; z: number; wx: number; wy: number; renderer: EntityRenderer }
+    type Entry = { entity: ViewEntity; sx: number; sy: number; renderer: EntityRenderer }
     const terrainRows: Entry[][] = []
     const uprightRows: Entry[][] = []
     for (let i = 0; i < viewHeight; i++) { terrainRows.push([]); uprightRows.push([]) }
 
-    for (const id of queryEntities(world, 'position', 'entityType')) {
-      const pos = getComponent(world, id, 'position')!
-      const sx = pos.x - cameraX
-      const sy = pos.y - cameraY
+    for (const entity of view.entities) {
+      const sx = entity.x - cameraX
+      const sy = entity.y - cameraY
       if (sx < 0 || sx >= viewWidth || sy < 0 || sy >= viewHeight) continue
-      const typeName = getComponent(world, id, 'entityType')!.type
-      const er = ENTITY_RENDERERS[typeName]
+      const er = ENTITY_RENDERERS[entity.type]
       if (!er) continue
       const bucket = er.terrain ? terrainRows : uprightRows
-      bucket[sy].push({ id, sx, sy, z: pos.z, wx: pos.x, wy: pos.y, renderer: er })
+      bucket[sy].push({ entity, sx, sy, renderer: er })
     }
 
     // Build per-frame render context.
     const maxZ = new Map<number, number>()
     const terrainAt = new Set<number>()
+    const typeAt = new Map<number, string>()
     for (const row of terrainRows) {
-      for (const { wx, wy, z, renderer } of row) {
-        const k = zKey(wx, wy)
+      for (const { entity, renderer } of row) {
+        const k = zKey(entity.x, entity.y)
         const prev = maxZ.get(k)
-        if (prev === undefined || z > prev) maxZ.set(k, z)
-        if (renderer.occluding) terrainAt.add(posKey(wx, wy, z))
+        if (prev === undefined || entity.z > prev) maxZ.set(k, entity.z)
+        if (renderer.occluding) terrainAt.add(posKey(entity.x, entity.y, entity.z))
+        typeAt.set(posKey(entity.x, entity.y, entity.z), entity.type)
       }
     }
-    const rc: RenderContext = { world, maxZ, terrainAt, now: performance.now() }
+    const rc: RenderContext = { maxZ, terrainAt, typeAt, now: performance.now() }
 
     // Pass 1: Terrain (back-to-front).
     for (const row of terrainRows) {
-      row.sort((a, b) => a.z - b.z)
-      for (const { id, sx, sy, z, wx, wy, renderer } of row) {
-        renderer.render(id, new DrawContext(ctx, this.spriteSheet, this.scale, sx, sy, wx, wy, z, rc))
+      row.sort((a, b) => a.entity.z - b.entity.z)
+      for (const { entity, sx, sy, renderer } of row) {
+        renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.scale, sx, sy, entity.x, entity.y, entity.z, rc))
       }
     }
 
     // Pass 2: Upright entities (back-to-front), drawn over all terrain.
     for (const row of uprightRows) {
-      row.sort((a, b) => a.z - b.z)
-      for (const { id, sx, sy, z, wx, wy, renderer } of row) {
-        renderer.render(id, new DrawContext(ctx, this.spriteSheet, this.scale, sx, sy, wx, wy, z, rc))
+      row.sort((a, b) => a.entity.z - b.entity.z)
+      for (const { entity, sx, sy, renderer } of row) {
+        renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.scale, sx, sy, entity.x, entity.y, entity.z, rc))
       }
     }
 

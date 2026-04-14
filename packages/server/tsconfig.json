@@ -9,7 +9,10 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "~engine/*": ["../engine/src/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "../engine/src/types.d.ts", "../engine/auto-imports.d.ts"]
 }

@@ -1,12 +1,13 @@
-import { Renderer } from '@sf/ui'
+import type { PlayerAction } from '@sf/server/sdk'
+import { Renderer } from './renderer.js'
 
 // ─── State ───
 
-let pendingInput: Action | null = null
+let pendingInput: PlayerAction | null = null
 let inspectedCell: { x: number; y: number } | null = null
 let hoveredCell: { x: number; y: number } | null = null
 
-export function getPendingInput(): Action | null {
+export function getPendingInput(): PlayerAction | null {
   const input = pendingInput
   pendingInput = null
   return input

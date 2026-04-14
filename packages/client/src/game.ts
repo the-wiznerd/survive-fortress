@@ -1,50 +1,54 @@
-import { Renderer } from '@sf/ui'
+import { createLocalGame, type Game, type GameView } from '@sf/server/sdk'
+import type { WorldManifest, ChunkData } from '@sf/state'
+import { importWorld } from '@sf/engine'
+import { Renderer } from './renderer.js'
 
 // ─── Game State ───
 
-let world: World
-let playerId: EntityId
+let game: Game
+let currentView: GameView
 
 const SAVE_PATH = '/saves/test-world'
-const TICK_INTERVAL_MS = 1000
 
-export function getWorld(): World { return world }
-export function getPlayerId(): EntityId { return playerId }
+export function getGame(): Game { return game }
+export function getView(): GameView { return currentView }
 
 export async function init(renderer: Renderer) {
-  const manifestResp = await fetch(`${SAVE_PATH}/world.json`)
-  const manifest: WorldManifest = await manifestResp.json()
+  game = await createLocalGame(async () => {
+    const manifestResp = await fetch(`${SAVE_PATH}/world.json`)
+    const manifest: WorldManifest = await manifestResp.json()
 
-  const chunks: ChunkData[] = []
-  for (const ref of Object.values(manifest.chunks)) {
-    const chunkResp = await fetch(`${SAVE_PATH}/chunks/${ref.cx}_${ref.cy}.json`)
-    chunks.push(await chunkResp.json())
-  }
+    const chunks: ChunkData[] = []
+    for (const ref of Object.values(manifest.chunks)) {
+      const chunkResp = await fetch(`${SAVE_PATH}/chunks/${ref.cx}_${ref.cy}.json`)
+      chunks.push(await chunkResp.json())
+    }
 
-  const result = importWorld(manifest, chunks)
-  world = result.world
-  playerId = result.playerIds[0]
+    return importWorld(manifest, chunks)
+  })
 
-  const pos = getComponent(world, playerId, 'position')!
-  renderer.setCamera(pos.x, pos.y)
+  currentView = game.getView()
+
+  // Center camera on player.
+  const player = currentView.entities.find(e => String(e.id) === currentView.playerId)
+  if (player) renderer.setCamera(player.x, player.y)
 }
 
-export function gameTick(renderer: Renderer, pendingInput: Action | null): void {
-  if (!world) return
+export function startTickLoop(renderer: Renderer, getInput: () => { type: string; dx?: number; dy?: number } | null, onTick: () => void) {
+  game.onViewUpdate((view) => {
+    currentView = view
+    const player = view.entities.find(e => String(e.id) === view.playerId)
+    if (player) renderer.setCamera(player.x, player.y)
+    onTick()
+  })
 
-  const pc = getComponent(world, playerId, 'playerControlled')!
-  pc.pendingAction = pendingInput ?? { type: 'wait' }
+  game.start()
 
-  tick(world)
-
-  const pos = getComponent(world, playerId, 'position')
-  if (pos) renderer.setCamera(pos.x, pos.y)
-}
-
-export function startTickLoop(renderer: Renderer, getInput: () => Action | null, onTick: () => void) {
+  // Feed input each frame — the game SDK will pick it up on next tick.
   setInterval(() => {
     const input = getInput()
-    gameTick(renderer, input)
-    onTick()
-  }, TICK_INTERVAL_MS)
+    if (input) {
+      game.sendAction(input as any)
+    }
+  }, 50)
 }

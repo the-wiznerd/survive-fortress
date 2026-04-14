@@ -1,9 +1,10 @@
+import { TraitRenderer } from './TraitRenderer.js'
+
 export class HealthTraitRenderer extends TraitRenderer {
-  render(id: EntityId, world: World): HTMLElement {
-    const h = getComponent(world, id, 'health')
+  render(data: Record<string, unknown>): HTMLElement {
     const el = document.createElement('stat-text')
     el.setAttribute('label', 'health')
-    el.setAttribute('value', h ? `${h.current}/${h.max}` : '—')
+    el.setAttribute('value', `${data.current}/${data.max}`)
     return el
   }
 }

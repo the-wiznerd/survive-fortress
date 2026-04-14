@@ -9,11 +9,13 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "paths": {
-      "@core/*": ["./src/core/*"],
-      "@ui/*": ["./src/ui/*"]
-    }
+    "noEmit": true
   },
-  "include": ["src", "tests", "auto-imports.d.ts"]
+  "include": ["scanExports.ts"],
+  "references": [
+    { "path": "packages/state" },
+    { "path": "packages/engine" },
+    { "path": "packages/server" },
+    { "path": "packages/client" }
+  ]
 }

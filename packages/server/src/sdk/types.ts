@@ -1,0 +1,53 @@
+// ─── View Types ───
+// Plain serializable types the client renders from.
+// No ECS internals, no classes — just data.
+
+/** A snapshot of the game state visible to the player. */
+export interface GameView {
+  tick: number
+  playerId: string
+  entities: ViewEntity[]
+}
+
+/** A single entity as seen by the client. */
+export interface ViewEntity {
+  id: number
+  type: string
+  x: number
+  y: number
+  z: number
+  name?: string
+  /** Visible trait data keyed by trait name. Only traits the player is allowed to see. */
+  traits: Record<string, Record<string, unknown>>
+}
+
+/** The action a player can send to the server. */
+export type PlayerAction =
+  | { type: 'move'; dx: number; dy: number }
+  | { type: 'wait' }
+
+/** Inspected entity details for the sidebar. */
+export interface InspectResult {
+  entities: ViewEntity[]
+}
+
+/** The game interface — same shape whether local or remote. */
+export interface Game {
+  /** Subscribe to view updates. Called after each tick with the current view. */
+  onViewUpdate(cb: (view: GameView) => void): void
+
+  /** Send a player action (queued for next tick). */
+  sendAction(action: PlayerAction): void
+
+  /** Request detailed info about entities at a world position. */
+  inspect(x: number, y: number): InspectResult
+
+  /** Start the tick loop. */
+  start(): void
+
+  /** Stop the tick loop. */
+  stop(): void
+
+  /** Get the current view (without waiting for a tick). */
+  getView(): GameView
+}

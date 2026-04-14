@@ -2,9 +2,15 @@
   "name": "@sf/server",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./sdk": "./src/sdk/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@sf/engine": "workspace:*",
-    "@sf/net": "workspace:*",
     "@sf/state": "workspace:*"
   }
 }

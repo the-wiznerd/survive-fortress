@@ -633,6 +633,41 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sf/client@workspace:packages/client":
+  version: 0.0.0-use.local
+  resolution: "@sf/client@workspace:packages/client"
+  dependencies:
+    "@sf/server": "workspace:*"
+    vite: "npm:^6.3.0"
+  languageName: unknown
+  linkType: soft
+
+"@sf/engine@workspace:*, @sf/engine@workspace:packages/engine":
+  version: 0.0.0-use.local
+  resolution: "@sf/engine@workspace:packages/engine"
+  dependencies:
+    "@sf/state": "workspace:*"
+    unplugin-auto-import: "npm:^21.0.0"
+    vite: "npm:^6.3.0"
+    vitest: "npm:^3.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@sf/server@workspace:*, @sf/server@workspace:packages/server":
+  version: 0.0.0-use.local
+  resolution: "@sf/server@workspace:packages/server"
+  dependencies:
+    "@sf/engine": "workspace:*"
+    "@sf/state": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
+"@sf/state@workspace:*, @sf/state@workspace:packages/state":
+  version: 0.0.0-use.local
+  resolution: "@sf/state@workspace:packages/state"
+  languageName: unknown
+  linkType: soft
+
 "@types/chai@npm:^5.2.2":
   version: 5.2.3
   resolution: "@types/chai@npm:5.2.3"
