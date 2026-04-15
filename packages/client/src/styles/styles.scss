@@ -60,3 +60,25 @@ canvas {
     color: var(--color-white);
   }
 }
+
+
+.segments {
+  display: inline-flex;
+  gap: 0.25em;
+  vertical-align: middle;
+  margin-inline-start: 0.7ch;
+}
+
+.segment {
+  display: inline-block;
+  width: 0.75em;
+  height: 0.98em;
+  border: 2px solid var(--color-gray);
+  position: relative;
+  top: -1px;
+
+  &.filled {
+    background: var(--color-lightest-gray);
+    border-color: var(--color-lightest-gray);
+  }
+}
