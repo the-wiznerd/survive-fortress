@@ -1,8 +1,4 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@use 'reset';
 
 #app {
   background: #1a1a2e;
@@ -25,4 +21,46 @@
 
 canvas {
   image-rendering: pixelated;
+}
+
+#sidebar {
+  width: 280px;
+  padding: 1.5rem;
+  background: #16213e;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.5;
+
+  h1,
+  h2 {
+    color: #87ceeb;
+    margin-bottom: 0.5em;
+    font-size: 14px;
+  }
+
+  .label {
+    color: #888;
+  }
+
+  .section {
+    margin-top: 16px;
+  }
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 1px 0;
+  font-size: 12px;
+  line-height: 1.4;
+
+
+  .label {
+    color: #888;
+  }
+
+  .value {
+    color: #e0e0e0;
+  }
+
 }
