@@ -15,7 +15,7 @@ import {
 } from '@repo/engine'
 
 /** Trait names the client is allowed to see when inspecting entities. */
-const VISIBLE_TRAITS = ['health', 'hunger', 'speed', 'moisture', 'groundCover'] as const
+const VISIBLE_TRAITS = ['health', 'hunger', 'movement', 'moisture', 'groundCover'] as const
 
 /**
  * Create a local (in-process) game. Engine runs directly — no networking.

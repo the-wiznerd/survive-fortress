@@ -10,7 +10,7 @@ export interface ComponentTypes {
   position: Position
   health: Health
   hunger: Hunger
-  speed: Speed
+  movement: Movement
   playerControlled: PlayerControlled
   entityType: EntityType
   moisture: Moisture
@@ -40,7 +40,7 @@ export interface Hunger {
   drainPerTick: number
 }
 
-export interface Speed {
+export interface Movement {
   /** Move once every `pace` ticks. 1 = every tick, 3 = every 3rd tick. */
   pace: number
 }
@@ -99,7 +99,7 @@ export function createWorld(): World {
       position: new Map(),
       health: new Map(),
       hunger: new Map(),
-      speed: new Map(),
+      movement: new Map(),
       playerControlled: new Map(),
       entityType: new Map(),
       moisture: new Map(),

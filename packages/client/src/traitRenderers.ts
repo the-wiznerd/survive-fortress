@@ -9,7 +9,7 @@ export interface TraitRenderer {
 export const TRAIT_RENDERERS: Record<string, TraitRenderer> = {
   health: { component: StatText, props: d => ({ label: 'Health', value: `${d.current}/${d.max}` }) },
   hunger: { component: StatText, props: d => ({ label: 'Hunger', value: `${d.current}/${d.max}` }) },
-  speed: { component: StatText, props: d => ({ label: 'Speed', value: String(d.pace) }) },
+  movement: { component: StatText, props: d => ({ label: 'Pace', value: String(d.pace) }) },
   moisture: { component: StatText, props: d => ({ label: 'Moisture', value: `${d.current}/${d.capacity}` }) },
   groundCover: { component: StatText, props: d => d.cover ? { label: 'Ground Cover', value: String(d.cover) } : null },
 }

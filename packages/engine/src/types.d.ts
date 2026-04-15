@@ -5,4 +5,4 @@ type Trait<K extends string = string> = import('~engine/traits/Trait').Trait<K>
 type BaseEntityType = import('~engine/entityTypes/BaseEntityType').BaseEntityType
 type PositionTrait = import('~engine/traits/PositionTrait').PositionTrait
 type TickCounter = import('~engine/traits/TickCounter').TickCounter
-type SpeedTrait = import('~engine/traits/SpeedTrait').SpeedTrait
+type MovementTrait = import('~engine/traits/MovementTrait').MovementTrait

@@ -26,10 +26,10 @@ declare global {
   const HealthTrait: typeof import('~engine/traits/HealthTrait').HealthTrait
   const HungerTrait: typeof import('~engine/traits/HungerTrait').HungerTrait
   const MoistureTrait: typeof import('~engine/traits/MoistureTrait').MoistureTrait
+  const MovementTrait: typeof import('~engine/traits/MovementTrait').MovementTrait
   const NameTrait: typeof import('~engine/traits/NameTrait').NameTrait
   const PlayerControlledTrait: typeof import('~engine/traits/PlayerControlledTrait').PlayerControlledTrait
   const PositionTrait: typeof import('~engine/traits/PositionTrait').PositionTrait
-  const SpeedTrait: typeof import('~engine/traits/SpeedTrait').SpeedTrait
   const TickCounter: typeof import('~engine/traits/TickCounter').TickCounter
   const Trait: typeof import('~engine/traits/Trait').Trait
   const BaseEntityType: typeof import('~engine/entityTypes/BaseEntityType').BaseEntityType
