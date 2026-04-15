@@ -1,8 +1,9 @@
 @use 'reset';
+@use 'variables';
 
 #app {
-  background: #1a1a2e;
-  color: #e0e0e0;
+  background: var(--color-black);
+  color: var(--color-lightest-gray);
   font-family: 'Courier New', monospace;
   display: flex;
   height: 100%;
@@ -24,26 +25,23 @@ canvas {
 }
 
 #sidebar {
-  width: 280px;
+  width: 300px;
   padding: 1.5rem;
-  background: #16213e;
   overflow-y: auto;
-  font-size: 13px;
   line-height: 1.5;
+  border-inline-start: 2px solid var(--color-darkest-gray);
+}
 
-  h1,
-  h2 {
-    color: #87ceeb;
-    margin-bottom: 0.5em;
-    font-size: 14px;
-  }
+.section {
+  margin-top: 1.5rem;
+}
 
-  .label {
-    color: #888;
-  }
+.entity-card {
 
-  .section {
-    margin-top: 16px;
+  >.label {
+    color: var(--color-lightest-blue);
+    margin-bottom: 0.25em;
+    font-size: 1.2rem;
   }
 }
 
@@ -51,16 +49,5 @@ canvas {
   display: flex;
   justify-content: space-between;
   padding: 1px 0;
-  font-size: 12px;
   line-height: 1.4;
-
-
-  .label {
-    color: #888;
-  }
-
-  .value {
-    color: #e0e0e0;
-  }
-
 }

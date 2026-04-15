@@ -70,7 +70,7 @@ export class Renderer {
     if (!this.spriteReady) return
 
     // Clear.
-    ctx.fillStyle = '#1a1a2e'
+    ctx.fillStyle = '#1a1a1a'
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
 
     // Collect visible entities into rows for back-to-front drawing.

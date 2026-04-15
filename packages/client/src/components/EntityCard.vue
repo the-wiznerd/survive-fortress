@@ -1,7 +1,7 @@
 <template>
-  <div class="entity-card">
-    <div class="entity-card-label">{{ label }}</div>
-    <div v-if="traits.length" class="entity-card-traits">
+  <div class="entity-card section">
+    <h2 class="label">{{ label }}</h2>
+    <div v-if="traits.length" class="traits">
       <component
         v-for="t in traits"
         :key="t.name"

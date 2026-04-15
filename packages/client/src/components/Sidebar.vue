@@ -1,7 +1,5 @@
 <template>
   <aside id="sidebar">
-    <h1>Survive Fortress</h1>
-
     <div v-if="view" class="section">
       <div class="stat"><span class="label">Day:</span> {{ day }}.{{ tickOfDay }}</div>
     </div>
