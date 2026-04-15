@@ -58,6 +58,45 @@
     #sidebar .section {
       margin-top: 16px;
     }
+
+    .entity-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+
+    .entity-card-label {
+      color: #87ceeb;
+      font-weight: bold;
+      font-size: 13px;
+      text-transform: capitalize;
+    }
+
+    .entity-card-traits:empty {
+      display: none;
+    }
+
+    .entity-card-traits {
+      margin-top: 4px;
+    }
+
+    .stat-text {
+      display: flex;
+      justify-content: space-between;
+      padding: 1px 0;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .stat-text .label {
+      color: #888;
+    }
+
+    .stat-text .value {
+      color: #e0e0e0;
+    }
   </style>
 </head>
 
@@ -67,9 +106,36 @@
   </div>
   <div id="sidebar">
     <h1>Survive Fortress</h1>
-    <div id="game-state" class="section"></div>
-    <div id="player-card" class="section"></div>
-    <div id="selection" class="section"></div>
+
+    <div class="section">
+      <div class="stat"><span class="label">Day:</span> {{ store.day }}.{{ store.tickOfDay }}</div>
+    </div>
+
+    <div v-if="store.player" class="section">
+      <div class="entity-card">
+        <div class="entity-card-label">{{ store.player.label }}</div>
+        <div v-if="store.player.traits.length" class="entity-card-traits">
+          <div v-for="t in store.player.traits" :key="t.label" class="stat-text">
+            <span class="label">{{ t.label }}</span>
+            <span class="value">{{ t.value }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="store.selection" class="section">
+      <h2>Tile ({{ store.selection.x }}, {{ store.selection.y }})</h2>
+      <div v-if="store.selection.entities.length === 0" class="stat">Empty</div>
+      <div v-for="e in store.selection.entities" :key="e.id" class="entity-card">
+        <div class="entity-card-label">{{ e.label }}</div>
+        <div v-if="e.traits.length" class="entity-card-traits">
+          <div v-for="t in e.traits" :key="t.label" class="stat-text">
+            <span class="label">{{ t.label }}</span>
+            <span class="value">{{ t.value }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>

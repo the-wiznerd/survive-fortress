@@ -10,7 +10,6 @@ const pkgs = {
     clientSrc,
     `${clientSrc}/rendering`,
     `${clientSrc}/rendering/entities`,
-    `${clientSrc}/rendering/traits`,
   ],
 }
 const dtsPath = path.resolve(import.meta.dirname, 'auto-imports.d.ts')
@@ -19,6 +18,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '~client': clientSrc,
+      vue: 'vue/dist/vue.esm-bundler.js',
     },
   },
   plugins: [

@@ -1,83 +1,84 @@
-import type { Game, GameView, ViewEntity, InspectResult } from '@repo/server/sdk'
-
-// ─── Trait Renderer Registry ───
-
-const TRAIT_RENDERERS: Record<string, TraitRenderer> = {
-  health: new HealthTraitRenderer(),
-  hunger: new HungerTraitRenderer(),
-  speed: new SpeedTraitRenderer(),
-  moisture: new MoistureTraitRenderer(),
-  groundCover: new GroundCoverTraitRenderer(),
-}
-
-// ─── DOM References ───
-
-const gameStateEl = document.getElementById('game-state')!
-const playerCardEl = document.getElementById('player-card')!
-const selectionEl = document.getElementById('selection')!
+import { createApp, reactive } from 'vue'
+import type { GameView, ViewEntity, InspectResult } from '@repo/server/sdk'
 
 // ─── Constants ───
 
 const TICKS_PER_DAY = 100
 
-// ─── Entity Cards ───
+// ─── Trait Formatters ───
 
-function buildEntityCard(entity: ViewEntity, renderer: Renderer): HTMLElement {
+interface FormattedTrait {
+  label: string
+  value: string
+}
+
+const TRAIT_FORMATTERS: Record<string, (data: Record<string, unknown>) => FormattedTrait | null> = {
+  health: (d) => ({ label: 'Health', value: `${d.current}/${d.max}` }),
+  hunger: (d) => ({ label: 'Hunger', value: `${d.current}/${d.max}` }),
+  speed: (d) => ({ label: 'Speed', value: String(d.pace) }),
+  moisture: (d) => ({ label: 'Moisture', value: `${d.current}/${d.capacity}` }),
+  groundCover: (d) => d.cover ? { label: 'Ground Cover', value: String(d.cover) } : null,
+}
+
+// ─── Display Entity ───
+
+interface DisplayEntity {
+  id: number
+  label: string
+  traits: FormattedTrait[]
+}
+
+function toDisplayEntity(entity: ViewEntity, renderer: Renderer): DisplayEntity {
   const label = entity.name ? `${entity.name} (${entity.type})` : entity.type
-  const card = document.createElement('entity-card')
-  card.setAttribute('label', label)
-
   const er = renderer.getEntityRenderer(entity.type)
-  if (er) {
-    for (const traitName of er.describeTraits(entity)) {
-      const data = entity.traits[traitName]
-      const tr = TRAIT_RENDERERS[traitName]
-      if (tr && data) card.appendChild(tr.render(data))
-    }
+  const traitNames = er ? er.describeTraits(entity) : []
+  const traits: FormattedTrait[] = []
+  for (const name of traitNames) {
+    const data = entity.traits[name]
+    const fmt = TRAIT_FORMATTERS[name]
+    if (!data || !fmt) continue
+    const result = fmt(data)
+    if (result) traits.push(result)
   }
+  return { id: entity.id, label, traits }
+}
 
-  return card
+// ─── Reactive Store ───
+
+const store = reactive({
+  day: 0,
+  tickOfDay: '00',
+  player: null as DisplayEntity | null,
+  selection: null as { x: number; y: number; entities: DisplayEntity[] } | null,
+})
+
+// ─── Mount Vue App ───
+
+export function initSidebar() {
+  createApp({ setup: () => ({ store }) }).mount('#sidebar')
 }
 
 // ─── Updates ───
 
 export function updateUI(view: GameView, renderer: Renderer) {
-  // Game state.
-  const day = Math.floor(view.tick / TICKS_PER_DAY) + 1
-  const tickOfDay = view.tick % TICKS_PER_DAY
-  gameStateEl.innerHTML = `
-    <div class="stat"><span class="label">Day:</span> ${day}.${String(tickOfDay).padStart(2, '0')}</div>
-  `
+  store.day = Math.floor(view.tick / TICKS_PER_DAY) + 1
+  store.tickOfDay = String(view.tick % TICKS_PER_DAY).padStart(2, '0')
 
-  // Player card (always visible).
   const player = view.entities.find(e => String(e.id) === view.playerId)
-  playerCardEl.innerHTML = ''
-  if (player) playerCardEl.appendChild(buildEntityCard(player, renderer))
+  store.player = player ? toDisplayEntity(player, renderer) : null
 }
 
 export function updateSelection(inspectResult: InspectResult | null, inspectedCell: { x: number; y: number } | null, renderer: Renderer) {
   if (!inspectResult || !inspectedCell) {
-    selectionEl.innerHTML = ''
+    store.selection = null
     return
   }
 
   const { x, y } = inspectedCell
-  const entities = inspectResult.entities
-
-  if (entities.length === 0) {
-    selectionEl.innerHTML = `<h2>Tile (${x}, ${y})</h2><div class="stat">Empty</div>`
-    return
-  }
-
-  // Show entities sorted by z descending.
-  const sorted = [...entities].sort((a, b) => b.z - a.z)
-
-  selectionEl.innerHTML = ''
-  const heading = document.createElement('h2')
-  heading.textContent = `Tile (${x}, ${y})`
-  selectionEl.appendChild(heading)
-
-  for (const entity of sorted) {
-    selectionEl.appendChild(buildEntityCard(entity, renderer))
+  const sorted = [...inspectResult.entities].sort((a, b) => b.z - a.z)
+  store.selection = {
+    x,
+    y,
+    entities: sorted.map(e => toDisplayEntity(e, renderer)),
   }
 }

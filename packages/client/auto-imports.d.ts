@@ -15,6 +15,7 @@ declare global {
   const getHoveredCell: typeof import('~client/input').getHoveredCell
   const bindInput: typeof import('~client/input').bindInput
   const Renderer: typeof import('~client/renderer').Renderer
+  const initSidebar: typeof import('~client/sidebar').initSidebar
   const updateUI: typeof import('~client/sidebar').updateUI
   const updateSelection: typeof import('~client/sidebar').updateSelection
   const CELL_W: typeof import('~client/rendering/types').CELL_W
@@ -28,12 +29,6 @@ declare global {
   const SandRenderer: typeof import('~client/rendering/entities/SandRenderer').SandRenderer
   const StoneRenderer: typeof import('~client/rendering/entities/StoneRenderer').StoneRenderer
   const WaterRenderer: typeof import('~client/rendering/entities/WaterRenderer').WaterRenderer
-  const GroundCoverTraitRenderer: typeof import('~client/rendering/traits/GroundCoverTraitRenderer').GroundCoverTraitRenderer
-  const HealthTraitRenderer: typeof import('~client/rendering/traits/HealthTraitRenderer').HealthTraitRenderer
-  const HungerTraitRenderer: typeof import('~client/rendering/traits/HungerTraitRenderer').HungerTraitRenderer
-  const MoistureTraitRenderer: typeof import('~client/rendering/traits/MoistureTraitRenderer').MoistureTraitRenderer
-  const SpeedTraitRenderer: typeof import('~client/rendering/traits/SpeedTraitRenderer').SpeedTraitRenderer
-  const TraitRenderer: typeof import('~client/rendering/traits/TraitRenderer').TraitRenderer
 }
 // for type re-export
 declare global {
@@ -61,22 +56,4 @@ declare global {
   // @ts-ignore
   export type { WaterRenderer } from '~client/rendering/entities/WaterRenderer'
   import('~client/rendering/entities/WaterRenderer')
-  // @ts-ignore
-  export type { GroundCoverTraitRenderer } from '~client/rendering/traits/GroundCoverTraitRenderer'
-  import('~client/rendering/traits/GroundCoverTraitRenderer')
-  // @ts-ignore
-  export type { HealthTraitRenderer } from '~client/rendering/traits/HealthTraitRenderer'
-  import('~client/rendering/traits/HealthTraitRenderer')
-  // @ts-ignore
-  export type { HungerTraitRenderer } from '~client/rendering/traits/HungerTraitRenderer'
-  import('~client/rendering/traits/HungerTraitRenderer')
-  // @ts-ignore
-  export type { MoistureTraitRenderer } from '~client/rendering/traits/MoistureTraitRenderer'
-  import('~client/rendering/traits/MoistureTraitRenderer')
-  // @ts-ignore
-  export type { SpeedTraitRenderer } from '~client/rendering/traits/SpeedTraitRenderer'
-  import('~client/rendering/traits/SpeedTraitRenderer')
-  // @ts-ignore
-  export type { TraitRenderer } from '~client/rendering/traits/TraitRenderer'
-  import('~client/rendering/traits/TraitRenderer')
 }

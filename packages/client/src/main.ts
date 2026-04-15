@@ -1,8 +1,7 @@
-import './components/entity-card.js'
-import './components/stat-text.js'
-
 const canvas = document.getElementById('canvas') as HTMLCanvasElement
 const renderer = new Renderer(canvas, 32, 24, 3)
+
+initSidebar()
 
 renderer.onReady = () => {
   const view = getView()

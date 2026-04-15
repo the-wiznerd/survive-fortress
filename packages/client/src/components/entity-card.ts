@@ -1,4 +1,7 @@
 export class EntityCard extends HTMLElement {
+  /** Trait name → child element for in-place updates. */
+  readonly traitEls = new Map<string, HTMLElement>()
+
   connectedCallback() {
     const shadow = this.attachShadow({ mode: 'open' })
     shadow.innerHTML = `
@@ -27,7 +30,14 @@ export class EntityCard extends HTMLElement {
       <div class="label"></div>
       <div class="traits"><slot></slot></div>
     `
-    shadow.querySelector('.label')!.textContent = this.getAttribute('label') ?? ''
+    this.updateLabel()
+  }
+
+  static get observedAttributes() { return ['label'] }
+  attributeChangedCallback() { if (this.shadowRoot) this.updateLabel() }
+
+  private updateLabel() {
+    this.shadowRoot!.querySelector('.label')!.textContent = this.getAttribute('label') ?? ''
   }
 }
 
