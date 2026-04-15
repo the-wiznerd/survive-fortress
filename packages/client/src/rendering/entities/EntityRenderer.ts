@@ -1,4 +1,4 @@
-import type { ViewEntity } from '@repo/server/sdk'
+import type { ViewEntity, VisibleTraitName } from '@repo/server/sdk'
 
 /**
  * Base class for per-entity-type renderers.
@@ -15,7 +15,7 @@ export abstract class EntityRenderer {
   abstract render(entity: ViewEntity, dc: DrawContext): void
 
   /** Return trait names to display on the entity card, in order. */
-  describeTraits(entity: ViewEntity): string[] {
+  describeTraits(entity: ViewEntity): VisibleTraitName[] {
     return []
   }
 }

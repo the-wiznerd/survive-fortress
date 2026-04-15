@@ -1,4 +1,4 @@
-import type { ViewEntity } from '@repo/server/sdk'
+import type { ViewEntity, VisibleTraitName } from '@repo/server/sdk'
 
 const SPRITE_COL = 0
 const SPRITE_ROW = 6
@@ -10,7 +10,7 @@ export class PlayerRenderer extends EntityRenderer {
     dc.draw(SPRITE_COL, SPRITE_ROW, 1, SPRITE_HEIGHT, Y_OFFSET)
   }
 
-  describeTraits(entity: ViewEntity): string[] {
+  describeTraits(entity: ViewEntity): VisibleTraitName[] {
     return ['health', 'hunger', 'movement']
   }
 }

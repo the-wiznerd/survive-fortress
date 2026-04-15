@@ -13,15 +13,15 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, inject } from 'vue'
-  import type { ViewEntity } from '@repo/server/sdk'
-  import { TRAIT_RENDERERS } from '../traitRenderers'
+  import { computed, inject, type Component } from 'vue'
+  import type { ViewEntity, VisibleTraitName } from '@repo/server/sdk'
+  import { renderTrait } from '../traitRenderers'
 
   const props = defineProps<{
     entity: ViewEntity
   }>()
 
-  const getTraitNames = inject<(entity: ViewEntity) => string[]>('getTraitNames')!
+  const getTraitNames = inject<(entity: ViewEntity) => VisibleTraitName[]>('getTraitNames')!
 
   const label = computed(() => {
     const e = props.entity
@@ -29,13 +29,12 @@
   })
 
   const traits = computed(() => {
-    const result: { name: string; component: any; props: Record<string, unknown> }[] = []
+    const result: { name: string; component: Component; props: Record<string, unknown> }[] = []
     for (const name of getTraitNames(props.entity)) {
-      const renderer = TRAIT_RENDERERS[name]
       const data = props.entity.traits[name]
-      if (!renderer || !data) continue
-      const p = renderer.props(data)
-      if (p) result.push({ name, component: renderer.component, props: p })
+      if (!data) continue
+      const rendered = renderTrait(name, data)
+      if (rendered) result.push({ name, ...rendered })
     }
     return result
   })

@@ -1,3 +1,20 @@
+import type { Health, Hunger, Movement, Moisture, GroundCover } from '@repo/state'
+
+// ─── Trait Views ───
+// What the client receives for each visible trait.
+// Mirrors the component interface plus any sub-trait data.
+
+export interface TraitViews {
+  health: Health
+  hunger: Hunger
+  movement: Movement & { timer: { counter: number; threshold: number } }
+  moisture: Moisture
+  groundCover: GroundCover
+}
+
+/** A trait name the client is allowed to see. */
+export type VisibleTraitName = keyof TraitViews
+
 // ─── View Types ───
 // Plain serializable types the client renders from.
 // No ECS internals, no classes — just data.
@@ -18,7 +35,7 @@ export interface ViewEntity {
   z: number
   name?: string
   /** Visible trait data keyed by trait name. Only traits the player is allowed to see. */
-  traits: Record<string, Record<string, unknown>>
+  traits: { [K in VisibleTraitName]?: TraitViews[K] }
 }
 
 /** The action a player can send to the server. */

@@ -1,4 +1,4 @@
-import type { ViewEntity } from '@repo/server/sdk'
+import type { ViewEntity, VisibleTraitName } from '@repo/server/sdk'
 
 const EDGE: EdgeVariants = {
   row: 0,
@@ -27,7 +27,7 @@ export class DirtRenderer extends EntityRenderer {
     }
   }
 
-  describeTraits(entity: ViewEntity): string[] {
+  describeTraits(entity: ViewEntity): VisibleTraitName[] {
     return ['moisture', 'groundCover']
   }
 }

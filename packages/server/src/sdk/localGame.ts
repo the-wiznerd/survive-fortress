@@ -13,9 +13,10 @@ import {
   importWorld,
   type BaseEntityType,
 } from '@repo/engine'
+import type { VisibleTraitName } from './types.js'
 
 /** Trait names the client is allowed to see when inspecting entities. */
-const VISIBLE_TRAITS = ['health', 'hunger', 'movement', 'moisture', 'groundCover'] as const
+const VISIBLE_TRAITS: VisibleTraitName[] = ['health', 'hunger', 'movement', 'moisture', 'groundCover']
 
 /**
  * Create a local (in-process) game. Engine runs directly — no networking.
@@ -42,7 +43,7 @@ export async function createLocalGame(
     const traits: Record<string, Record<string, unknown>> = {}
 
     for (const traitName of VISIBLE_TRAITS) {
-      const data = getComponent(world, id, traitName as any)
+      const data = getComponent(world, id, traitName)
       if (data) {
         // Clone the trait data as a plain object (strip class prototype)
         const plain: Record<string, unknown> = {}
@@ -60,7 +61,7 @@ export async function createLocalGame(
       y: pos.y,
       z: pos.z,
       name: nameComp?.name,
-      traits,
+      traits: traits as ViewEntity['traits'],
     }
   }
 

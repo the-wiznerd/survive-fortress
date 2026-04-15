@@ -11,6 +11,6 @@ declare global {
 // for type re-export
 declare global {
   // @ts-ignore
-  export type { GameView, ViewEntity, PlayerAction, InspectResult, Game } from '~server/sdk/types'
+  export type { TraitViews, VisibleTraitName, GameView, ViewEntity, PlayerAction, InspectResult, Game } from '~server/sdk/types'
   import('~server/sdk/types')
 }

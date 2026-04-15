@@ -16,6 +16,7 @@ declare global {
   const bindInput: typeof import('~client/input').bindInput
   const Renderer: typeof import('~client/renderer').Renderer
   const TRAIT_RENDERERS: typeof import('~client/traitRenderers').TRAIT_RENDERERS
+  const renderTrait: typeof import('~client/traitRenderers').renderTrait
   const CELL_W: typeof import('~client/rendering/types').CELL_W
   const CELL_H: typeof import('~client/rendering/types').CELL_H
   const DrawContext: typeof import('~client/rendering/types').DrawContext
@@ -33,9 +34,6 @@ declare global {
   // @ts-ignore
   export type { Renderer } from '~client/renderer'
   import('~client/renderer')
-  // @ts-ignore
-  export type { TraitRenderer } from '~client/traitRenderers'
-  import('~client/traitRenderers')
   // @ts-ignore
   export type { DrawContext, StaticSprite, AnimatedSprite, EdgeVariants, RenderContext } from '~client/rendering/types'
   import('~client/rendering/types')

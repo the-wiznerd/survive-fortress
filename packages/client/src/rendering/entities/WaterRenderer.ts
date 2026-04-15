@@ -1,4 +1,4 @@
-import type { ViewEntity } from '@repo/server/sdk'
+import type { ViewEntity, VisibleTraitName } from '@repo/server/sdk'
 
 const EDGE_ROWS = [2, 3, 4, 5] // 4 animation frames, same col layout per row
 const EDGE_TOP_COLS = [0, 1, 2, 3, 5, 4, 6, 3]
@@ -39,7 +39,7 @@ export class WaterRenderer extends EntityRenderer {
     return t !== undefined && t !== 'water'
   }
 
-  describeTraits(entity: ViewEntity): string[] {
+  describeTraits(entity: ViewEntity): VisibleTraitName[] {
     return ['moisture']
   }
 }
