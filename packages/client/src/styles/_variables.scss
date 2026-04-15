@@ -1,5 +1,5 @@
 :root {
-  --color-white: #eee;
+  --color-white: #eff0e0;
   --color-lightest-gray: #c0c1aa;
   --color-light-gray: #a7ad9a;
   --color-gray: #7c877a;
@@ -30,4 +30,6 @@
   --color-blue: #518fb0;
   --color-dark-blue: #476f7a;
   --color-darkest-blue: var(--color-darkest-green);
+
+  --font-mono: 'Pixel Operator 8', monospace;
 }

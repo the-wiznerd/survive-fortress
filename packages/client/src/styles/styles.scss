@@ -1,11 +1,14 @@
 @use 'reset';
+@use 'fonts';
 @use 'variables';
 
 #app {
   background: var(--color-black);
   color: var(--color-lightest-gray);
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
   display: flex;
+  text-transform: uppercase;
+  font-size: 0.75rem;
   height: 100%;
   width: 100%;
   min-height: 100svh;
@@ -26,28 +29,34 @@ canvas {
 
 #sidebar {
   width: 300px;
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
   overflow-y: auto;
   line-height: 1.5;
   border-inline-start: 2px solid var(--color-darkest-gray);
 }
 
 .section {
-  margin-top: 1.5rem;
+  margin-block-end: 2.5rem;
 }
 
 .entity-card {
 
   >.label {
-    color: var(--color-lightest-blue);
-    margin-bottom: 0.25em;
-    font-size: 1.2rem;
+    color: var(--color-lightest-yellow);
+    margin-bottom: 1em;
+    font-size: 0.85rem;
+    font-weight: bold;
+  }
+
+  .traits {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
   }
 }
 
 .stat {
-  display: flex;
-  justify-content: space-between;
-  padding: 1px 0;
-  line-height: 1.4;
+  >.label {
+    color: var(--color-white);
+  }
 }

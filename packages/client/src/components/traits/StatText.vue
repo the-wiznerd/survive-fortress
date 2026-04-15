@@ -1,7 +1,6 @@
 <template>
   <div class="stat --text">
-    <span class="label">{{ label }}</span>
-    <span class="value">{{ value }}</span>
+    <span class="label">{{ label }}:</span> <span class="value">{{ value }}</span>
   </div>
 </template>
 

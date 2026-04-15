@@ -9,7 +9,6 @@
     </div>
 
     <div v-if="selection" class="section">
-      <h2>Tile ({{ selection.x }}, {{ selection.y }})</h2>
       <div v-if="selection.entities.length === 0" class="stat">Empty</div>
       <EntityCard
         v-for="e in selection.entities"
