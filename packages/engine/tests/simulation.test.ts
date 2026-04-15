@@ -53,18 +53,33 @@ describe('hunger system', () => {
     const b = runSim()
 
     expect(a.tick).toBe(b.tick)
-    expect(getComponent(a, 1, 'health')).toEqual(getComponent(b, 1, 'health'))
-    expect(getComponent(a, 1, 'hunger')).toEqual(getComponent(b, 1, 'hunger'))
-    expect(getComponent(a, 1, 'position')).toEqual(getComponent(b, 1, 'position'))
+
+    const ha = getComponent(a, 1, 'health')!
+    const hb = getComponent(b, 1, 'health')!
+    expect(ha.current).toBe(hb.current)
+    expect(ha.max).toBe(hb.max)
+
+    const ua = getComponent(a, 1, 'hunger')!
+    const ub = getComponent(b, 1, 'hunger')!
+    expect(ua.current).toBe(ub.current)
+    expect(ua.max).toBe(ub.max)
+
+    const pa = getComponent(a, 1, 'position')!
+    const pb = getComponent(b, 1, 'position')!
+    expect(pa.x).toBe(pb.x)
+    expect(pa.y).toBe(pb.y)
+    expect(pa.z).toBe(pb.z)
   })
 })
 
 describe('movement system', () => {
-  it('moves player when action submitted and AP sufficient', () => {
+  it('moves player when action submitted and timer ready', () => {
     const world = createWorld()
     const player = spawnPlayer(world, 10, 10)
 
-    // Player has apPerTick: 10, MOVE_COST: 10 → can move every tick.
+    // Player pace=3: need 3 ticks to fill the timer before first move.
+    simulate(world, 3)
+
     const pc = getComponent(world, player, 'playerControlled')!
     pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
 
@@ -79,28 +94,32 @@ describe('movement system', () => {
     const world = createWorld()
     const player = spawnPlayer(world, 10, 10)
 
-    // Slow down the player: move once every 3 ticks.
-    getComponent(world, player, 'speed')!.pace = 3
-
-    // Tick 0 (world.tick starts at 0): 0 % 3 === 0, can move.
+    // Player pace=3: timer starts at 0, fills after 3 ticks.
     const pc = getComponent(world, player, 'playerControlled')!
+
+    // Ticks 0-2: timer filling (0→1→2→3), not ready until counter reaches 3.
     pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
-    tick(world)
+    tick(world) // counter: 1
+    expect(getComponent(world, player, 'position')!.x).toBe(10)
+
+    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
+    tick(world) // counter: 2
+    expect(getComponent(world, player, 'position')!.x).toBe(10)
+
+    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
+    tick(world) // counter: 3 → ready, moves, resets to 0
     expect(getComponent(world, player, 'position')!.x).toBe(11)
 
-    // Tick 1: 1 % 3 !== 0, can't move.
+    // Immediately after move: counter reset to 0, can't move again.
     pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
-    tick(world)
+    tick(world) // counter: 1
     expect(getComponent(world, player, 'position')!.x).toBe(11)
 
-    // Tick 2: 2 % 3 !== 0, can't move.
+    // Fill up again.
     pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
-    tick(world)
-    expect(getComponent(world, player, 'position')!.x).toBe(11)
-
-    // Tick 3: 3 % 3 === 0, moves again.
+    tick(world) // counter: 2
     pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
-    tick(world)
+    tick(world) // counter: 3 → ready, moves
     expect(getComponent(world, player, 'position')!.x).toBe(12)
   })
 
@@ -108,13 +127,17 @@ describe('movement system', () => {
     const world = createWorld()
     const player = spawnPlayer(world, 10, 10)
 
+    // Fill the movement timer first (pace=3).
+    simulate(world, 3)
+
     const pc = getComponent(world, player, 'playerControlled')!
     pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
     tick(world)
 
     expect(pc.pendingAction).toBeNull()
 
-    // Next tick with no input: player doesn't move.
+    // Fill timer again, then tick with no input: player doesn't move.
+    simulate(world, 3)
     tick(world)
     expect(getComponent(world, player, 'position')!.x).toBe(11)
   })

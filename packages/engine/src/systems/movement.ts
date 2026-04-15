@@ -2,8 +2,10 @@ import { queryEntities, getComponent, type World, type Action } from '@repo/stat
 
 export function movementSystem(world: World) {
   for (const id of queryEntities(world, 'speed', 'position')) {
-    const speed = getComponent(world, id, 'speed')!
-    if (world.tick % speed.pace !== 0) continue
+    const speed = getComponent(world, id, 'speed')! as SpeedTrait
+    speed.timer.tick()
+
+    if (!speed.timer.ready) continue
 
     let action: Action | null = null
 
@@ -17,6 +19,7 @@ export function movementSystem(world: World) {
       const pos = getComponent(world, id, 'position')!
       pos.x += action.dx
       pos.y += action.dy
+      speed.timer.reset()
     }
   }
 }

@@ -30,6 +30,7 @@ declare global {
   const PlayerControlledTrait: typeof import('~engine/traits/PlayerControlledTrait').PlayerControlledTrait
   const PositionTrait: typeof import('~engine/traits/PositionTrait').PositionTrait
   const SpeedTrait: typeof import('~engine/traits/SpeedTrait').SpeedTrait
+  const TickCounter: typeof import('~engine/traits/TickCounter').TickCounter
   const Trait: typeof import('~engine/traits/Trait').Trait
   const BaseEntityType: typeof import('~engine/entityTypes/BaseEntityType').BaseEntityType
   const Dirt: typeof import('~engine/entityTypes/Dirt').Dirt
