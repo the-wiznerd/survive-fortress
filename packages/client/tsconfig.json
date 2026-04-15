@@ -14,5 +14,5 @@
       "~client/*": ["./src/*"]
     }
   },
-  "include": ["src", "auto-imports.d.ts"]
+  "include": ["src", "auto-imports.d.ts", "src/env.d.ts"]
 }

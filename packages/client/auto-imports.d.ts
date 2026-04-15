@@ -15,9 +15,7 @@ declare global {
   const getHoveredCell: typeof import('~client/input').getHoveredCell
   const bindInput: typeof import('~client/input').bindInput
   const Renderer: typeof import('~client/renderer').Renderer
-  const initSidebar: typeof import('~client/sidebar').initSidebar
-  const updateUI: typeof import('~client/sidebar').updateUI
-  const updateSelection: typeof import('~client/sidebar').updateSelection
+  const TRAIT_RENDERERS: typeof import('~client/traitRenderers').TRAIT_RENDERERS
   const CELL_W: typeof import('~client/rendering/types').CELL_W
   const CELL_H: typeof import('~client/rendering/types').CELL_H
   const DrawContext: typeof import('~client/rendering/types').DrawContext
@@ -35,6 +33,9 @@ declare global {
   // @ts-ignore
   export type { Renderer } from '~client/renderer'
   import('~client/renderer')
+  // @ts-ignore
+  export type { TraitRenderer } from '~client/traitRenderers'
+  import('~client/traitRenderers')
   // @ts-ignore
   export type { DrawContext, StaticSprite, AnimatedSprite, EdgeVariants, RenderContext } from '~client/rendering/types'
   import('~client/rendering/types')

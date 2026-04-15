@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import path from 'node:path'
+import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import { buildAutoImports, autoImportDtsPlugin } from '../../scanExports.js'
 
@@ -18,10 +19,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '~client': clientSrc,
-      vue: 'vue/dist/vue.esm-bundler.js',
     },
   },
   plugins: [
+    vue(),
     AutoImport({
       imports: buildAutoImports(pkgs, clientSrc),
       dts: false,
