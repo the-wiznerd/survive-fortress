@@ -11,6 +11,10 @@ type TraitRendererMap = {
 }
 
 export const TRAIT_RENDERERS: TraitRendererMap = {
+  position: {
+    component: StatText,
+    props: d => ({ label: 'Position', value: `${d.x}, ${d.y}, ${d.z}` })
+  },
   health: {
     component: StatText,
     props: d => ({

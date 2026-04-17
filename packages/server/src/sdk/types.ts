@@ -5,6 +5,7 @@ import type { Health, Hunger, Movement, Moisture, GroundCover } from '@repo/stat
 // Mirrors the component interface plus any sub-trait data.
 
 export interface TraitViews {
+  position: { x: number; y: number; z: number }
   health: Health
   hunger: Hunger
   movement: Movement & { timer: { counter: number; threshold: number } }

@@ -39,6 +39,6 @@ export class WaterRenderer extends EntityRenderer {
   }
 
   describeTraits(entity: ViewEntity): VisibleTraitName[] {
-    return ['moisture']
+    return ['moisture', 'position']
   }
 }

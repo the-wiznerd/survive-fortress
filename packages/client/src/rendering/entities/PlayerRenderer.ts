@@ -11,6 +11,6 @@ export class PlayerRenderer extends EntityRenderer {
   }
 
   describeTraits(entity: ViewEntity): VisibleTraitName[] {
-    return ['health', 'hunger', 'movement']
+    return ['health', 'hunger', 'movement', 'position']
   }
 }

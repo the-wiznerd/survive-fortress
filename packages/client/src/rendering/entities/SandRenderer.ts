@@ -10,6 +10,6 @@ export class SandRenderer extends EntityRenderer {
   }
 
   describeTraits(entity: ViewEntity): VisibleTraitName[] {
-    return ['moisture']
+    return ['moisture', 'position']
   }
 }

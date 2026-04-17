@@ -60,7 +60,10 @@ export async function createLocalGame(
       y: pos.y,
       z: pos.z,
       name: nameComp?.name,
-      traits: traits as ViewEntity['traits'],
+      traits: {
+        position: { x: pos.x, y: pos.y, z: pos.z },
+        ...traits,
+      } as ViewEntity['traits'],
     }
   }
 

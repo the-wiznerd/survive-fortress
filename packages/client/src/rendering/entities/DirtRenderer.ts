@@ -17,6 +17,6 @@ export class DirtRenderer extends EntityRenderer {
   }
 
   describeTraits(entity: ViewEntity): VisibleTraitName[] {
-    return ['moisture', 'groundCover']
+    return ['moisture', 'groundCover', 'position']
   }
 }
