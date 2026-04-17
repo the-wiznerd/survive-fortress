@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { EditorRenderer } from './renderer'
 import { listSaves } from './connection'
 import {
@@ -18,10 +18,12 @@ const PALETTE_TYPES = ['dirt', 'sand', 'stone', 'water', 'player']
 // State
 const saves = ref<string[]>([])
 const activeZ = ref(0)
+const showAllZ = ref(true)
 const activeTool = ref<'draw' | 'delete'>('draw')
 const activeType = ref(PALETTE_TYPES[0])
 const hoveredCell = ref<{ x: number; y: number } | null>(null)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
+const shiftHeld = ref(false)
 const toastMessage = ref('')
 let toastTimer = 0
 
@@ -42,9 +44,15 @@ let panCamStartX = 0
 let panCamStartY = 0
 
 // Rendering loop
+const effectiveTool = computed(() => shiftHeld.value ? 'delete' : activeTool.value)
+
 function renderLoop() {
   if (renderer && world.value) {
-    renderer.render(getEntities(), activeZ.value, hoveredCell.value, activeTool.value, activeType.value)
+    let entities = getEntities()
+    if (!showAllZ.value) {
+      entities = entities.filter(e => e.z === activeZ.value)
+    }
+    renderer.render(entities, activeZ.value, hoveredCell.value, effectiveTool.value, activeType.value)
   }
   rafId = requestAnimationFrame(renderLoop)
 }
@@ -123,6 +131,7 @@ function onCanvasContextMenu(e: MouseEvent) {
 // Canvas interaction
 function onCanvasMouseMove(e: MouseEvent) {
   if (!renderer) return
+  shiftHeld.value = e.shiftKey
 
   if (panning) {
     const dx = (e.clientX - panStartX) / renderer.destW
@@ -145,12 +154,13 @@ function onCanvasMouseLeave() {
 
 function onCanvasClick(e: MouseEvent) {
   if (!renderer || !world.value) return
+  shiftHeld.value = e.shiftKey
   const rect = (e.target as HTMLCanvasElement).getBoundingClientRect()
   const canvasX = e.clientX - rect.left
   const canvasY = e.clientY - rect.top
   const pos = renderer.screenToWorld(canvasX, canvasY, activeZ.value)
 
-  if (activeTool.value === 'draw') {
+  if (effectiveTool.value === 'draw') {
     placeEntity(activeType.value, pos.x, pos.y, activeZ.value)
   } else {
     deleteEntities(pos.x, pos.y, activeZ.value)
@@ -158,6 +168,7 @@ function onCanvasClick(e: MouseEvent) {
 }
 
 function onKeyDown(e: KeyboardEvent) {
+  shiftHeld.value = e.shiftKey
   const step = e.shiftKey ? 5 : 1
   switch (e.key) {
     case 'ArrowLeft':  cameraX.value -= step; break
@@ -168,6 +179,10 @@ function onKeyDown(e: KeyboardEvent) {
   }
   e.preventDefault()
   updateCamera()
+}
+
+function onKeyUp(e: KeyboardEvent) {
+  shiftHeld.value = e.shiftKey
 }
 </script>
 
@@ -192,6 +207,7 @@ function onKeyDown(e: KeyboardEvent) {
           <span>{{ activeZ }}</span>
           <button @click="activeZ++">+</button>
         </div>
+        <label class="z-show-all"><input type="checkbox" v-model="showAllZ"> Show all</label>
 
         <h2>Tool</h2>
         <div class="tool-buttons">
@@ -230,6 +246,7 @@ function onKeyDown(e: KeyboardEvent) {
         @click="onCanvasClick"
         @contextmenu="onCanvasContextMenu"
         @keydown="onKeyDown"
+        @keyup="onKeyUp"
       />
       <div v-if="toastMessage" class="toast">{{ toastMessage }}</div>
     </div>

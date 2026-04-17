@@ -64,6 +64,18 @@ export class EditorRenderer {
     const self = this
     this.world.render(entities, this.cameraX, this.cameraY, new Set(), {
       onAfterEntities(ctx) {
+        // Origin marker at (0, 0, 0).
+        const ox = -Math.floor(self.cameraX)
+        const oy = -activeZ - Math.floor(self.cameraY)
+        if (ox >= 0 && ox < self.viewWidth && oy >= 0 && oy < self.viewHeight) {
+          const cx = ox * self.destW + self.destW / 2
+          const cy = oy * self.rowStep + self.rowStep / 2
+          ctx.fillStyle = '#ffffff'
+          ctx.beginPath()
+          ctx.arc(cx, cy, 3, 0, Math.PI * 2)
+          ctx.fill()
+        }
+
         // Grid overlay.
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
         ctx.lineWidth = 1

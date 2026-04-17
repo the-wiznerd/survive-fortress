@@ -104,9 +104,17 @@ body {
   gap: 8px;
 
   span {
-    min-width: 40px;
+    min-width: 20px;
     text-align: center;
   }
+}
+
+.z-show-all {
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .save-list {
