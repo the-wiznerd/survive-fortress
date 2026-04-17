@@ -22,6 +22,9 @@ declare global {
   const renderTrait: typeof import('~client/traitRenderers').renderTrait
   const CELL_W: typeof import('~client/rendering/types').CELL_W
   const CELL_H: typeof import('~client/rendering/types').CELL_H
+  const TOP_VARIANT: typeof import('~client/rendering/types').TOP_VARIANT
+  const FRONT_VARIANT: typeof import('~client/rendering/types').FRONT_VARIANT
+  const terrainVariants: typeof import('~client/rendering/types').terrainVariants
   const DrawContext: typeof import('~client/rendering/types').DrawContext
   const zKey: typeof import('~client/rendering/types').zKey
   const posKey: typeof import('~client/rendering/types').posKey
@@ -41,7 +44,7 @@ declare global {
   export type { Renderer } from '~client/renderer'
   import('~client/renderer')
   // @ts-ignore
-  export type { DrawContext, StaticSprite, AnimatedSprite, EdgeVariants, RenderContext } from '~client/rendering/types'
+  export type { DrawContext, StaticSprite, AnimatedSprite, TerrainVariants, RenderContext } from '~client/rendering/types'
   import('~client/rendering/types')
   // @ts-ignore
   export type { DirtRenderer } from '~client/rendering/entities/DirtRenderer'

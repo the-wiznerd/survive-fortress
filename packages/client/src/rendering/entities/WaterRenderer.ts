@@ -1,8 +1,7 @@
 import type { ViewEntity, VisibleTraitName } from '@repo/server/sdk'
 
-const EDGE_ROWS = [2, 3, 4, 5] // 4 animation frames, same col layout per row
-const EDGE_TOP_COLS = [0, 1, 2, 3, 5, 4, 6, 3]
-const EDGE_FRONT_COLS = [9, 8, 10, 7]
+const ANIM_ROWS = [2, 3, 4, 5] // 4 animation frames, same col layout per row
+const WATER = terrainVariants(0, 0)  // cols are row-independent; row picked per-frame
 
 /** Water sits 0.25 cells lower than surrounding terrain. */
 const Y_OFFSET = 0.25
@@ -21,14 +20,14 @@ export class WaterRenderer extends EntityRenderer {
     const w = this.hasNonWaterNeighbor(rc.typeAt, wx - 1, wy, z) ? 1 : 0
 
     // Animation: stagger by world position so tiles don't all sync.
-    const frame = (Math.floor(rc.now / ANIM_INTERVAL) + wx + wy) % EDGE_ROWS.length
-    const row = EDGE_ROWS[frame]
+    const frame = (Math.floor(rc.now / ANIM_INTERVAL) + wx + wy) % ANIM_ROWS.length
+    const row = ANIM_ROWS[frame]
 
-    const topCol = EDGE_TOP_COLS[n * 4 + e * 2 + w]
+    const topCol = WATER.topCols[n * 4 + e * 2 + w]
     dc.draw(topCol, row, 1, 1, Y_OFFSET)
 
     if (!dc.frontOccluded) {
-      const frontCol = EDGE_FRONT_COLS[e * 2 + w]
+      const frontCol = WATER.frontCols[e * 2 + w]
       dc.draw(frontCol, row, 1, 1, 1 + Y_OFFSET)
     }
   }

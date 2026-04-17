@@ -11,10 +11,43 @@ export type AnimatedSprite = { frames: StaticSprite[]; interval: number }
  * frontCols: indexed by E*2 + W (0–3) → source column for front face.
  * All face cells live in the same row.
  */
-export interface EdgeVariants {
+export interface TerrainVariants {
   row: number
   topCols: number[]
   frontCols: number[]
+}
+
+/**
+ * Standard layout offsets from base column for terrain edge variants.
+ *
+ * Top face (8 variants, indexed by N*4 + E*2 + W):
+ *   +0 flat    +1 W      +2 E      +3 EW
+ *   +5 N       +4 NW     +6 NE     +3 NEW (same as EW)
+ *
+ * Front face (4 variants, indexed by E*2 + W):
+ *   +9 flat    +8 W      +10 E     +7 EW
+ */
+const TOP_OFFSETS = [0, 1, 2, 3, 5, 4, 6, 3]
+const FRONT_OFFSETS = [9, 8, 10, 7]
+
+/** Top-face edge variant names, indexed by N*4 + E*2 + W. */
+export const TOP_VARIANT = {
+  FLAT: 0, W: 1, E: 2, EW: 3,
+  N: 4, NW: 5, NE: 6, NEW: 7,
+} as const
+
+/** Front-face edge variant names, indexed by E*2 + W. */
+export const FRONT_VARIANT = {
+  FLAT: 0, W: 1, E: 2, EW: 3,
+} as const
+
+/** Build a TerrainVariants from a sprite row and base column. */
+export function terrainVariants(row: number, baseCol: number): TerrainVariants {
+  return {
+    row,
+    topCols: TOP_OFFSETS.map(o => baseCol + o),
+    frontCols: FRONT_OFFSETS.map(o => baseCol + o),
+  }
 }
 
 /** Per-frame context passed to entity renderers. */
@@ -99,11 +132,11 @@ export class DrawContext {
   }
 
   /** Draw a terrain tile with edge-aware top and front faces. */
-  drawEdgeTerrain(edge: EdgeVariants) {
+  drawTerrain(tv: TerrainVariants) {
     const { n, e, w } = this.edgeFlags()
-    this.draw(edge.topCols[n * 4 + e * 2 + w], edge.row)
+    this.draw(tv.topCols[n * 4 + e * 2 + w], tv.row)
     if (!this.frontOccluded) {
-      this.draw(edge.frontCols[e * 2 + w], edge.row, 1, 1, 1)
+      this.draw(tv.frontCols[e * 2 + w], tv.row, 1, 1, 1)
     }
   }
 }
