@@ -31,12 +31,29 @@ The z component does not appear as a spatial axis on screen. Instead, it becomes
 
 ## Vision
 
-The player has a **VisionTrait** with `range` and `upward` properties:
+Vision is per-entity, defined by two parameters: **horizontal range** and **vertical range**.
 
-- **range** — Circular (Euclidean) horizontal radius in columns around the player.
-- **upward** — How many z-levels above the player are visible.
-- **downward** — Unlimited. The player can see down through any non-opaque terrain.
+**Horizontal scope:** All columns within a circular radius of `horizontal range` around the entity's (x, y).
 
-At each column within range, visibility walks top-down from `player.z + upward` to the world's minimum z. **Opaque terrain** (OccludingTrait with `opaque: true`) blocks visibility of everything below it in that column. Non-opaque terrain (e.g. water) does not block.
+**Vertical scope per column — two searches from entity z:**
+
+**Downward (from entity z toward lower z):**
+
+- Find the highest occluder at or below the entity's z in this column, bounded by `entity.z - vertical range`.
+- Everything between the entity's z and that occluder (inclusive) is visible.
+- If the occluder is at the entity's own z, nothing below is visible in this column.
+- If no occluder is found, everything down to the floor of the search range is visible.
+- Non-opaque entities (e.g. water) are visible but don't stop the search.
+
+**Upward (from entity z toward higher z):**
+
+- Walk upward from entity z to `entity.z + vertical range`.
+- All entities encountered are visible, including occluders.
+- The first occluder stops the search and marks the column as having a **ceiling**.
+- If no occluder is found within the range, check whether any occluder exists above the range. If one does, the column still has a ceiling. If not, the column is open sky.
+
+**No X/Y plane occlusion.** Vision does not ray-cast horizontally — if a column is within range, it's checked. Only z-axis (vertical) occlusion matters.
+
+**Ceiling** is a per-column flag indicating that the entity is "indoors" or "underground" in that column — there's opaque terrain somewhere above the visible range.
 
 Only entities at visible positions are sent to the client. The client never receives data about positions outside the player's vision.
