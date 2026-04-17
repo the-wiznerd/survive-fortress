@@ -705,6 +705,34 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@repo/editor-server@workspace:*, @repo/editor-server@workspace:packages/editor-server":
+  version: 0.0.0-use.local
+  resolution: "@repo/editor-server@workspace:packages/editor-server"
+  dependencies:
+    "@types/ws": "npm:^8.18.0"
+    tsx: "npm:^4.19.0"
+    vite: "npm:^6.3.0"
+    vite-plugin-dts: "npm:^4.5.0"
+    ws: "npm:^8.18.0"
+  languageName: unknown
+  linkType: soft
+
+"@repo/editor@workspace:packages/editor":
+  version: 0.0.0-use.local
+  resolution: "@repo/editor@workspace:packages/editor"
+  dependencies:
+    "@repo/editor-server": "workspace:*"
+    "@repo/engine": "workspace:*"
+    "@repo/state": "workspace:*"
+    "@vitejs/plugin-vue": "npm:^6.0.6"
+    sass: "npm:^1.99.0"
+    unplugin-auto-import: "npm:^21.0.0"
+    vite: "npm:^6.3.0"
+    vue: "npm:^3.5.32"
+    vue-tsc: "npm:^3.2.6"
+  languageName: unknown
+  linkType: soft
+
 "@repo/engine@workspace:*, @repo/engine@workspace:packages/engine":
   version: 0.0.0-use.local
   resolution: "@repo/engine@workspace:packages/engine"
@@ -1081,12 +1109,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^25.6.0":
+"@types/node@npm:*, @types/node@npm:^25.6.0":
   version: 25.6.0
   resolution: "@types/node@npm:25.6.0"
   dependencies:
     undici-types: "npm:~7.19.0"
   checksum: 10c0/d2d2015630ff098a201407f55f5077a20270ae4f465c739b40865cd9933b91b9c5d2b85568eadaf3db0801b91e267333ca7eb39f007428b173d1cdab4b339ac5
+  languageName: node
+  linkType: hard
+
+"@types/ws@npm:^8.18.0":
+  version: 8.18.1
+  resolution: "@types/ws@npm:8.18.1"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/61aff1129143fcc4312f083bc9e9e168aa3026b7dd6e70796276dcfb2c8211c4292603f9c4864fae702f2ed86e4abd4d38aa421831c2fd7f856c931a481afbab
   languageName: node
   linkType: hard
 
@@ -3278,6 +3315,21 @@ __metadata:
   bin:
     why-is-node-running: cli.js
   checksum: 10c0/1cde0b01b827d2cf4cb11db962f3958b9175d5d9e7ac7361d1a7b0e2dc6069a263e69118bd974c4f6d0a890ef4eedfe34cf3d5167ec14203dbc9a18620537054
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.18.0":
+  version: 8.20.0
+  resolution: "ws@npm:8.20.0"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10c0/956ac5f11738c914089b65878b9223692ace77337ba55379ae68e1ecbeae9b47a0c6eb9403688f609999a58c80d83d99865fe0029b229d308b08c1ef93d4ea14
   languageName: node
   linkType: hard
 

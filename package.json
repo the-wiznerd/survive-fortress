@@ -10,6 +10,7 @@
     "typecheck": "turbo typecheck",
     "dev": "turbo watch build dev",
     "build": "turbo build",
+    "editor": "turbo watch build dev --filter=@repo/editor-server --filter=@repo/editor",
     "dev:kill": "lsof -ti :5173 -ti :5174 -ti :5175 | xargs kill -9 2>/dev/null; echo 'Dev servers killed'"
   },
   "devDependencies": {

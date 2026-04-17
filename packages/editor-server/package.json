@@ -1,0 +1,25 @@
+{
+  "name": "@repo/editor-server",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./sdk": {
+      "import": "./dist/sdk/index.js",
+      "types": "./dist/sdk/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "tsx watch src/main.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.0",
+    "tsx": "^4.19.0",
+    "vite": "^6.3.0",
+    "vite-plugin-dts": "^4.5.0"
+  }
+}
