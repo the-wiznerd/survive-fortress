@@ -164,7 +164,7 @@ export class Renderer {
 
     let x = player.x
     let y = player.y
-    const z = player.z
+    const drawZ = player.z - 1
 
     for (const step of queue) {
       x += step.dx
@@ -177,7 +177,7 @@ export class Renderer {
       const col = arrowCol(step.dx, step.dy)
       ctx.drawImage(this.spriteSheet,
         col * CELL_W, ARROW_ROW * CELL_H, CELL_W, CELL_H,
-        sx * cellW, sy * cellH - z * cellH,
+        sx * cellW, sy * cellH - drawZ * cellH,
         cellW, cellH)
     }
   }

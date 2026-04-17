@@ -67,4 +67,5 @@ export function startTickLoop(renderer: Renderer, onTick: () => void) {
   })
 
   game.start()
+  //
 }

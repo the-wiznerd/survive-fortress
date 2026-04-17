@@ -41,7 +41,7 @@ export function getHoveredCell() { return hoveredCell }
 
 // ─── Binding ───
 
-export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelect: () => void, onReload: () => void) {
+export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelect: () => void, onReload: () => void): () => void {
   canvas.addEventListener('click', (e) => {
     inspectedCell = canvasToWorld(e, canvas, renderer)
     onSelect()
@@ -55,7 +55,7 @@ export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelec
     hoveredCell = null
   })
 
-  document.addEventListener('keydown', (e) => {
+  const onKeyDown = (e: KeyboardEvent) => {
     if (e.repeat) return
 
     let step: MoveStep | null = null
@@ -81,16 +81,24 @@ export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelec
         setQueue([step])
       }
     }
-  })
+  }
 
-  document.addEventListener('keyup', (e) => {
+  const onKeyUp = (e: KeyboardEvent) => {
     if (e.key === ' ') {
       if (!arrowDuringSpace) {
         setQueue([])
       }
       spaceHeld = false
     }
-  })
+  }
+
+  document.addEventListener('keydown', onKeyDown)
+  document.addEventListener('keyup', onKeyUp)
+
+  return () => {
+    document.removeEventListener('keydown', onKeyDown)
+    document.removeEventListener('keyup', onKeyUp)
+  }
 }
 
 // ─── Helpers ───

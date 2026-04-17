@@ -29,6 +29,8 @@
     return er ? er.describeTraits(entity) : []
   })
 
+  let unbindInput: (() => void) | null = null
+
   onMounted(async () => {
     const canvas = canvasRef.value!
     renderer = new Renderer(canvas, 32, 24, 3)
@@ -37,13 +39,14 @@
       if (view.value) renderer.render(view.value, getHoveredCell(), getInspectedCell())
     }
 
-    bindInput(canvas, renderer, refreshUI, () => { startGame() })
+    unbindInput = bindInput(canvas, renderer, refreshUI, () => { startGame() })
     rafId = requestAnimationFrame(animationLoop)
     await startGame()
   })
 
   onUnmounted(() => {
     if (rafId) cancelAnimationFrame(rafId)
+    if (unbindInput) unbindInput()
   })
 
   async function startGame() {
