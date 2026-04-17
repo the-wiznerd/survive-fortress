@@ -56,6 +56,12 @@ function handleSaveWorld(
   const chunksDir = path.join(worldDir, 'chunks')
   try {
     fs.mkdirSync(chunksDir, { recursive: true })
+    // Remove old chunk files so stale data doesn't persist.
+    for (const file of fs.readdirSync(chunksDir)) {
+      if (file.endsWith('.json')) {
+        fs.unlinkSync(path.join(chunksDir, file))
+      }
+    }
     fs.writeFileSync(path.join(worldDir, 'world.json'), JSON.stringify(manifest, null, 2))
     for (const chunk of chunks) {
       fs.writeFileSync(

@@ -3,15 +3,15 @@
   "tick": 0,
   "chunkSize": 16,
   "chunks": {
-    "0_0": {
-      "cx": 0,
-      "cy": 0,
-      "state": "frozen",
-      "freezeTick": 0
-    },
     "0_-1": {
       "cx": 0,
       "cy": -1,
+      "state": "frozen",
+      "freezeTick": 0
+    },
+    "0_0": {
+      "cx": 0,
+      "cy": 0,
       "state": "frozen",
       "freezeTick": 0
     }
