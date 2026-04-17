@@ -8,7 +8,9 @@ let currentView: GameView
 let lastPlayerX: number | undefined
 let lastPlayerY: number | undefined
 
-const SAVE_PATH = '/saves/test-world'
+const DEFAULT_SAVE = 'test-world'
+const SAVE_NAME = new URLSearchParams(window.location.search).get('save') ?? DEFAULT_SAVE
+const SAVE_PATH = `/saves/${SAVE_NAME}`
 
 export function getGame(): Game { return game }
 export function getView(): GameView { return currentView }

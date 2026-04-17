@@ -7,6 +7,7 @@
 export {}
 declare global {
   const Colors: typeof import('~client/colors').Colors
+  const ENTITY_TRAIT_NAMES: typeof import('~client/entityTraits').ENTITY_TRAIT_NAMES
   const getGame: typeof import('~client/game').getGame
   const getView: typeof import('~client/game').getView
   const init: typeof import('~client/game').init
@@ -20,20 +21,6 @@ declare global {
   const Renderer: typeof import('~client/renderer').Renderer
   const TRAIT_RENDERERS: typeof import('~client/traitRenderers').TRAIT_RENDERERS
   const renderTrait: typeof import('~client/traitRenderers').renderTrait
-  const CELL_W: typeof import('~client/rendering/types').CELL_W
-  const CELL_H: typeof import('~client/rendering/types').CELL_H
-  const TOP_VARIANT: typeof import('~client/rendering/types').TOP_VARIANT
-  const FRONT_VARIANT: typeof import('~client/rendering/types').FRONT_VARIANT
-  const terrainVariants: typeof import('~client/rendering/types').terrainVariants
-  const DrawContext: typeof import('~client/rendering/types').DrawContext
-  const zKey: typeof import('~client/rendering/types').zKey
-  const posKey: typeof import('~client/rendering/types').posKey
-  const DirtRenderer: typeof import('~client/rendering/entities/DirtRenderer').DirtRenderer
-  const EntityRenderer: typeof import('~client/rendering/entities/EntityRenderer').EntityRenderer
-  const PlayerRenderer: typeof import('~client/rendering/entities/PlayerRenderer').PlayerRenderer
-  const SandRenderer: typeof import('~client/rendering/entities/SandRenderer').SandRenderer
-  const StoneRenderer: typeof import('~client/rendering/entities/StoneRenderer').StoneRenderer
-  const WaterRenderer: typeof import('~client/rendering/entities/WaterRenderer').WaterRenderer
 }
 // for type re-export
 declare global {
@@ -43,25 +30,4 @@ declare global {
   // @ts-ignore
   export type { Renderer } from '~client/renderer'
   import('~client/renderer')
-  // @ts-ignore
-  export type { DrawContext, StaticSprite, AnimatedSprite, TerrainVariants, RenderContext } from '~client/rendering/types'
-  import('~client/rendering/types')
-  // @ts-ignore
-  export type { DirtRenderer } from '~client/rendering/entities/DirtRenderer'
-  import('~client/rendering/entities/DirtRenderer')
-  // @ts-ignore
-  export type { EntityRenderer } from '~client/rendering/entities/EntityRenderer'
-  import('~client/rendering/entities/EntityRenderer')
-  // @ts-ignore
-  export type { PlayerRenderer } from '~client/rendering/entities/PlayerRenderer'
-  import('~client/rendering/entities/PlayerRenderer')
-  // @ts-ignore
-  export type { SandRenderer } from '~client/rendering/entities/SandRenderer'
-  import('~client/rendering/entities/SandRenderer')
-  // @ts-ignore
-  export type { StoneRenderer } from '~client/rendering/entities/StoneRenderer'
-  import('~client/rendering/entities/StoneRenderer')
-  // @ts-ignore
-  export type { WaterRenderer } from '~client/rendering/entities/WaterRenderer'
-  import('~client/rendering/entities/WaterRenderer')
 }
