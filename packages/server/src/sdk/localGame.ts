@@ -1,5 +1,4 @@
 import {
-  type World,
   type EntityId,
   type WorldManifest,
   type ChunkData,
@@ -11,7 +10,7 @@ import {
   bootstrap,
   tick,
   importWorld,
-  type BaseEntityType,
+  VisionTrait,
 } from '@repo/engine'
 import type { Game, GameView, ViewEntity, PlayerAction, VisibleTraitName } from './types.js'
 
@@ -66,11 +65,20 @@ export async function createLocalGame(
   }
 
   function buildView(): GameView {
+    const visionComp = getComponent(world, playerId, 'vision') as VisionTrait | undefined
+    const visiblePositions = visionComp
+      ? visionComp.getVisiblePositions()
+      : null
+
     const entities: ViewEntity[] = []
     for (const id of queryEntities(world, 'position', 'entityType')) {
+      if (visiblePositions) {
+        const pos = getComponent(world, id, 'position')!
+        if (id !== playerId && !visiblePositions.has(`${pos.x},${pos.y},${pos.z}`)) continue
+      }
       entities.push(buildViewEntity(id))
     }
-    return { tick: world.tick, playerId: String(playerId), entities }
+    return { tick: world.tick, playerId: String(playerId), entities, visiblePositions: visiblePositions ?? new Set() }
   }
 
   function gameTick() {

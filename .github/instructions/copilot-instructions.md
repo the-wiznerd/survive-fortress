@@ -26,7 +26,6 @@ Each package uses `unplugin-auto-import` to auto-import **its own internal** exp
 
 - **Cross-package dependencies** like `import { World } from '@repo/state'` in engine files.
 - **Third-party libraries** like `vitest` (`import { describe, it, expect } from 'vitest'`).
-- **Side-effect imports** for web components (`import './components/entity-card.js'`).
 
 ### Adding new exports
 
@@ -47,12 +46,12 @@ The client interacts with the game exclusively through `@repo/server/sdk`:
 
 ## Key Commands
 
-- `nvm use 22` before any yarn/node commands — default system Node is v16, breaks Vite.
-- `yarn dev` — builds deps + starts client dev server (Turborepo)
-- `yarn build` — full production build all packages
-- `yarn test` — engine tests (vitest, 20 tests)
-- `yarn typecheck` — tsc --noEmit all packages
-- `yarn dev:kill` — kill dev servers on ports 5173-5175
+- `nvm use` before any yarn/node commands to use the correct Node version
+- `yarn dev`  builds deps + starts client dev server (Turborepo)
+- `yarn build` full production build all packages
+- `yarn test` engine tests (vitest, 20 tests)
+- `yarn typecheck` tsc --noEmit all packages
+- `yarn dev:kill` kill dev servers on ports 5173-5175
 
 ## Style
 
@@ -61,8 +60,8 @@ The client interacts with the game exclusively through `@repo/server/sdk`:
 ### File & Directory Organization
 
 - **Split unrelated but similar code into separate files** in a single directory. One class/system/trait per file.
-- **File names match the class they contain**, including capitalization. `Dirt.ts` exports `class Dirt`, `MoistureTrait.ts` exports `class MoistureTrait`. Files that export only non-class values (functions, constants) use camelCase: `moisture.ts`, `movement.ts`.
 - **Directory names use camelCase or PascalCase**, matching JS naming conventions. No snake_case: `entityTypes/`, `traits/`, not `entity_types/`, `trait_files/`.
+- **File names match the class they contain**, including capitalization. `Dirt.ts` exports `class Dirt`, `MoistureTrait.ts` exports `class MoistureTrait`. Files that export only non-class values (functions, constants) use camelCase: `moisture.ts`, `movement.ts`.
 
 ### Functions
 

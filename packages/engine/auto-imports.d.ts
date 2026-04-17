@@ -33,6 +33,7 @@ declare global {
   const PositionTrait: typeof import('~engine/traits/PositionTrait').PositionTrait
   const TickCounter: typeof import('~engine/traits/TickCounter').TickCounter
   const Trait: typeof import('~engine/traits/Trait').Trait
+  const VisionTrait: typeof import('~engine/traits/VisionTrait').VisionTrait
   const BaseEntityType: typeof import('~engine/entityTypes/BaseEntityType').BaseEntityType
   const Dirt: typeof import('~engine/entityTypes/Dirt').Dirt
   const Player: typeof import('~engine/entityTypes/Player').Player

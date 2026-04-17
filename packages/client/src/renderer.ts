@@ -117,7 +117,7 @@ export class Renderer {
         typeAt.set(posKey(entity.x, entity.y, entity.z), entity.type)
       }
     }
-    const rc: RenderContext = { maxZ, occludingMaxZ, terrainAt, typeAt, now: performance.now() }
+    const rc: RenderContext = { maxZ, occludingMaxZ, terrainAt, typeAt, knownPositions: view.visiblePositions, now: performance.now() }
 
     // Pass 1: Terrain (back-to-front).
     for (const row of terrainRows) {

@@ -27,6 +27,8 @@ export interface RenderContext {
   terrainAt: Set<number>
   /** Entity type at each (x, y, z) for neighbor checks. */
   typeAt: Map<number, string>
+  /** Set of "x,y,z" keys the player can see (from GameView). */
+  knownPositions: Set<string>
   /** Current timestamp from performance.now(). */
   now: number
 }
@@ -71,16 +73,28 @@ export class DrawContext {
 
   /** Whether the front face is hidden by terrain in the next row. */
   get frontOccluded(): boolean {
+    // If the south neighbor is outside known positions, don't draw the front face
+    // (unknown ≠ air, so don't assume a cliff).
+    if (!this.isKnown(this.wx, this.wy + 1)) return true
     return this.rc.terrainAt.has(posKey(this.wx, this.wy + 1, this.z))
+  }
+
+  /** Whether a column (x, y) contains any known position. */
+  private isKnown(x: number, y: number): boolean {
+    if (this.rc.knownPositions.size === 0) return true  // no vision = everything known
+    // Check if any z-level at (x,y) is known.
+    // Quick: check if maxZ has an entry (means we have terrain there in our view).
+    return this.rc.maxZ.has(zKey(x, y))
   }
 
   /** Compute edge flags (N, E, W as 0|1) based on neighboring elevation. */
   edgeFlags(): { n: number; e: number; w: number } {
     const { maxZ } = this.rc
     const { wx, wy, z } = this
-    const n = (maxZ.get(zKey(wx, wy - 1)) ?? -Infinity) < z ? 1 : 0
-    const e = (maxZ.get(zKey(wx + 1, wy)) ?? -Infinity) < z ? 1 : 0
-    const w = (maxZ.get(zKey(wx - 1, wy)) ?? -Infinity) < z ? 1 : 0
+    // Unknown neighbors (outside vision) are treated as same-height — no edge drawn.
+    const n = this.isKnown(wx, wy - 1) && (maxZ.get(zKey(wx, wy - 1)) ?? -Infinity) < z ? 1 : 0
+    const e = this.isKnown(wx + 1, wy) && (maxZ.get(zKey(wx + 1, wy)) ?? -Infinity) < z ? 1 : 0
+    const w = this.isKnown(wx - 1, wy) && (maxZ.get(zKey(wx - 1, wy)) ?? -Infinity) < z ? 1 : 0
     return { n, e, w }
   }
 

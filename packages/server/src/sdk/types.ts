@@ -24,6 +24,8 @@ export interface GameView {
   tick: number
   playerId: string
   entities: ViewEntity[]
+  /** Set of "x,y,z" keys the player can see — used by renderer for edge logic. */
+  visiblePositions: Set<string>
 }
 
 /** A single entity as seen by the client. */

@@ -16,6 +16,7 @@ export interface ComponentTypes {
   moisture: Moisture
   groundCover: GroundCover
   occluding: Occluding
+  vision: Vision
   name: Name
   instance: Instance
 }
@@ -69,6 +70,11 @@ export interface Occluding {
   opaque: boolean
 }
 
+export interface Vision {
+  range: number
+  upward: number
+}
+
 export interface Name {
   name: string
 }
@@ -110,6 +116,7 @@ export function createWorld(): World {
       moisture: new Map(),
       groundCover: new Map(),
       occluding: new Map(),
+      vision: new Map(),
       name: new Map(),
       instance: new Map(),
     },
