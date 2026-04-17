@@ -6,6 +6,7 @@
 // biome-ignore lint: disable
 export {}
 declare global {
+  const Colors: typeof import('~client/colors').Colors
   const getGame: typeof import('~client/game').getGame
   const getView: typeof import('~client/game').getView
   const init: typeof import('~client/game').init
