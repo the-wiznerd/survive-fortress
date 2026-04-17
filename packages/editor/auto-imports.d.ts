@@ -13,6 +13,7 @@ declare global {
   const EditorRenderer: typeof import('~editor/renderer').EditorRenderer
   const world: typeof import('~editor/world').world
   const currentSaveName: typeof import('~editor/world').currentSaveName
+  const editorNewWorld: typeof import('~editor/world').editorNewWorld
   const editorLoadWorld: typeof import('~editor/world').editorLoadWorld
   const editorSaveWorld: typeof import('~editor/world').editorSaveWorld
   const placeEntity: typeof import('~editor/world').placeEntity

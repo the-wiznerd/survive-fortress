@@ -56,6 +56,36 @@ body {
     background: #e94560;
     border-color: #e94560;
   }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}
+
+.sidebar select {
+  background: #0f3460;
+  color: #e0e0e0;
+  border: 1px solid #1a4a7a;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 12px;
+  width: 100%;
+
+  &:hover {
+    background: #1a4a7a;
+  }
+
+  option {
+    background: #16213e;
+    color: #e0e0e0;
+  }
+}
+
+.save-buttons {
+  display: flex;
+  gap: 4px;
 }
 
 .palette {

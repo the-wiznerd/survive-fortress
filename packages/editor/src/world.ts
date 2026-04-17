@@ -38,6 +38,15 @@ function ensureBootstrap() {
   }
 }
 
+/** Create a blank world in the editor. */
+export function editorNewWorld() {
+  ensureBootstrap()
+  const w = createEcsWorld()
+  world.value = w
+  manifest = { seed: 0, tick: 0, chunkSize: 16, chunks: { '0,0': { cx: 0, cy: 0, state: 'frozen', freezeTick: 0 } } }
+  currentSaveName.value = null
+}
+
 /** Load a world from the editor-server by name. */
 export async function editorLoadWorld(name: string) {
   ensureBootstrap()
@@ -50,9 +59,12 @@ export async function editorLoadWorld(name: string) {
 }
 
 /** Save the current world back to the editor-server. */
-export async function editorSaveWorld() {
+export async function editorSaveWorld(name?: string) {
   const w = world.value
-  if (!w || !manifest || !currentSaveName.value) return
+  if (!w || !manifest) return
+
+  const saveName = name ?? currentSaveName.value
+  if (!saveName) return
 
   const chunkCoords = Object.values(manifest.chunks).map(c => ({ cx: c.cx, cy: c.cy }))
   const newManifest = exportManifest(w, manifest.seed, manifest.chunkSize, chunkCoords)
@@ -61,8 +73,9 @@ export async function editorSaveWorld() {
     data: exportChunk(w, cx, cy, manifest!.chunkSize),
   }))
 
-  await saveWorld(currentSaveName.value, newManifest, chunks)
+  await saveWorld(saveName, newManifest, chunks)
   manifest = newManifest
+  currentSaveName.value = saveName
 }
 
 /** Place an entity of the given type at world position. */

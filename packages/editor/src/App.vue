@@ -7,6 +7,7 @@ import {
   currentSaveName,
   editorLoadWorld,
   editorSaveWorld,
+  editorNewWorld,
   placeEntity,
   deleteEntities,
   getEntities,
@@ -21,6 +22,8 @@ const activeTool = ref<'draw' | 'delete'>('draw')
 const activeType = ref(PALETTE_TYPES[0])
 const hoveredCell = ref<{ x: number; y: number } | null>(null)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
+const toastMessage = ref('')
+let toastTimer = 0
 
 const SCALE = 3
 const VIEW_W = 40
@@ -30,8 +33,8 @@ let renderer: EditorRenderer | null = null
 let rafId = 0
 
 // Camera panning state
-const cameraX = ref(0)
-const cameraY = ref(0)
+const cameraX = ref(-Math.floor(VIEW_W / 2))
+const cameraY = ref(-Math.floor(VIEW_H / 2))
 let panning = false
 let panStartX = 0
 let panStartY = 0
@@ -57,17 +60,37 @@ onMounted(async () => {
 watch(canvasRef, (canvas) => {
   if (!canvas) return
   renderer = new EditorRenderer(canvas, VIEW_W, VIEW_H, SCALE)
+  renderer.setCamera(cameraX.value, cameraY.value)
   renderer.onReady = () => renderLoop()
 })
 
 // Save browser
-async function openSave(name: string) {
-  await editorLoadWorld(name)
-  // Trigger a re-render
+async function onFileSelect(e: Event) {
+  const value = (e.target as HTMLSelectElement).value
+  if (value === '__new__') {
+    editorNewWorld()
+  } else {
+    await editorLoadWorld(value)
+  }
 }
 
 async function handleSave() {
   await editorSaveWorld()
+  showToast('Saved!')
+}
+
+async function handleSaveAs() {
+  const name = prompt('Save as:', currentSaveName.value ?? '')
+  if (!name) return
+  await editorSaveWorld(name)
+  if (!saves.value.includes(name)) saves.value.push(name)
+  showToast(`Saved as "${name}"!`)
+}
+
+function showToast(msg: string) {
+  toastMessage.value = msg
+  clearTimeout(toastTimer)
+  toastTimer = window.setTimeout(() => { toastMessage.value = '' }, 2000)
 }
 
 // Camera panning
@@ -151,20 +174,17 @@ function onKeyDown(e: KeyboardEvent) {
 <template>
   <div class="editor-layout">
     <div class="sidebar">
-      <h2>Saves</h2>
-      <div class="save-list">
-        <button
-          v-for="name in saves"
-          :key="name"
-          :class="{ active: name === currentSaveName }"
-          @click="openSave(name)"
-        >
-          {{ name }}
-        </button>
-      </div>
+      <h2>File</h2>
+      <select :value="currentSaveName ?? ''" @change="onFileSelect">
+        <option value="__new__">New…</option>
+        <option v-for="name in saves" :key="name" :value="name">{{ name }}</option>
+      </select>
 
       <template v-if="world">
-        <button @click="handleSave">Save</button>
+        <div class="save-buttons">
+          <button @click="handleSave" :disabled="!currentSaveName">Save</button>
+          <button @click="handleSaveAs">Save as…</button>
+        </div>
 
         <h2>Z-Level</h2>
         <div class="z-controls">
@@ -211,6 +231,25 @@ function onKeyDown(e: KeyboardEvent) {
         @contextmenu="onCanvasContextMenu"
         @keydown="onKeyDown"
       />
+      <div v-if="toastMessage" class="toast">{{ toastMessage }}</div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.toast {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(34, 120, 50, 0.85);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 14px;
+  pointer-events: none;
+}
+.viewport {
+  position: relative;
+}
+</style>
