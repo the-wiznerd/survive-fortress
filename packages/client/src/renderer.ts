@@ -187,7 +187,7 @@ export class Renderer {
     renderer.render(entity, new DrawContext(offCtx, this.spriteSheet, scale, offSx, offSy, entity.x, entity.y, 0, rc))
 
     offCtx.globalCompositeOperation = 'source-in'
-    offCtx.fillStyle = '#eff0e0'
+    offCtx.fillStyle = '#3f3f3f'
     offCtx.fillRect(0, 0, offCanvas.width, offCanvas.height)
     offCtx.globalCompositeOperation = 'source-over'
 
