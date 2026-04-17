@@ -4,7 +4,6 @@ import {
   type ChunkData,
   getComponent,
   queryEntities,
-  getEntitiesInColumn,
 } from '@repo/state'
 import {
   bootstrap,
@@ -84,6 +83,8 @@ export async function createLocalGame(
     return { tick: world.tick, playerId: String(playerId), entities, visiblePositions: visiblePositions ?? new Set() }
   }
 
+  let currentView: GameView = buildView()
+
   function gameTick() {
     if (pendingAction) {
       const pc = getComponent(world, playerId, 'playerControlled')
@@ -91,7 +92,8 @@ export async function createLocalGame(
       pendingAction = null
     }
     tick(world)
-    viewCallback?.(buildView())
+    currentView = buildView()
+    viewCallback?.(currentView)
   }
 
   return {
@@ -104,8 +106,7 @@ export async function createLocalGame(
     },
 
     inspect(x, y): InspectResult {
-      const ids = getEntitiesInColumn(world, x, y)
-      return { entities: ids.map(buildViewEntity) }
+      return { entities: currentView.entities.filter(e => e.x === x && e.y === y) }
     },
 
     start() {
@@ -118,7 +119,7 @@ export async function createLocalGame(
     },
 
     getView() {
-      return buildView()
+      return currentView
     },
   }
 }

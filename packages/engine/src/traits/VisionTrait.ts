@@ -43,6 +43,13 @@ export class VisionTrait extends Trait<'vision'> {
     const visible = new Set<string>()
     const r2 = range * range
 
+    // Derive world min-z from the spatial index so we don't hardcode a floor.
+    let minZ = 0
+    for (const key of this.world.spatialIndex.keys()) {
+      const z = parseInt(key.substring(key.lastIndexOf(',') + 1), 10)
+      if (z < minZ) minZ = z
+    }
+
     for (let dx = -range; dx <= range; dx++) {
       for (let dy = -range; dy <= range; dy++) {
         // Circular range check.
@@ -53,7 +60,7 @@ export class VisionTrait extends Trait<'vision'> {
         const maxZ = pos.z + upward
 
         // Walk column top-down. Once we hit opaque terrain, everything below is hidden.
-        for (let z = maxZ; z >= 0; z--) {
+        for (let z = maxZ; z >= minZ; z--) {
           // Check if there are any entities at this position at all.
           const entitiesHere = getEntitiesAt(this.world, wx, wy, z)
           if (entitiesHere.length > 0) {
