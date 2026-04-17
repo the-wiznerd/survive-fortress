@@ -148,23 +148,10 @@ EntityRenderer.describeTraits()  →  trait names
 ### Adding a new trait to the sidebar
 
 1. **Add the view type** to `TraitViews` in `packages/server/src/sdk/types.ts`.
-2. **Add a renderer entry** in `traitRenderers.ts`:
-   ```ts
-   myTrait: {
-     component: StatText,
-     props: d => ({ label: 'My Trait', value: `${d.someField}` })
-   },
-   ```
+2. **Add a renderer entry** in `traitRenderers.ts` mapping the trait name to a Vue component and props factory.
 3. **Add the trait name** to `describeTraits()` in the relevant entity renderer(s).
 
-### Available trait components
-
-| Component | Location | Props | Use case |
-|---|---|---|---|
-| `StatText` | `components/traits/StatText.vue` | `label: string, value: string \| number` | Simple label/value display |
-| `MovementBar` | `components/traits/MovementBar.vue` | `pace: number, counter: number` | Segmented progress bar |
-
-Create new trait components in `src/components/traits/` when you need custom display beyond label/value.
+Use existing `StatText` for simple label/value display, or create a new component in `src/components/traits/` for custom rendering. See `traitRenderers.ts` for the current registry and examples.
 
 ## Vue Components
 
