@@ -9,6 +9,7 @@
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, provide } from 'vue'
   import type { GameView, ViewEntity, InspectResult, VisibleTraitName } from '@repo/server/sdk'
+  import { ENTITY_TRAIT_NAMES } from './entityTraits'
   import Sidebar from './components/Sidebar.vue'
 
   const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -25,8 +26,7 @@
   provide('inspectedCell', inspectedCell)
   provide('inspectResult', inspectResult)
   provide('getTraitNames', (entity: ViewEntity): VisibleTraitName[] => {
-    const er = renderer?.getEntityRenderer(entity.type)
-    return er ? er.describeTraits(entity) : []
+    return ENTITY_TRAIT_NAMES[entity.type] ?? []
   })
 
   let unbindInput: (() => void) | null = null

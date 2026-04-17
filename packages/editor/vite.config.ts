@@ -9,8 +9,6 @@ const editorSrc = path.resolve(import.meta.dirname, 'src')
 const pkgs = {
   '~editor': [
     editorSrc,
-    `${editorSrc}/rendering`,
-    `${editorSrc}/rendering/entities`,
   ],
 }
 const dtsPath = path.resolve(import.meta.dirname, 'auto-imports.d.ts')

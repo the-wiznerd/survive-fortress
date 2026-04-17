@@ -10,8 +10,6 @@ const clientSrc = path.resolve(import.meta.dirname, 'src')
 const pkgs = {
   '~client': [
     clientSrc,
-    `${clientSrc}/rendering`,
-    `${clientSrc}/rendering/entities`,
   ],
 }
 const dtsPath = path.resolve(import.meta.dirname, 'auto-imports.d.ts')

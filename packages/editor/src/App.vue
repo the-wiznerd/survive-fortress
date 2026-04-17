@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from 'vue'
 import { EditorRenderer } from './renderer'
-import { PALETTE_TYPES } from './rendering/entities'
 import { listSaves } from './connection'
 import {
   world,
@@ -12,6 +11,8 @@ import {
   deleteEntities,
   getEntities,
 } from './world'
+
+const PALETTE_TYPES = ['dirt', 'sand', 'stone', 'water', 'player']
 
 // State
 const saves = ref<string[]>([])

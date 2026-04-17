@@ -695,6 +695,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@repo/client@workspace:packages/client"
   dependencies:
+    "@repo/rendering": "workspace:*"
     "@repo/server": "workspace:*"
     "@vitejs/plugin-vue": "npm:^6.0.6"
     sass: "npm:^1.99.0"
@@ -723,6 +724,7 @@ __metadata:
   dependencies:
     "@repo/editor-server": "workspace:*"
     "@repo/engine": "workspace:*"
+    "@repo/rendering": "workspace:*"
     "@repo/state": "workspace:*"
     "@vitejs/plugin-vue": "npm:^6.0.6"
     sass: "npm:^1.99.0"
@@ -742,6 +744,15 @@ __metadata:
     vite: "npm:^6.3.0"
     vite-plugin-dts: "npm:^4.5.0"
     vitest: "npm:^3.1.0"
+  languageName: unknown
+  linkType: soft
+
+"@repo/rendering@workspace:*, @repo/rendering@workspace:packages/rendering":
+  version: 0.0.0-use.local
+  resolution: "@repo/rendering@workspace:packages/rendering"
+  dependencies:
+    vite: "npm:^6.3.0"
+    vite-plugin-dts: "npm:^4.5.0"
   languageName: unknown
   linkType: soft
 

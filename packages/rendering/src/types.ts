@@ -21,11 +21,14 @@ export interface TerrainVariants {
  * Standard layout offsets from base column for terrain edge variants.
  *
  * Top face (8 variants, indexed by N*4 + E*2 + W):
- *   +0 flat    +1 W      +2 E      +3 EW
- *   +5 N       +4 NW     +6 NE     +3 NEW (same as EW)
+ *   +0 flat    +5 N
+ *   +1 W       +4 NW
+ *   +2 E       +6 NE
+ *   +3 EW      +3 NEW (same as EW)
  *
  * Front face (4 variants, indexed by E*2 + W):
- *   +9 flat    +8 W      +10 E     +7 EW
+ *   +9 flat    +7 EW
+ *   +8 W       +10 E
  */
 const TOP_OFFSETS = [0, 1, 2, 3, 5, 4, 6, 3]
 const FRONT_OFFSETS = [9, 8, 10, 7]
@@ -50,7 +53,33 @@ export function terrainVariants(row: number, baseCol: number): TerrainVariants {
   }
 }
 
-/** Per-frame context passed to entity renderers. */
+// ─── Spatial Key Helpers ───
+
+export function zKey(x: number, y: number): number {
+  return y * 100000 + x
+}
+
+export function posKey(x: number, y: number, z: number): number {
+  return ((z + 128) << 20) | ((y & 0x3FF) << 10) | (x & 0x3FF)
+}
+
+// ─── Rendering Entity Interface ───
+
+/**
+ * Minimal entity shape consumed by the rendering pipeline.
+ * No dependency on @repo/server — consumers map their data into this shape.
+ */
+export interface RenderEntity {
+  type: string
+  x: number
+  y: number
+  z: number
+  traits: Record<string, unknown>
+}
+
+// ─── Render Context ───
+
+/** Per-frame context shared across all entity draws. */
 export interface RenderContext {
   /** Max terrain z at each world (x, y). */
   maxZ: Map<number, number>
@@ -60,11 +89,13 @@ export interface RenderContext {
   terrainAt: Set<number>
   /** Entity type at each (x, y, z) for neighbor checks. */
   typeAt: Map<number, string>
-  /** Set of "x,y,z" keys the player can see (from GameView). */
+  /** Set of "x,y,z" keys known to be visible (empty = show all). */
   knownPositions: Set<string>
   /** Current timestamp from performance.now(). */
   now: number
 }
+
+// ─── Draw Context ───
 
 /**
  * Per-entity drawing context. Captures the sprite sheet, canvas, position,
@@ -87,14 +118,6 @@ export class DrawContext {
     readonly rc: RenderContext,
   ) { }
 
-  /**
-   * Draw cells from the sprite sheet at this entity's screen position.
-   * @param col   Source cell column
-   * @param row   Source cell row
-   * @param w     Width in cells (default 1)
-   * @param h     Height in cells (default 1)
-   * @param yOff  Extra Y offset in cells (e.g. 1 = one cell down, -0.5 = half cell up)
-   */
   draw(col: number, row: number, w = 1, h = 1, yOff = 0) {
     const cellW = CELL_W * this.scale
     const cellH = CELL_H * this.scale
@@ -104,34 +127,25 @@ export class DrawContext {
       cellW * w, cellH * h)
   }
 
-  /** Whether the front face is hidden by terrain in the next row. */
   get frontOccluded(): boolean {
-    // If the south neighbor is outside known positions, don't draw the front face
-    // (unknown ≠ air, so don't assume a cliff).
     if (!this.isKnown(this.wx, this.wy + 1)) return true
     return this.rc.terrainAt.has(posKey(this.wx, this.wy + 1, this.z))
   }
 
-  /** Whether a column (x, y) contains any known position. */
   private isKnown(x: number, y: number): boolean {
-    if (this.rc.knownPositions.size === 0) return true  // no vision = everything known
-    // Check if any z-level at (x,y) is known.
-    // Quick: check if maxZ has an entry (means we have terrain there in our view).
+    if (this.rc.knownPositions.size === 0) return true
     return this.rc.maxZ.has(zKey(x, y))
   }
 
-  /** Compute edge flags (N, E, W as 0|1) based on neighboring elevation. */
   edgeFlags(): { n: number; e: number; w: number } {
     const { maxZ } = this.rc
     const { wx, wy, z } = this
-    // Unknown neighbors (outside vision) are treated as same-height — no edge drawn.
     const n = this.isKnown(wx, wy - 1) && (maxZ.get(zKey(wx, wy - 1)) ?? -Infinity) < z ? 1 : 0
     const e = this.isKnown(wx + 1, wy) && (maxZ.get(zKey(wx + 1, wy)) ?? -Infinity) < z ? 1 : 0
     const w = this.isKnown(wx - 1, wy) && (maxZ.get(zKey(wx - 1, wy)) ?? -Infinity) < z ? 1 : 0
     return { n, e, w }
   }
 
-  /** Draw a terrain tile with edge-aware top and front faces. */
   drawTerrain(tv: TerrainVariants) {
     const { n, e, w } = this.edgeFlags()
     this.draw(tv.topCols[n * 4 + e * 2 + w], tv.row)
@@ -139,14 +153,4 @@ export class DrawContext {
       this.draw(tv.frontCols[e * 2 + w], tv.row, 1, 1, 1)
     }
   }
-}
-
-/** Hashed key for (x, y) elevation lookups. */
-export function zKey(x: number, y: number): number {
-  return y * 100000 + x
-}
-
-/** Packed key for (x, y, z) terrain presence lookups. */
-export function posKey(x: number, y: number, z: number): number {
-  return ((z + 128) << 20) | ((y & 0x3FF) << 10) | (x & 0x3FF)
 }

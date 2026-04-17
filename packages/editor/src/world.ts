@@ -16,6 +16,7 @@ import {
   exportManifest,
   spawnEntity,
 } from '@repo/engine'
+import type { RenderEntity } from '@repo/rendering'
 import { loadWorld, saveWorld } from './connection'
 import { ref, shallowRef } from 'vue'
 
@@ -84,14 +85,17 @@ export function deleteEntities(x: number, y: number, z: number) {
 }
 
 /** Get all entities as a flat list for rendering. */
-export function getEntities(): { id: number; type: string; x: number; y: number; z: number }[] {
+export function getEntities(): RenderEntity[] {
   const w = world.value
   if (!w) return []
-  const result: { id: number; type: string; x: number; y: number; z: number }[] = []
+  const result: RenderEntity[] = []
   for (const id of queryEntities(w, 'position', 'entityType')) {
     const pos = getComponent(w, id, 'position')!
     const et = getComponent(w, id, 'entityType')!
-    result.push({ id, type: et.type, x: pos.x, y: pos.y, z: pos.z })
+    const traits: Record<string, unknown> = {}
+    const gc = getComponent(w, id, 'groundCover')
+    if (gc) traits.groundCover = gc
+    result.push({ type: et.type, x: pos.x, y: pos.y, z: pos.z, traits })
   }
   return result
 }

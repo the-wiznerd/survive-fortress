@@ -18,21 +18,10 @@ declare global {
   const placeEntity: typeof import('~editor/world').placeEntity
   const deleteEntities: typeof import('~editor/world').deleteEntities
   const getEntities: typeof import('~editor/world').getEntities
-  const EDITOR_SPRITES: typeof import('~editor/rendering/entities').EDITOR_SPRITES
-  const PALETTE_TYPES: typeof import('~editor/rendering/entities').PALETTE_TYPES
-  const CELL_W: typeof import('~editor/rendering/types').CELL_W
-  const CELL_H: typeof import('~editor/rendering/types').CELL_H
-  const terrainVariants: typeof import('~editor/rendering/types').terrainVariants
 }
 // for type re-export
 declare global {
   // @ts-ignore
   export type { EditorRenderer } from '~editor/renderer'
   import('~editor/renderer')
-  // @ts-ignore
-  export type { EditorSprite } from '~editor/rendering/entities'
-  import('~editor/rendering/entities')
-  // @ts-ignore
-  export type { TerrainVariants } from '~editor/rendering/types'
-  import('~editor/rendering/types')
 }
