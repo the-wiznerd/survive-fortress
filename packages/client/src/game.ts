@@ -1,9 +1,12 @@
 import { createLocalGame, type Game, type GameView } from '@repo/server/sdk'
+import { setOnQueueChange, advanceQueue, type MoveStep } from './input'
 
 // ─── Game State ───
 
 let game: Game
 let currentView: GameView
+let lastPlayerX: number | undefined
+let lastPlayerY: number | undefined
 
 const SAVE_PATH = '/saves/test-world'
 
@@ -28,24 +31,40 @@ export async function init(renderer: Renderer) {
 
   // Center camera on player.
   const player = currentView.entities.find(e => String(e.id) === currentView.playerId)
-  if (player) renderer.setCamera(player.x, player.y)
+  if (player) {
+    renderer.setCamera(player.x, player.y)
+    lastPlayerX = player.x
+    lastPlayerY = player.y
+  }
+
+  // Wire queue changes to game actions.
+  setOnQueueChange((front: MoveStep | null) => {
+    if (front) {
+      game.sendAction({ type: 'move', dx: front.dx, dy: front.dy })
+    } else {
+      game.sendAction({ type: 'wait' })
+    }
+  })
 }
 
-export function startTickLoop(renderer: Renderer, getInput: () => { type: string; dx?: number; dy?: number } | null, onTick: () => void) {
+export function startTickLoop(renderer: Renderer, onTick: () => void) {
   game.onViewUpdate((view) => {
     currentView = view
     const player = view.entities.find(e => String(e.id) === view.playerId)
-    if (player) renderer.setCamera(player.x, player.y)
+    if (player) {
+      renderer.setCamera(player.x, player.y)
+
+      // Detect player movement → advance queue.
+      if (lastPlayerX !== undefined && lastPlayerY !== undefined) {
+        if (player.x !== lastPlayerX || player.y !== lastPlayerY) {
+          advanceQueue()
+        }
+      }
+      lastPlayerX = player.x
+      lastPlayerY = player.y
+    }
     onTick()
   })
 
   game.start()
-
-  // Feed input each frame — the game SDK will pick it up on next tick.
-  setInterval(() => {
-    const input = getInput()
-    if (input) {
-      game.sendAction(input as any)
-    }
-  }, 50)
 }

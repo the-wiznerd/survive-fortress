@@ -74,13 +74,11 @@ export async function createLocalGame(
   }
 
   function gameTick() {
-    const pc = getComponent(world, playerId, 'playerControlled')
-    if (pc) {
-      pc.pendingAction = pendingAction
-        ? { type: pendingAction.type, ...(pendingAction.type === 'move' ? { dx: pendingAction.dx, dy: pendingAction.dy } : {}) } as any
-        : { type: 'wait' }
+    if (pendingAction) {
+      const pc = getComponent(world, playerId, 'playerControlled')
+      if (pc) pc.pendingAction = pendingAction
+      pendingAction = null
     }
-    pendingAction = null
     tick(world)
     viewCallback?.(buildView())
   }

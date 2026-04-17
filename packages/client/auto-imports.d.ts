@@ -10,7 +10,9 @@ declare global {
   const getView: typeof import('~client/game').getView
   const init: typeof import('~client/game').init
   const startTickLoop: typeof import('~client/game').startTickLoop
-  const getPendingInput: typeof import('~client/input').getPendingInput
+  const setOnQueueChange: typeof import('~client/input').setOnQueueChange
+  const getMoveQueue: typeof import('~client/input').getMoveQueue
+  const advanceQueue: typeof import('~client/input').advanceQueue
   const getInspectedCell: typeof import('~client/input').getInspectedCell
   const getHoveredCell: typeof import('~client/input').getHoveredCell
   const bindInput: typeof import('~client/input').bindInput
@@ -31,6 +33,9 @@ declare global {
 }
 // for type re-export
 declare global {
+  // @ts-ignore
+  export type { MoveStep } from '~client/input'
+  import('~client/input')
   // @ts-ignore
   export type { Renderer } from '~client/renderer'
   import('~client/renderer')

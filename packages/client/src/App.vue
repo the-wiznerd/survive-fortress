@@ -48,7 +48,7 @@
 
   async function startGame() {
     await init(renderer)
-    startTickLoop(renderer, getPendingInput, refreshUI)
+    startTickLoop(renderer, refreshUI)
     refreshUI()
   }
 

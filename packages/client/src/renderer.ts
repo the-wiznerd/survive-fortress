@@ -1,4 +1,5 @@
 import type { GameView, ViewEntity } from '@repo/server/sdk'
+import { getMoveQueue } from './input'
 
 /** Registry of entity type name → renderer instance. */
 const ENTITY_RENDERERS: Record<string, EntityRenderer> = {
@@ -112,6 +113,9 @@ export class Renderer {
       }
     }
 
+    // Pass 1.5: Movement arrows (on terrain surface, before upright entities).
+    this.drawMoveArrows(ctx, view)
+
     // Pass 2: Upright entities (back-to-front), drawn over all terrain.
     for (const row of uprightRows) {
       row.sort((a, b) => a.entity.z - b.entity.z)
@@ -147,4 +151,43 @@ export class Renderer {
     ctx.lineWidth = 2
     ctx.strokeRect(px + 1, py + 1, this.destW - 2, this.rowStep - 2)
   }
+
+  private drawMoveArrows(ctx: CanvasRenderingContext2D, view: GameView) {
+    const queue = getMoveQueue()
+    if (queue.length === 0) return
+
+    const player = view.entities.find(e => String(e.id) === view.playerId)
+    if (!player) return
+
+    const cellW = CELL_W * this.scale
+    const cellH = CELL_H * this.scale
+
+    let x = player.x
+    let y = player.y
+    const z = player.z
+
+    for (const step of queue) {
+      x += step.dx
+      y += step.dy
+
+      const sx = x - this.cameraX
+      const sy = y - this.cameraY
+      if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) continue
+
+      const col = arrowCol(step.dx, step.dy)
+      ctx.drawImage(this.spriteSheet,
+        col * CELL_W, ARROW_ROW * CELL_H, CELL_W, CELL_H,
+        sx * cellW, sy * cellH - z * cellH,
+        cellW, cellH)
+    }
+  }
+}
+
+const ARROW_ROW = 8
+
+function arrowCol(dx: number, dy: number): number {
+  if (dy < 0) return 0 // up
+  if (dx > 0) return 1 // right
+  if (dy > 0) return 2 // down
+  return 3             // left
 }
