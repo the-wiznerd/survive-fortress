@@ -16,6 +16,8 @@ export class Renderer {
   private cameraY = 0
   private spriteSheet: HTMLImageElement
   private spriteReady = false
+  private silhouetteCanvas: HTMLCanvasElement
+  private silhouetteCtx: CanvasRenderingContext2D
 
   /** Scaled pixel width of one tile on screen. */
   private destW: number
@@ -39,6 +41,13 @@ export class Renderer {
 
     // Crisp pixel scaling.
     this.ctx.imageSmoothingEnabled = false
+
+    // Offscreen canvas for silhouette rendering.
+    this.silhouetteCanvas = document.createElement('canvas')
+    this.silhouetteCanvas.width = 4 * this.destW
+    this.silhouetteCanvas.height = 5 * this.rowStep
+    this.silhouetteCtx = this.silhouetteCanvas.getContext('2d')!
+    this.silhouetteCtx.imageSmoothingEnabled = false
 
     // Load sprite sheet.
     this.spriteSheet = new Image()
@@ -92,6 +101,7 @@ export class Renderer {
 
     // Build per-frame render context.
     const maxZ = new Map<number, number>()
+    const occludingMaxZ = new Map<number, number>()
     const terrainAt = new Set<number>()
     const typeAt = new Map<number, string>()
     for (const row of terrainRows) {
@@ -99,11 +109,15 @@ export class Renderer {
         const k = zKey(entity.x, entity.y)
         const prev = maxZ.get(k)
         if (prev === undefined || entity.z > prev) maxZ.set(k, entity.z)
-        if (renderer.occluding) terrainAt.add(posKey(entity.x, entity.y, entity.z))
+        if (renderer.occluding) {
+          terrainAt.add(posKey(entity.x, entity.y, entity.z))
+          const oprev = occludingMaxZ.get(k)
+          if (oprev === undefined || entity.z > oprev) occludingMaxZ.set(k, entity.z)
+        }
         typeAt.set(posKey(entity.x, entity.y, entity.z), entity.type)
       }
     }
-    const rc: RenderContext = { maxZ, terrainAt, typeAt, now: performance.now() }
+    const rc: RenderContext = { maxZ, occludingMaxZ, terrainAt, typeAt, now: performance.now() }
 
     // Pass 1: Terrain (back-to-front).
     for (const row of terrainRows) {
@@ -117,10 +131,15 @@ export class Renderer {
     this.drawMoveArrows(ctx, view)
 
     // Pass 2: Upright entities (back-to-front), drawn over all terrain.
+    // Entities behind occluding terrain are drawn as silhouettes.
     for (const row of uprightRows) {
       row.sort((a, b) => a.entity.z - b.entity.z)
       for (const { entity, sx, sy, renderer } of row) {
-        renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.scale, sx, sy, entity.x, entity.y, entity.z, rc))
+        if (this.isOccludedByForeground(entity, rc)) {
+          this.drawSplitOccluded(entity, sx, sy, renderer, rc)
+        } else {
+          renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.scale, sx, sy, entity.x, entity.y, entity.z, rc))
+        }
       }
     }
 
@@ -132,6 +151,54 @@ export class Renderer {
   /** Get the EntityRenderer for a given type name (used by inspector). */
   getEntityRenderer(typeName: string): EntityRenderer | undefined {
     return ENTITY_RENDERERS[typeName]
+  }
+
+  /** Check if an upright entity is behind occluding terrain to the south. */
+  private isOccludedByForeground(entity: ViewEntity, rc: RenderContext): boolean {
+    const southMaxZ = rc.occludingMaxZ.get(zKey(entity.x, entity.y + 1))
+    return southMaxZ !== undefined && southMaxZ >= entity.z
+  }
+
+  /**
+   * Draw an entity split at the occlusion boundary:
+   * visible portion (above terrain) renders normally,
+   * occluded portion (behind terrain) renders as a solid-color silhouette.
+   */
+  private drawSplitOccluded(entity: ViewEntity, sx: number, sy: number, renderer: EntityRenderer, rc: RenderContext) {
+    const { silhouetteCtx: offCtx, silhouetteCanvas: offCanvas, ctx, scale } = this
+    const cellH = CELL_H * scale
+    const cellW = CELL_W * scale
+
+    // Clip Y: top edge of the occluding terrain's top face at (x, y+1).
+    const occZ = rc.occludingMaxZ.get(zKey(entity.x, entity.y + 1))!
+    const clipY = (sy + 1) * cellH - occZ * cellH
+
+    // Visible portion: render normally, clipped above the occlusion line.
+    ctx.save()
+    ctx.beginPath()
+    ctx.rect(0, 0, ctx.canvas.width, clipY)
+    ctx.clip()
+    renderer.render(entity, new DrawContext(ctx, this.spriteSheet, scale, sx, sy, entity.x, entity.y, entity.z, rc))
+    ctx.restore()
+
+    // Occluded portion: render silhouette, clipped below the occlusion line.
+    const offSx = 1, offSy = 1
+    offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height)
+    renderer.render(entity, new DrawContext(offCtx, this.spriteSheet, scale, offSx, offSy, entity.x, entity.y, 0, rc))
+
+    offCtx.globalCompositeOperation = 'source-in'
+    offCtx.fillStyle = '#eff0e0'
+    offCtx.fillRect(0, 0, offCanvas.width, offCanvas.height)
+    offCtx.globalCompositeOperation = 'source-over'
+
+    ctx.save()
+    ctx.beginPath()
+    ctx.rect(0, clipY, ctx.canvas.width, ctx.canvas.height - clipY)
+    ctx.clip()
+    const dx = (sx - offSx) * cellW
+    const dy = (sy - entity.z - offSy) * cellH
+    ctx.drawImage(offCanvas, dx, dy)
+    ctx.restore()
   }
 
   private drawTileHighlight(

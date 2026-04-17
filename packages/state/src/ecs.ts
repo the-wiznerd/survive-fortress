@@ -15,6 +15,7 @@ export interface ComponentTypes {
   entityType: EntityType
   moisture: Moisture
   groundCover: GroundCover
+  occluding: Occluding
   name: Name
   instance: Instance
 }
@@ -64,6 +65,10 @@ export interface GroundCover {
   cover: string | null
 }
 
+export interface Occluding {
+  opaque: boolean
+}
+
 export interface Name {
   name: string
 }
@@ -104,6 +109,7 @@ export function createWorld(): World {
       entityType: new Map(),
       moisture: new Map(),
       groundCover: new Map(),
+      occluding: new Map(),
       name: new Map(),
       instance: new Map(),
     },

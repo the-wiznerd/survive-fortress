@@ -21,6 +21,8 @@ export interface EdgeVariants {
 export interface RenderContext {
   /** Max terrain z at each world (x, y). */
   maxZ: Map<number, number>
+  /** Max z of occluding terrain at each world (x, y). */
+  occludingMaxZ: Map<number, number>
   /** Set of packed (x, y, z) keys where terrain exists. */
   terrainAt: Set<number>
   /** Entity type at each (x, y, z) for neighbor checks. */

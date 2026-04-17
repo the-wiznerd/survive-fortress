@@ -28,6 +28,7 @@ declare global {
   const MoistureTrait: typeof import('~engine/traits/MoistureTrait').MoistureTrait
   const MovementTrait: typeof import('~engine/traits/MovementTrait').MovementTrait
   const NameTrait: typeof import('~engine/traits/NameTrait').NameTrait
+  const OccludingTrait: typeof import('~engine/traits/OccludingTrait').OccludingTrait
   const PlayerControlledTrait: typeof import('~engine/traits/PlayerControlledTrait').PlayerControlledTrait
   const PositionTrait: typeof import('~engine/traits/PositionTrait').PositionTrait
   const TickCounter: typeof import('~engine/traits/TickCounter').TickCounter
