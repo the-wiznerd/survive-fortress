@@ -29,6 +29,15 @@ const VIEW_H = 40
 let renderer: EditorRenderer | null = null
 let rafId = 0
 
+// Camera panning state
+const cameraX = ref(0)
+const cameraY = ref(0)
+let panning = false
+let panStartX = 0
+let panStartY = 0
+let panCamStartX = 0
+let panCamStartY = 0
+
 // Rendering loop
 function renderLoop() {
   if (renderer && world.value) {
@@ -61,9 +70,45 @@ async function handleSave() {
   await editorSaveWorld()
 }
 
+// Camera panning
+function updateCamera() {
+  if (renderer) renderer.setCamera(cameraX.value, cameraY.value)
+}
+
+function onCanvasMouseDown(e: MouseEvent) {
+  // Middle-click (1) or right-click (2) starts panning
+  if (e.button === 1 || e.button === 2) {
+    e.preventDefault()
+    panning = true
+    panStartX = e.clientX
+    panStartY = e.clientY
+    panCamStartX = cameraX.value
+    panCamStartY = cameraY.value
+  }
+}
+
+function onCanvasMouseUp(e: MouseEvent) {
+  if (e.button === 1 || e.button === 2) {
+    panning = false
+  }
+}
+
+function onCanvasContextMenu(e: MouseEvent) {
+  e.preventDefault()
+}
+
 // Canvas interaction
 function onCanvasMouseMove(e: MouseEvent) {
   if (!renderer) return
+
+  if (panning) {
+    const dx = (e.clientX - panStartX) / renderer.destW
+    const dy = (e.clientY - panStartY) / renderer.rowStep
+    cameraX.value = panCamStartX - dx
+    cameraY.value = panCamStartY - dy
+    updateCamera()
+  }
+
   const rect = (e.target as HTMLCanvasElement).getBoundingClientRect()
   const canvasX = e.clientX - rect.left
   const canvasY = e.clientY - rect.top
@@ -72,6 +117,7 @@ function onCanvasMouseMove(e: MouseEvent) {
 
 function onCanvasMouseLeave() {
   hoveredCell.value = null
+  panning = false
 }
 
 function onCanvasClick(e: MouseEvent) {
@@ -86,6 +132,19 @@ function onCanvasClick(e: MouseEvent) {
   } else {
     deleteEntities(pos.x, pos.y, activeZ.value)
   }
+}
+
+function onKeyDown(e: KeyboardEvent) {
+  const step = e.shiftKey ? 5 : 1
+  switch (e.key) {
+    case 'ArrowLeft':  cameraX.value -= step; break
+    case 'ArrowRight': cameraX.value += step; break
+    case 'ArrowUp':    cameraY.value -= step; break
+    case 'ArrowDown':  cameraY.value += step; break
+    default: return
+  }
+  e.preventDefault()
+  updateCamera()
 }
 </script>
 
@@ -143,9 +202,14 @@ function onCanvasClick(e: MouseEvent) {
     <div class="viewport">
       <canvas
         ref="canvasRef"
+        tabindex="0"
+        @mousedown="onCanvasMouseDown"
+        @mouseup="onCanvasMouseUp"
         @mousemove="onCanvasMouseMove"
         @mouseleave="onCanvasMouseLeave"
         @click="onCanvasClick"
+        @contextmenu="onCanvasContextMenu"
+        @keydown="onKeyDown"
       />
     </div>
   </div>

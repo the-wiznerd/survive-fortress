@@ -29,11 +29,13 @@ export class EditorRenderer {
 
   /** Convert canvas pixel coords to world (x, y) at the given z-level. */
   screenToWorld(canvasX: number, canvasY: number, z: number): { x: number; y: number } {
+    const camX = Math.floor(this.cameraX)
+    const camY = Math.floor(this.cameraY)
     const sx = canvasX / this.destW
     const sy = canvasY / this.rowStep
     return {
-      x: Math.floor(this.cameraX + sx),
-      y: Math.floor(this.cameraY + sy + z),
+      x: Math.floor(camX + sx),
+      y: Math.floor(camY + sy + z),
     }
   }
 
@@ -58,11 +60,11 @@ export class EditorRenderer {
 
         // Hover highlight.
         if (hoveredCell) {
-          const hx = hoveredCell.x - self.cameraX
-          const hy = hoveredCell.y - activeZ - self.cameraY
+          const hx = hoveredCell.x - Math.floor(self.cameraX)
+          const hy = hoveredCell.y - activeZ - Math.floor(self.cameraY)
           if (hx >= 0 && hx < self.viewWidth && hy >= 0 && hy < self.viewHeight) {
             ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'
-            ctx.fillRect(hx * self.destW, hy * self.rowStep, self.destW, self.rowStep)
+            ctx.fillRect(hx * self.destW, hy * self.rowStep, self.destW, self.rowStep * 2)
           }
         }
       },

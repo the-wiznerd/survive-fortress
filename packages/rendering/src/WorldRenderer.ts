@@ -108,6 +108,8 @@ export class WorldRenderer {
     if (!this.spriteReady) return
 
     const { ctx, viewWidth, viewHeight, scale } = this
+    const camX = Math.floor(cameraX)
+    const camY = Math.floor(cameraY)
 
     // Clear.
     ctx.fillStyle = '#1a1a1a'
@@ -120,8 +122,8 @@ export class WorldRenderer {
     for (let i = 0; i < viewHeight; i++) { terrainRows.push([]); uprightRows.push([]) }
 
     for (const entity of entities) {
-      const sx = entity.x - cameraX
-      const sy = entity.y - cameraY
+      const sx = entity.x - camX
+      const sy = entity.y - camY
       if (sx < 0 || sx >= viewWidth || sy < 0 || sy >= viewHeight) continue
       const er = ENTITY_RENDERERS[entity.type]
       if (!er) continue
