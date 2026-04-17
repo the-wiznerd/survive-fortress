@@ -86,6 +86,10 @@ body {
 .save-buttons {
   display: flex;
   gap: 4px;
+
+  button {
+    flex: 1;
+  }
 }
 
 .palette {

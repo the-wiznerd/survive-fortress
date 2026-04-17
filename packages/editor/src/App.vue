@@ -44,7 +44,7 @@ let panCamStartY = 0
 // Rendering loop
 function renderLoop() {
   if (renderer && world.value) {
-    renderer.render(getEntities(), activeZ.value, hoveredCell.value)
+    renderer.render(getEntities(), activeZ.value, hoveredCell.value, activeTool.value, activeType.value)
   }
   rafId = requestAnimationFrame(renderLoop)
 }

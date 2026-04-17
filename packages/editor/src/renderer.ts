@@ -1,5 +1,18 @@
 import { WorldRenderer, CELL_W, CELL_H, type RenderEntity } from '@repo/rendering'
 
+/** Preview sprite info per entity type. */
+type TerrainPreview = { kind: 'terrain'; topCol: number; frontCol: number; row: number }
+type UprightPreview = { kind: 'upright'; col: number; row: number; h: number; yOff: number }
+type PreviewSprite = TerrainPreview | UprightPreview
+
+const PREVIEW_SPRITES: Record<string, PreviewSprite> = {
+  dirt: { kind: 'terrain', topCol: 3, frontCol: 7, row: 0 },
+  sand: { kind: 'terrain', topCol: 3, frontCol: 7, row: 11 },
+  stone: { kind: 'terrain', topCol: 14, frontCol: 18, row: 11 },
+  water: { kind: 'terrain', topCol: 3, frontCol: 7, row: 2 },
+  player: { kind: 'upright', col: 0, row: 6, h: 2, yOff: -0.25 },
+}
+
 export class EditorRenderer {
   private world: WorldRenderer
   private cameraX = 0
@@ -43,6 +56,8 @@ export class EditorRenderer {
     entities: RenderEntity[],
     activeZ: number,
     hoveredCell: { x: number; y: number } | null,
+    activeTool: 'draw' | 'delete',
+    activeType: string,
   ) {
     if (!this.world.ready) return
 
@@ -58,13 +73,43 @@ export class EditorRenderer {
           }
         }
 
-        // Hover highlight.
+        // Hover preview / highlight.
         if (hoveredCell) {
           const hx = hoveredCell.x - Math.floor(self.cameraX)
           const hy = hoveredCell.y - activeZ - Math.floor(self.cameraY)
           if (hx >= 0 && hx < self.viewWidth && hy >= 0 && hy < self.viewHeight) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'
-            ctx.fillRect(hx * self.destW, hy * self.rowStep, self.destW, self.rowStep * 2)
+            if (activeTool === 'draw') {
+              const sprite = PREVIEW_SPRITES[activeType]
+              if (sprite) {
+                ctx.globalAlpha = 0.75
+                const dx = hx * self.destW
+                const dy = hy * self.rowStep
+                if (sprite.kind === 'terrain') {
+                  // Top face
+                  ctx.drawImage(
+                    self.world.spriteSheet,
+                    sprite.topCol * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H,
+                    dx, dy, self.destW, self.rowStep,
+                  )
+                  // Front face
+                  ctx.drawImage(
+                    self.world.spriteSheet,
+                    sprite.frontCol * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H,
+                    dx, dy + self.rowStep, self.destW, self.rowStep,
+                  )
+                } else {
+                  ctx.drawImage(
+                    self.world.spriteSheet,
+                    sprite.col * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H * sprite.h,
+                    dx, dy + sprite.yOff * self.rowStep, self.destW, self.rowStep * sprite.h,
+                  )
+                }
+                ctx.globalAlpha = 1
+              }
+            } else {
+              ctx.fillStyle = 'rgba(230, 60, 60, 0.25)'
+              ctx.fillRect(hx * self.destW, hy * self.rowStep, self.destW, self.rowStep * 2)
+            }
           }
         }
       },
