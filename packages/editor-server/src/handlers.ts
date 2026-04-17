@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { EditorRequest, EditorResponse } from './sdk/types.js'
 
-const SAVES_DIR = path.resolve(import.meta.dirname, '../../client/public/saves')
+const SAVES_DIR = path.resolve(import.meta.dirname, '../../../saves')
 
 export function handleRequest(req: EditorRequest): EditorResponse {
   switch (req.type) {
