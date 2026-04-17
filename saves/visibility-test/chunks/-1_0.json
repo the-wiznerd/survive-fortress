@@ -1,0 +1,14 @@
+{
+  "cx": -1,
+  "cy": 0,
+  "entities": [
+    {
+      "entityType": "sand",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": 0
+      }
+    }
+  ]
+}

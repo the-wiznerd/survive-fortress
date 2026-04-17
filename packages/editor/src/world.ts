@@ -66,7 +66,20 @@ export async function editorSaveWorld(name?: string) {
   const saveName = name ?? currentSaveName.value
   if (!saveName) return
 
-  const chunkCoords = Object.values(manifest.chunks).map(c => ({ cx: c.cx, cy: c.cy }))
+  // Compute which chunks are needed based on actual entity positions.
+  const chunkSet = new Set<string>()
+  for (const id of queryEntities(w, 'position', 'entityType')) {
+    const pos = getComponent(w, id, 'position')!
+    const cx = Math.floor(pos.x / manifest.chunkSize)
+    const cy = Math.floor(pos.y / manifest.chunkSize)
+    chunkSet.add(chunkKey(cx, cy))
+  }
+
+  const chunkCoords = [...chunkSet].map(k => {
+    const [cx, cy] = k.split('_').map(Number)
+    return { cx, cy }
+  })
+
   const newManifest = exportManifest(w, manifest.seed, manifest.chunkSize, chunkCoords)
   const chunks = chunkCoords.map(({ cx, cy }) => ({
     filename: `${chunkKey(cx, cy)}.json`,
