@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { EditorRenderer } from './renderer'
-import { CELL_W, CELL_H } from '@repo/rendering'
+import { CELL_W, TOP_H } from '@repo/rendering'
 import { listSaves } from './connection'
 import {
   world,
@@ -154,7 +154,7 @@ function onCanvasMouseMove(e: MouseEvent) {
     const rect = canvas.getBoundingClientRect()
     const cssScale = rect.width / canvas.width
     const dx = (e.clientX - panStartX) / (CELL_W * cssScale)
-    const dy = (e.clientY - panStartY) / (CELL_H * cssScale)
+    const dy = (e.clientY - panStartY) / (TOP_H * cssScale)
     cameraX.value = panCamStartX - dx
     cameraY.value = panCamStartY - dy
     updateCamera()

@@ -1,6 +1,9 @@
 export {
   CELL_W,
   CELL_H,
+  TOP_H,
+  FRONT_H,
+  ATLAS_ROW_H,
   TOP_VARIANT,
   FRONT_VARIANT,
   terrainVariants,

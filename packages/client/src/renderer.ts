@@ -1,5 +1,5 @@
 import type { GameView, ViewEntity } from '@repo/server/sdk'
-import { WorldRenderer, CELL_W, CELL_H, zKey, type RenderEntity, type EntityRenderer } from '@repo/rendering'
+import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, zKey, type RenderEntity, type EntityRenderer } from '@repo/rendering'
 import { getMoveQueue } from './input'
 
 export class Renderer {
@@ -32,7 +32,7 @@ export class Renderer {
   /** Convert canvas pixel coordinates to world (x, y). */
   screenToWorld(canvasX: number, canvasY: number): { x: number; y: number } | null {
     const sx = Math.floor(canvasX / CELL_W)
-    const sy = Math.floor(canvasY / CELL_H)
+    const sy = Math.floor(canvasY / TOP_H)
     if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) return null
     return { x: sx + this.cameraX, y: sy + this.cameraY }
   }
@@ -92,11 +92,11 @@ export class Renderer {
     if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) return
 
     const px = sx * CELL_W
-    const py = sy * CELL_H
+    const py = sy * TOP_H
 
     ctx.strokeStyle = color
     ctx.lineWidth = 1
-    ctx.strokeRect(px + 0.5, py + 0.5, CELL_W - 1, CELL_H - 1)
+    ctx.strokeRect(px + 0.5, py + 0.5, CELL_W - 1, TOP_H - 1)
   }
 
   private drawMoveArrows(ctx: CanvasRenderingContext2D, view: GameView) {
@@ -124,7 +124,7 @@ export class Renderer {
       const col = arrowCol(step.dx, step.dy)
       ctx.drawImage(spriteSheet,
         col * CELL_W, ARROW_ROW * CELL_H, CELL_W, CELL_H,
-        sx * CELL_W, sy * CELL_H - drawZ * CELL_H,
+        sx * CELL_W, sy * TOP_H - drawZ * FRONT_H,
         CELL_W, CELL_H)
     }
   }

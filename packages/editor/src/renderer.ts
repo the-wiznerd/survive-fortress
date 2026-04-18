@@ -1,4 +1,4 @@
-import { WorldRenderer, CELL_W, CELL_H, type RenderEntity, type TerrainVariantCells } from '@repo/rendering'
+import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, ATLAS_ROW_H, type RenderEntity, type TerrainVariantCells } from '@repo/rendering'
 
 /** Preview sprite info per entity type. */
 type TerrainPreview = { kind: 'terrain'; atlas: true } | { kind: 'terrain'; atlas: false; topCol: number; frontCol: number; row: number }
@@ -40,7 +40,7 @@ export class EditorRenderer {
     const camX = Math.floor(this.cameraX)
     const camY = Math.floor(this.cameraY)
     const sx = canvasX / CELL_W
-    const sy = canvasY / CELL_H
+    const sy = canvasY / TOP_H
     return {
       x: Math.floor(camX + sx),
       y: Math.floor(camY + sy + z),
@@ -64,19 +64,20 @@ export class EditorRenderer {
         const oy = -activeZ - Math.floor(self.cameraY)
         if (ox >= 0 && ox < self.viewWidth && oy >= 0 && oy < self.viewHeight) {
           const cx = ox * CELL_W + CELL_W / 2
-          const cy = oy * CELL_H + CELL_H / 2
+          const cy = oy * TOP_H - activeZ * FRONT_H + TOP_H / 2
           ctx.fillStyle = '#ffffff'
           ctx.beginPath()
           ctx.arc(cx, cy, 2, 0, Math.PI * 2)
           ctx.fill()
         }
 
-        // Grid overlay.
+        // Grid overlay for current Z-level.
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
         ctx.lineWidth = 1
+        const gridOffY = -activeZ * FRONT_H
         for (let x = 0; x < self.viewWidth; x++) {
           for (let y = 0; y < self.viewHeight; y++) {
-            ctx.strokeRect(x * CELL_W, y * CELL_H, CELL_W, CELL_H)
+            ctx.strokeRect(x * CELL_W + 0.5, y * TOP_H + gridOffY + 0.5, CELL_W - 1, TOP_H - 1)
           }
         }
 
@@ -90,7 +91,7 @@ export class EditorRenderer {
               if (sprite) {
                 ctx.globalAlpha = 0.75
                 const dx = hx * CELL_W
-                const dy = hy * CELL_H
+                const dy = hy * TOP_H - activeZ * FRONT_H
                 if (sprite.kind === 'terrain') {
                   if (sprite.atlas) {
                     const atlasSource = self.world.terrainAtlas.bitmap ?? self.world.terrainAtlas.canvas
@@ -100,13 +101,13 @@ export class EditorRenderer {
                       const frontCell = variants.frontFaces[0]
                       ctx.drawImage(
                         atlasSource,
-                        topCell.col * CELL_W, topCell.row * CELL_H, CELL_W, CELL_H,
-                        dx, dy, CELL_W, CELL_H,
+                        topCell.col * CELL_W, topCell.row * ATLAS_ROW_H, CELL_W, TOP_H,
+                        dx, dy, CELL_W, TOP_H,
                       )
                       ctx.drawImage(
                         atlasSource,
-                        frontCell.col * CELL_W, frontCell.row * CELL_H, CELL_W, CELL_H,
-                        dx, dy + CELL_H, CELL_W, CELL_H,
+                        frontCell.col * CELL_W, frontCell.row * ATLAS_ROW_H, CELL_W, FRONT_H,
+                        dx, dy + TOP_H, CELL_W, FRONT_H,
                       )
                     }
                   } else {
@@ -119,21 +120,21 @@ export class EditorRenderer {
                     ctx.drawImage(
                       self.world.spriteSheet,
                       sprite.frontCol * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H,
-                      dx, dy + CELL_H, CELL_W, CELL_H,
+                      dx, dy + TOP_H, CELL_W, CELL_H,
                     )
                   }
                 } else {
                   ctx.drawImage(
                     self.world.spriteSheet,
                     sprite.col * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H * sprite.h,
-                    dx, dy + sprite.yOff * CELL_H, CELL_W, CELL_H * sprite.h,
+                    dx, dy + sprite.yOff * TOP_H, CELL_W, CELL_H * sprite.h,
                   )
                 }
                 ctx.globalAlpha = 1
               }
             } else {
               ctx.fillStyle = 'rgba(230, 60, 60, 0.25)'
-              ctx.fillRect(hx * CELL_W, hy * CELL_H, CELL_W, CELL_H * 2)
+              ctx.fillRect(hx * CELL_W, hy * TOP_H - activeZ * FRONT_H, CELL_W, TOP_H + FRONT_H)
             }
           }
         }

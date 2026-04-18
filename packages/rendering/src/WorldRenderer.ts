@@ -54,7 +54,7 @@ export class WorldRenderer {
     spritePath: string,
   ) {
     canvas.width = viewWidth * CELL_W
-    canvas.height = CELL_H * 2 + (viewHeight - 1) * CELL_H
+    canvas.height = viewHeight * TOP_H + FRONT_H
     canvas.style.width = (canvas.width * initialScale) + 'px'
     canvas.style.height = (canvas.height * initialScale) + 'px'
     this.ctx = canvas.getContext('2d')!
@@ -63,7 +63,7 @@ export class WorldRenderer {
     // Offscreen canvas for silhouette rendering.
     this.silhouetteCanvas = document.createElement('canvas')
     this.silhouetteCanvas.width = 4 * CELL_W
-    this.silhouetteCanvas.height = 5 * CELL_H
+    this.silhouetteCanvas.height = 5 * TOP_H
     this.silhouetteCtx = this.silhouetteCanvas.getContext('2d')!
     this.silhouetteCtx.imageSmoothingEnabled = false
 
@@ -211,7 +211,7 @@ export class WorldRenderer {
     const { silhouetteCtx: offCtx, silhouetteCanvas: offCanvas, ctx } = this
 
     const occZ = rc.occludingMaxZ.get(zKey(entity.x, entity.y + 1))!
-    const clipY = (sy + 1) * CELL_H - occZ * CELL_H
+    const clipY = (sy + 1) * TOP_H - occZ * FRONT_H
 
     // Visible above clip.
     ctx.save()
@@ -236,7 +236,7 @@ export class WorldRenderer {
     ctx.rect(0, clipY, ctx.canvas.width, ctx.canvas.height - clipY)
     ctx.clip()
     const dx = (sx - offSx) * CELL_W
-    const dy = (sy - entity.z - offSy) * CELL_H
+    const dy = (sy - offSy) * TOP_H - entity.z * FRONT_H
     ctx.drawImage(offCanvas, dx, dy)
     ctx.restore()
   }

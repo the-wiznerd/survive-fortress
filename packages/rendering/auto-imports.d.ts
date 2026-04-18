@@ -12,6 +12,9 @@ declare global {
   const placeholder: typeof import('~rendering/terrainDefs').placeholder
   const CELL_W: typeof import('~rendering/types').CELL_W
   const CELL_H: typeof import('~rendering/types').CELL_H
+  const TOP_H: typeof import('~rendering/types').TOP_H
+  const FRONT_H: typeof import('~rendering/types').FRONT_H
+  const ATLAS_ROW_H: typeof import('~rendering/types').ATLAS_ROW_H
   const TOP_VARIANT: typeof import('~rendering/types').TOP_VARIANT
   const FRONT_VARIANT: typeof import('~rendering/types').FRONT_VARIANT
   const terrainVariants: typeof import('~rendering/types').terrainVariants

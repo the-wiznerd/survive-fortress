@@ -1,6 +1,13 @@
-/** Sprite sheet: 16×12px cells. Each cell is one face (top or front). */
+/** Width of a grid cell in pixels. */
 export const CELL_W = 16
+/** Height of a sprite-sheet cell (used for non-terrain sprite source). */
 export const CELL_H = 12
+/** Height of a terrain top face and the grid row step. */
+export const TOP_H = 14
+/** Height of a terrain front (side) face. */
+export const FRONT_H = 10
+/** Atlas row height — tall enough for either face type. */
+export const ATLAS_ROW_H = Math.max(TOP_H, FRONT_H)
 
 export type StaticSprite = { col: number; row: number }
 export type AnimatedSprite = { frames: StaticSprite[]; interval: number }
@@ -141,17 +148,17 @@ export class DrawContext {
   draw(col: number, row: number, w = 1, h = 1, yOff = 0) {
     this.ctx.drawImage(this.sheet,
       col * CELL_W, row * CELL_H, CELL_W * w, CELL_H * h,
-      this.sx * CELL_W, this.sy * CELL_H - this.z * CELL_H + yOff * CELL_H,
+      this.sx * CELL_W, this.sy * TOP_H - this.z * FRONT_H + yOff * TOP_H,
       CELL_W * w, CELL_H * h)
   }
 
   /** Draw a cell from the generated terrain atlas. */
-  drawFromAtlas(col: number, row: number, yOff = 0) {
+  drawFromAtlas(col: number, row: number, yOff = 0, h = TOP_H) {
     if (!this.atlas) return
     this.ctx.drawImage(this.atlas,
-      col * CELL_W, row * CELL_H, CELL_W, CELL_H,
-      this.sx * CELL_W, this.sy * CELL_H - this.z * CELL_H + yOff * CELL_H,
-      CELL_W, CELL_H)
+      col * CELL_W, row * ATLAS_ROW_H, CELL_W, h,
+      this.sx * CELL_W, this.sy * TOP_H - this.z * FRONT_H + yOff * TOP_H,
+      CELL_W, h)
   }
 
   get frontOccluded(): boolean {
@@ -191,7 +198,7 @@ export class DrawContext {
     if (!this.frontOccluded) {
       const front = tv.frontFaces[s * 4 + e * 2 + w]
       if (fromAtlas) {
-        this.drawFromAtlas(front.col, front.row, 1)
+        this.drawFromAtlas(front.col, front.row, 1, FRONT_H)
       } else {
         this.draw(front.col, front.row, 1, 1, 1)
       }
