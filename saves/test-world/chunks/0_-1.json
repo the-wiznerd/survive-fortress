@@ -301,14 +301,6 @@
     {
       "entityType": "dirt",
       "position": {
-        "x": 18,
-        "y": -3,
-        "z": 0
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
         "x": 19,
         "y": -2,
         "z": 0
@@ -1607,6 +1599,462 @@
       "position": {
         "x": 19,
         "y": -3,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 18,
+        "y": -3,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 17,
+        "y": -3,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 19,
+        "y": -2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 18,
+        "y": -2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 17,
+        "y": -2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": -3,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 19,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 18,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 17,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": -2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 15,
+        "y": -2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 14,
+        "y": -2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 13,
+        "y": -2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 14,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 15,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 13,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 12,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 11,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 14,
+        "y": -2,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 15,
+        "y": -2,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": -3,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 17,
+        "y": -3,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 18,
+        "y": -3,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 19,
+        "y": -2,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": -2,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 17,
+        "y": -2,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 18,
+        "y": -2,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": -1,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 17,
+        "y": -1,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 18,
+        "y": -1,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 19,
+        "y": -1,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": -3,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 17,
+        "y": -3,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 18,
+        "y": -3,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 19,
+        "y": -2,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 18,
+        "y": -2,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 17,
+        "y": -2,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": -2,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 15,
+        "y": -2,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 19,
+        "y": -1,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 18,
+        "y": -1,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 17,
+        "y": -1,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": -1,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 17,
+        "y": -3,
+        "z": 3
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 18,
+        "y": -3,
+        "z": 3
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 18,
+        "y": -2,
+        "z": 3
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 19,
+        "y": -2,
+        "z": 3
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 19,
+        "y": -1,
+        "z": 3
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": -3,
+        "z": 3
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 17,
+        "y": -2,
+        "z": 3
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 13,
+        "y": -2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 14,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 15,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 13,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -1,
         "z": 0
       }
     }

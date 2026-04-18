@@ -21,7 +21,7 @@ export class WaterRenderer extends EntityRenderer {
     const e = this.hasNonWaterNeighbor(rc.typeAt, wx + 1, wy, z) ? 1 : 0
     const w = this.hasNonWaterNeighbor(rc.typeAt, wx - 1, wy, z) ? 1 : 0
 
-    const frame = (Math.floor(rc.now / ANIM_INTERVAL) + wx + wy) % WATER_FRAMES.length
+    const frame = ((Math.floor(rc.now / ANIM_INTERVAL) + wx + wy) % WATER_FRAMES.length + WATER_FRAMES.length) % WATER_FRAMES.length
     const water = WATER_FRAMES[frame]
 
     const top = water.topFaces[n * 4 + e * 2 + w]

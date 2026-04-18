@@ -161,6 +161,94 @@
         "y": -2,
         "z": 0
       }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": -2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": -2,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": -1,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": -1,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": -2,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": -1,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": -1,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": -1,
+        "z": 3
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": -1,
+        "z": 3
+      }
     }
   ]
 }

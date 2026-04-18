@@ -59,9 +59,9 @@ export class EditorRenderer {
     const self = this
     this.world.render(entities, this.cameraX, this.cameraY, new Set(), -Infinity, 0, {
       onAfterEntities(ctx) {
-        // Origin marker at (0, 0, 0).
+        // Origin marker at (0, 0) on the active Z-level.
         const ox = -Math.floor(self.cameraX)
-        const oy = -activeZ - Math.floor(self.cameraY)
+        const oy = -Math.floor(self.cameraY)
         if (ox >= 0 && ox < self.viewWidth && oy >= 0 && oy < self.viewHeight) {
           const cx = ox * CELL_W + CELL_W / 2
           const cy = oy * TOP_H - activeZ * FRONT_H + TOP_H / 2
@@ -84,7 +84,7 @@ export class EditorRenderer {
         // Hover preview / highlight.
         if (hoveredCell) {
           const hx = hoveredCell.x - Math.floor(self.cameraX)
-          const hy = hoveredCell.y - activeZ - Math.floor(self.cameraY)
+          const hy = hoveredCell.y - Math.floor(self.cameraY)
           if (hx >= 0 && hx < self.viewWidth && hy >= 0 && hy < self.viewHeight) {
             if (activeTool === 'draw') {
               const sprite = PREVIEW_SPRITES[activeType]
