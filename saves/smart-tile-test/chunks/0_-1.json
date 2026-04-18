@@ -1,0 +1,574 @@
+{
+  "cx": 0,
+  "cy": -1,
+  "entities": [
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 3,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 5,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 6,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 7,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 9,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 5,
+        "y": -4,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 6,
+        "y": -4,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 7,
+        "y": -4,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 7,
+        "y": -5,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 6,
+        "y": -5,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 5,
+        "y": -5,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 5,
+        "y": -6,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 6,
+        "y": -6,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 7,
+        "y": -6,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 3,
+        "y": -4,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 3,
+        "y": -5,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 3,
+        "y": -6,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 9,
+        "y": -4,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -4,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -4,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -4,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 9,
+        "y": -5,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -5,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -5,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -5,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -6,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -6,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -6,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 9,
+        "y": -6,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 9,
+        "y": -7,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -7,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -7,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -7,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 3,
+        "y": -4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 5,
+        "y": -4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 6,
+        "y": -4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 7,
+        "y": -4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 9,
+        "y": -4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 3,
+        "y": -5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 5,
+        "y": -5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 6,
+        "y": -5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 7,
+        "y": -5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 9,
+        "y": -5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 9,
+        "y": -6,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -6,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -6,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -6,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 9,
+        "y": -7,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -7,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -7,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -7,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -5,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -5,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -5,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -6,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -6,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -6,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 10,
+        "y": -7,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -7,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 12,
+        "y": -7,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 11,
+        "y": -6,
+        "z": 3
+      }
+    },
+    {
+      "entityType": "player",
+      "position": {
+        "x": 9,
+        "y": -1,
+        "z": 1
+      }
+    }
+  ]
+}

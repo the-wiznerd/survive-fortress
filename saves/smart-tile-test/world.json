@@ -9,8 +9,14 @@
       "state": "frozen",
       "freezeTick": 0
     },
-    "-1_0": {
-      "cx": -1,
+    "0_-1": {
+      "cx": 0,
+      "cy": -1,
+      "state": "frozen",
+      "freezeTick": 0
+    },
+    "1_0": {
+      "cx": 1,
       "cy": 0,
       "state": "frozen",
       "freezeTick": 0

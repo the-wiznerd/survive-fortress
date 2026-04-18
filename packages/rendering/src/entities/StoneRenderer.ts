@@ -9,17 +9,17 @@ export class StoneRenderer extends EntityRenderer {
   static readonly terrainDefs: Record<string, TerrainDef> = {
     stone: {
       top(ctx, w, h) {
-        ctx.fillStyle = Colors.lightGray
+        ctx.fillStyle = Colors.lightestGray
         ctx.fillRect(0, 0, w, h)
-        ctx.fillStyle = Colors.gray
+        ctx.fillStyle = Colors.lightGray
         ctx.fillRect(5, 11, 1, 1)
         ctx.fillRect(6, 10, 1, 1)
         ctx.fillRect(10, 2, 1, 1)
       },
       front(ctx, w, h) {
-        ctx.fillStyle = Colors.gray
+        ctx.fillStyle = Colors.lightGray
         ctx.fillRect(0, 0, w, h)
-        ctx.fillStyle = Colors.darkGray
+        ctx.fillStyle = Colors.gray
         ctx.fillRect(2, 9, 1, 1)
         ctx.fillRect(3, 8, 1, 1)
         ctx.fillRect(5, 0, 1, 1)
@@ -29,11 +29,11 @@ export class StoneRenderer extends EntityRenderer {
         ctx.fillRect(12, 6, 1, 1)
       },
       unknownTop(ctx, w, h) {
-        ctx.fillStyle = Colors.darkGray
+        ctx.fillStyle = Colors.gray
         ctx.fillRect(0, 0, w, h)
       },
-      topEdgeColor: Colors.gray,
-      frontEdgeColor: Colors.darkGray,
+      topEdgeColor: Colors.lightGray,
+      frontEdgeColor: Colors.gray,
     },
   }
 

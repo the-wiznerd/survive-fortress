@@ -1,0 +1,78 @@
+{
+  "cx": 1,
+  "cy": 0,
+  "entities": [
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 16,
+        "y": 2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 16,
+        "y": 1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 16,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 16,
+        "y": 2,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 16,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 16,
+        "y": 0,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 16,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 16,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 16,
+        "y": 0,
+        "z": 2
+      }
+    }
+  ]
+}
