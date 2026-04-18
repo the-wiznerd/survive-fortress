@@ -6,7 +6,6 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-  const Colors: typeof import('~client/colors').Colors
   const ENTITY_TRAIT_NAMES: typeof import('~client/entityTraits').ENTITY_TRAIT_NAMES
   const getGame: typeof import('~client/game').getGame
   const getView: typeof import('~client/game').getView

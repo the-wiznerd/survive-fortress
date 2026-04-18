@@ -24,3 +24,5 @@ export { WaterRenderer } from './entities/WaterRenderer.js'
 export { PlayerRenderer } from './entities/PlayerRenderer.js'
 
 export { WorldRenderer, type RenderHooks } from './WorldRenderer.js'
+
+export { Colors } from './colors.js'

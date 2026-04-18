@@ -24,8 +24,10 @@ export interface RenderHooks {
   onAfterEntities?: (ctx: CanvasRenderingContext2D) => void
 }
 
+import { Colors } from './colors.js'
+
 /** Silhouette color for occluded upright entities. */
-const SILHOUETTE_COLOR = '#7c877a'
+const SILHOUETTE_COLOR = Colors.gray
 
 /**
  * Opinionated world rendering pipeline.

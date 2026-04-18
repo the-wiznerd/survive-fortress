@@ -8,6 +8,12 @@
       "cy": 0,
       "state": "frozen",
       "freezeTick": 0
+    },
+    "-1_0": {
+      "cx": -1,
+      "cy": 0,
+      "state": "frozen",
+      "freezeTick": 0
     }
   }
 }

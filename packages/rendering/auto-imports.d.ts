@@ -8,6 +8,7 @@ export {}
 declare global {
   const TerrainAtlas: typeof import('~rendering/TerrainAtlas').TerrainAtlas
   const WorldRenderer: typeof import('~rendering/WorldRenderer').WorldRenderer
+  const Colors: typeof import('~rendering/colors').Colors
   const placeholder: typeof import('~rendering/terrainDefs').placeholder
   const CELL_W: typeof import('~rendering/types').CELL_W
   const CELL_H: typeof import('~rendering/types').CELL_H

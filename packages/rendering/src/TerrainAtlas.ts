@@ -7,7 +7,7 @@ export type FaceDrawFn = (ctx: CanvasRenderingContext2D, w: number, h: number) =
 
 /**
  * Definition for a programmatically generated terrain type.
- * Provide draw functions for each face and a border color for edge variants.
+ * Provide draw functions for each face and an edge color for border variants.
  */
 export interface TerrainDef {
   /** Draw the base top face (flat, no edges). */
@@ -16,19 +16,10 @@ export interface TerrainDef {
   front: FaceDrawFn
   /** Draw the "unknown above" top face variant. */
   unknownTop: FaceDrawFn
-  /**
-   * Draw the edge border for a top face. Called once per edge direction.
-   * The context is set up so you draw the border along the relevant edge.
-   */
-  topEdge: FaceDrawFn
-  /**
-   * Draw the top-face corner cutout for a rounded NE or NW corner.
-   * This erases pixels from the base to create rounded edges.
-   * The ctx has `destination-out` compositing set — just fill the pixels to erase.
-   */
-  topCorner: FaceDrawFn
-  /** Draw the edge border for a front face. */
-  frontEdge: FaceDrawFn
+  /** Color used for 1px top face edge borders and corner cutouts. */
+  topEdgeColor: string
+  /** Color used for 1px front face edge borders. */
+  frontEdgeColor: string
 }
 
 /** Atlas cell coordinates. */
@@ -162,7 +153,7 @@ export class TerrainAtlas {
     this._bitmap = await createImageBitmap(atlas)
   }
 
-  /** Composite a top face variant: base + edges + corner cutouts. */
+  /** Composite a top face variant: base + corner cutouts + edge borders. */
   private compositeTop(
     ctx: CanvasRenderingContext2D,
     def: TerrainDef,
@@ -174,44 +165,21 @@ export class TerrainAtlas {
     ctx.globalCompositeOperation = 'source-over'
     def.top(ctx, CELL_W, CELL_H)
 
-    // 2. Erase corner pixels where two edges meet.
-    if (n && e) {
-      ctx.globalCompositeOperation = 'destination-out'
-      ctx.save()
-      ctx.translate(CELL_W, 0) // NE corner
-      ctx.scale(-1, 1)
-      def.topCorner(ctx, CELL_W, CELL_H)
-      ctx.restore()
-    }
-    if (n && w) {
-      ctx.globalCompositeOperation = 'destination-out'
-      def.topCorner(ctx, CELL_W, CELL_H) // NW corner (default orientation)
-    }
+    // 2. Draw 1px edge borders.
+    ctx.fillStyle = def.topEdgeColor
+    if (n) ctx.fillRect(0, 0, CELL_W, 1)
+    if (w) ctx.fillRect(0, 0, 1, CELL_H)
+    if (e) ctx.fillRect(CELL_W - 1, 0, 1, CELL_H)
 
-    // 3. Draw edge borders.
-    ctx.globalCompositeOperation = 'source-over'
-    if (n) {
-      ctx.save()
-      def.topEdge(ctx, CELL_W, CELL_H) // N edge (default orientation = top)
-      ctx.restore()
-    }
-    if (e) {
-      ctx.save()
-      ctx.translate(CELL_W, 0)
-      ctx.scale(-1, 1)
-      def.topEdge(ctx, CELL_W, CELL_H) // E edge (mirrored W)
-      ctx.restore()
-    }
-    if (w) {
-      ctx.save()
-      def.topEdge(ctx, CELL_W, CELL_H) // W edge (same as default? or separate?)
-      ctx.restore()
-    }
+    // 3. Erase corner pixels where two edges meet.
+    ctx.globalCompositeOperation = 'destination-out'
+    if (n && w) ctx.fillRect(0, 0, 1, 1)
+    if (n && e) ctx.fillRect(CELL_W - 1, 0, 1, 1)
 
     ctx.globalCompositeOperation = 'source-over'
   }
 
-  /** Composite a front face variant: base + edges. */
+  /** Composite a front face variant: base + edge borders. */
   private compositeFront(
     ctx: CanvasRenderingContext2D,
     def: TerrainDef,
@@ -223,19 +191,10 @@ export class TerrainAtlas {
     ctx.globalCompositeOperation = 'source-over'
     def.front(ctx, CELL_W, CELL_H)
 
-    // 2. Draw edge borders.
-    if (e) {
-      ctx.save()
-      ctx.translate(CELL_W, 0)
-      ctx.scale(-1, 1)
-      def.frontEdge(ctx, CELL_W, CELL_H) // E = mirrored W
-      ctx.restore()
-    }
-    if (w) {
-      ctx.save()
-      def.frontEdge(ctx, CELL_W, CELL_H)
-      ctx.restore()
-    }
+    // 2. Draw 1px edge borders.
+    ctx.fillStyle = def.frontEdgeColor
+    if (w) ctx.fillRect(0, 0, 1, CELL_H)
+    if (e) ctx.fillRect(CELL_W - 1, 0, 1, CELL_H)
 
     ctx.globalCompositeOperation = 'source-over'
   }
