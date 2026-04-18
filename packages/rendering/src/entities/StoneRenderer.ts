@@ -32,7 +32,7 @@ export class StoneRenderer extends EntityRenderer {
         ctx.fillStyle = Colors.gray
         ctx.fillRect(0, 0, w, h)
       },
-      topEdgeColor: Colors.lightGray,
+      topEdgeColor: Colors.lightestGray,
       frontEdgeColor: Colors.gray,
     },
   }

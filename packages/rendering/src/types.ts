@@ -5,7 +5,7 @@ export const CELL_H = 12
 /** Height of a terrain top face and the grid row step. */
 export const TOP_H = 12
 /** Height of a terrain front (side) face. */
-export const FRONT_H = 12
+export const FRONT_H = 10
 /** Atlas row height — tall enough for either face type. */
 export const ATLAS_ROW_H = Math.max(TOP_H, FRONT_H)
 
