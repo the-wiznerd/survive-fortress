@@ -2,7 +2,7 @@ import type { RenderEntity, DrawContext } from '../types.js'
 import { EntityRenderer } from './EntityRenderer.js'
 
 const SPRITE_COL = 0
-const SPRITE_ROW = 6
+const SPRITE_ROW = 14
 const SPRITE_HEIGHT = 2
 const Y_OFFSET = -0.25
 

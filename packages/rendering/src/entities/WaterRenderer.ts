@@ -2,8 +2,12 @@ import type { RenderEntity, DrawContext } from '../types.js'
 import { terrainVariants, posKey, CELL_H, CELL_W } from '../types.js'
 import { EntityRenderer } from './EntityRenderer.js'
 
-const ANIM_ROWS = [2, 3, 4, 5]
-const WATER = terrainVariants(0, 0)
+const WATER_FRAMES = [
+  terrainVariants(2, 0),
+  terrainVariants(4, 0),
+  terrainVariants(6, 0),
+  terrainVariants(8, 0),
+]
 const Y_OFFSET = 0.25
 const ANIM_INTERVAL = 250
 
@@ -18,15 +22,15 @@ export class WaterRenderer extends EntityRenderer {
     const e = this.hasNonWaterNeighbor(rc.typeAt, wx + 1, wy, z) ? 1 : 0
     const w = this.hasNonWaterNeighbor(rc.typeAt, wx - 1, wy, z) ? 1 : 0
 
-    const frame = (Math.floor(rc.now / ANIM_INTERVAL) + wx + wy) % ANIM_ROWS.length
-    const row = ANIM_ROWS[frame]
+    const frame = (Math.floor(rc.now / ANIM_INTERVAL) + wx + wy) % WATER_FRAMES.length
+    const water = WATER_FRAMES[frame]
 
-    const topCol = WATER.topCols[n * 4 + e * 2 + w]
-    dc.draw(topCol, row, 1, 1, Y_OFFSET)
+    const top = water.topFaces[n * 4 + e * 2 + w]
+    dc.draw(top.col, top.row, 1, 1, Y_OFFSET)
 
     if (!dc.frontOccluded) {
-      const frontCol = WATER.frontCols[e * 2 + w]
-      dc.draw(frontCol, row, 1, 1, 1 + Y_OFFSET)
+      const front = water.frontFaces[e * 2 + w]
+      dc.draw(front.col, front.row, 1, 1, 1 + Y_OFFSET)
     }
   }
 

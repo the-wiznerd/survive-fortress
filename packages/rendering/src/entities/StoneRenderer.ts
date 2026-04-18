@@ -2,7 +2,7 @@ import type { RenderEntity, DrawContext } from '../types.js'
 import { terrainVariants } from '../types.js'
 import { EntityRenderer } from './EntityRenderer.js'
 
-const STONE = terrainVariants(1, 11)
+const STONE = terrainVariants(0, 18)
 
 export class StoneRenderer extends EntityRenderer {
   readonly terrain = true

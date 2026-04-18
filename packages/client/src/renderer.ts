@@ -120,7 +120,7 @@ export class Renderer {
   }
 }
 
-const ARROW_ROW = 8
+const ARROW_ROW = 16
 
 function arrowCol(dx: number, dy: number): number {
   if (dy < 0) return 0 // up

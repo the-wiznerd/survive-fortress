@@ -6,11 +6,11 @@ type UprightPreview = { kind: 'upright'; col: number; row: number; h: number; yO
 type PreviewSprite = TerrainPreview | UprightPreview
 
 const PREVIEW_SPRITES: Record<string, PreviewSprite> = {
-  dirt: { kind: 'terrain', topCol: 3, frontCol: 7, row: 0 },
-  sand: { kind: 'terrain', topCol: 14, frontCol: 18, row: 0 },
-  stone: { kind: 'terrain', topCol: 14, frontCol: 18, row: 1 },
-  water: { kind: 'terrain', topCol: 3, frontCol: 7, row: 2 },
-  player: { kind: 'upright', col: 0, row: 6, h: 2, yOff: -0.25 },
+  dirt: { kind: 'terrain', topCol: 0, frontCol: 4, row: 0 },
+  sand: { kind: 'terrain', topCol: 6, frontCol: 10, row: 0 },
+  stone: { kind: 'terrain', topCol: 18, frontCol: 22, row: 0 },
+  water: { kind: 'terrain', topCol: 0, frontCol: 4, row: 2 },
+  player: { kind: 'upright', col: 0, row: 14, h: 2, yOff: -0.25 },
 }
 
 export class EditorRenderer {

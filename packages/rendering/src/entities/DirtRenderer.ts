@@ -3,7 +3,7 @@ import { terrainVariants } from '../types.js'
 import { EntityRenderer } from './EntityRenderer.js'
 
 const DIRT = terrainVariants(0, 0)
-const GRASS = terrainVariants(1, 0)
+const GRASS = terrainVariants(0, 12)
 
 export class DirtRenderer extends EntityRenderer {
   readonly terrain = true
