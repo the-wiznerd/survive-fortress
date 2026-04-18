@@ -53,15 +53,19 @@ const TOP_EDGE_COMBOS = [
 ]
 
 const FRONT_EDGE_COMBOS = [
-  { e: 0, w: 0 }, // flat
-  { e: 0, w: 1 }, // W
-  { e: 1, w: 0 }, // E
-  { e: 1, w: 1 }, // EW
+  { s: 0, e: 0, w: 0 }, // flat
+  { s: 0, e: 0, w: 1 }, // W
+  { s: 0, e: 1, w: 0 }, // E
+  { s: 0, e: 1, w: 1 }, // EW
+  { s: 1, e: 0, w: 0 }, // S
+  { s: 1, e: 0, w: 1 }, // SW
+  { s: 1, e: 1, w: 0 }, // SE
+  { s: 1, e: 1, w: 1 }, // SEW
 ]
 
 /**
  * Generates a texture atlas of all terrain edge variants at runtime.
- * Each registered terrain type gets 8 top + 4 front + 1 unknownTop = 13 cells.
+ * Each registered terrain type gets 8 top + 8 front + 1 unknownTop = 17 cells.
  * The atlas is a single ImageBitmap for GPU-resident rendering.
  */
 export class TerrainAtlas {
@@ -71,7 +75,7 @@ export class TerrainAtlas {
   private _canvas: HTMLCanvasElement | null = null
 
   /** Number of cell columns in the atlas. */
-  private atlasCols = 13
+  private atlasCols = 17
 
   /** Register a terrain type for atlas generation. */
   register(name: string, def: TerrainDef) {
@@ -130,10 +134,10 @@ export class TerrainAtlas {
         col++
       }
 
-      // --- 4 front face variants ---
+      // --- 8 front face variants ---
       const frontFaces: Cell[] = []
       for (const combo of FRONT_EDGE_COMBOS) {
-        this.compositeFront(tmpCtx, def, combo.e, combo.w)
+        this.compositeFront(tmpCtx, def, combo.s, combo.e, combo.w)
         ctx.drawImage(tmp, col * CELL_W, baseY)
         frontFaces.push({ col, row: typeIdx })
         col++
@@ -179,11 +183,11 @@ export class TerrainAtlas {
     ctx.globalCompositeOperation = 'source-over'
   }
 
-  /** Composite a front face variant: base + edge borders. */
+  /** Composite a front face variant: base + edge borders + corner cutouts. */
   private compositeFront(
     ctx: CanvasRenderingContext2D,
     def: TerrainDef,
-    e: number, w: number,
+    s: number, e: number, w: number,
   ) {
     ctx.clearRect(0, 0, CELL_W, CELL_H)
 
@@ -193,8 +197,14 @@ export class TerrainAtlas {
 
     // 2. Draw 1px edge borders.
     ctx.fillStyle = def.frontEdgeColor
+    if (s) ctx.fillRect(0, CELL_H - 1, CELL_W, 1)
     if (w) ctx.fillRect(0, 0, 1, CELL_H)
     if (e) ctx.fillRect(CELL_W - 1, 0, 1, CELL_H)
+
+    // 3. Erase corner pixels where two edges meet.
+    ctx.globalCompositeOperation = 'destination-out'
+    if (s && w) ctx.fillRect(0, CELL_H - 1, 1, 1)
+    if (s && e) ctx.fillRect(CELL_W - 1, CELL_H - 1, 1, 1)
 
     ctx.globalCompositeOperation = 'source-over'
   }

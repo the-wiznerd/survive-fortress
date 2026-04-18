@@ -152,6 +152,7 @@ export class WorldRenderer {
 
     // Build per-frame render context.
     const maxZ = new Map<number, number>()
+    const minZ = new Map<number, number>()
     const occludingMaxZ = new Map<number, number>()
     const terrainAt = new Set<number>()
     const typeAt = new Map<number, string>()
@@ -160,6 +161,8 @@ export class WorldRenderer {
         const k = zKey(entity.x, entity.y)
         const prev = maxZ.get(k)
         if (prev === undefined || entity.z > prev) maxZ.set(k, entity.z)
+        const prevMin = minZ.get(k)
+        if (prevMin === undefined || entity.z < prevMin) minZ.set(k, entity.z)
         if (renderer.occluding) {
           terrainAt.add(posKey(entity.x, entity.y, entity.z))
           const oprev = occludingMaxZ.get(k)
@@ -168,7 +171,7 @@ export class WorldRenderer {
         typeAt.set(posKey(entity.x, entity.y, entity.z), entity.type)
       }
     }
-    const rc: RenderContext = { maxZ, occludingMaxZ, terrainAt, typeAt, knownColumns, playerZ, verticalRange, now: performance.now() }
+    const rc: RenderContext = { maxZ, minZ, occludingMaxZ, terrainAt, typeAt, knownColumns, playerZ, verticalRange, now: performance.now() }
 
     // Pass 1: Terrain (back-to-front).
     for (const row of terrainRows) {

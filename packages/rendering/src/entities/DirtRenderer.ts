@@ -26,7 +26,7 @@ export class DirtRenderer extends EntityRenderer {
         ctx.fillRect(11, 4, 1, 1)
       },
       unknownTop(ctx, w, h) {
-        ctx.fillStyle = Colors.yellow
+        ctx.fillStyle = Colors.darkYellow
         ctx.fillRect(0, 0, w, h)
       },
       topEdgeColor: Colors.yellow,

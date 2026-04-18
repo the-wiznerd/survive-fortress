@@ -8,8 +8,7 @@ export type AnimatedSprite = { frames: StaticSprite[]; interval: number }
 /**
  * Edge variant lookup for terrain with elevation-aware borders.
  * topFaces: indexed by N*4 + E*2 + W (0–7) → { col, row } for top face.
- * frontFaces: indexed by E*2 + W (0–3) → { col, row } for front face.
- * Variants span two sprite rows (baseRow and baseRow+1).
+ * frontFaces: indexed by S*4 + E*2 + W (0–7) → { col, row } for front face.
  */
 export interface TerrainVariants {
   topFaces: { col: number; row: number }[]
@@ -25,8 +24,8 @@ export interface TerrainVariants {
  *   Row+0: +0 flat, +1 EW, +2 NEW, +3 NW, +4 N, +5 NE
  *   Row+1: +0 W, +1 E
  *
- * Front face (4 variants, indexed by E*2 + W):
- *   Row+1: +4 flat, +3 W, +5 E, +2 EW
+ * Front face (8 variants, indexed by S*4 + E*2 + W):
+ *   Row+1: +4 flat, +3 W, +5 E, +2 EW (sprite sheet lacks S variants)
  */
 const TOP_OFFSETS: [number, number][] = [
   [0, 0], // flat
@@ -51,16 +50,19 @@ export const TOP_VARIANT = {
   N: 4, NW: 5, NE: 6, NEW: 7,
 } as const
 
-/** Front-face edge variant names, indexed by E*2 + W. */
+/** Front-face edge variant names, indexed by S*4 + E*2 + W. */
 export const FRONT_VARIANT = {
   FLAT: 0, W: 1, E: 2, EW: 3,
+  S: 4, SW: 5, SE: 6, SEW: 7,
 } as const
 
 /** Build a TerrainVariants from a sprite base row and base column. */
 export function terrainVariants(baseRow: number, baseCol: number): TerrainVariants {
+  const frontFaces = FRONT_OFFSETS.map(([dc, dr]) => ({ col: baseCol + dc, row: baseRow + dr }))
   return {
     topFaces: TOP_OFFSETS.map(([dc, dr]) => ({ col: baseCol + dc, row: baseRow + dr })),
-    frontFaces: FRONT_OFFSETS.map(([dc, dr]) => ({ col: baseCol + dc, row: baseRow + dr })),
+    // Sprite sheets lack S variants — duplicate the 4 base entries for S=1.
+    frontFaces: [...frontFaces, ...frontFaces],
     unknownTop: { col: baseCol + 6, row: baseRow },
   }
 }
@@ -95,6 +97,8 @@ export interface RenderEntity {
 export interface RenderContext {
   /** Max terrain z at each world (x, y). */
   maxZ: Map<number, number>
+  /** Min terrain z at each world (x, y). */
+  minZ: Map<number, number>
   /** Max z of occluding terrain at each world (x, y). */
   occludingMaxZ: Map<number, number>
   /** Set of packed (x, y, z) keys where terrain exists. */
@@ -165,17 +169,20 @@ export class DrawContext {
     return this.rc.knownColumns.has(zKey(x, y))
   }
 
-  edgeFlags(): { n: number; e: number; w: number } {
+  edgeFlags(): { n: number; e: number; s: number; w: number } {
     const { maxZ } = this.rc
     const { wx, wy, z } = this
     const n = this.isKnown(wx, wy - 1) && (maxZ.get(zKey(wx, wy - 1)) ?? -Infinity) < z ? 1 : 0
     const e = this.isKnown(wx + 1, wy) && (maxZ.get(zKey(wx + 1, wy)) ?? -Infinity) < z ? 1 : 0
     const w = this.isKnown(wx - 1, wy) && (maxZ.get(zKey(wx - 1, wy)) ?? -Infinity) < z ? 1 : 0
-    return { n, e, w }
+    const minZ = this.rc.minZ.get(zKey(wx, wy))
+    const s = minZ !== undefined && minZ < z
+      && !this.rc.terrainAt.has(posKey(wx, wy, z - 1)) ? 1 : 0
+    return { n, e, s, w }
   }
 
   drawTerrain(tv: TerrainVariants, fromAtlas = false) {
-    const { n, e, w } = this.edgeFlags()
+    const { n, e, s, w } = this.edgeFlags()
     const isTop = this.z === this.rc.maxZ.get(zKey(this.wx, this.wy))
     const aboveUnknown = isTop
       && this.rc.knownColumns.size > 0
@@ -187,7 +194,7 @@ export class DrawContext {
       this.draw(top.col, top.row)
     }
     if (!this.frontOccluded) {
-      const front = tv.frontFaces[e * 2 + w]
+      const front = tv.frontFaces[s * 4 + e * 2 + w]
       if (fromAtlas) {
         this.drawFromAtlas(front.col, front.row, 1)
       } else {

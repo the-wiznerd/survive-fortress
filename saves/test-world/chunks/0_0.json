@@ -6564,6 +6564,150 @@
         "y": 3,
         "z": 1
       }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 13,
+        "y": 7,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 13,
+        "y": 6,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 13,
+        "y": 5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 13,
+        "y": 4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 14,
+        "y": 4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 14,
+        "y": 5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 15,
+        "y": 4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 15,
+        "y": 5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 15,
+        "y": 6,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": 4,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": 6,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": 5,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": 7,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 15,
+        "y": 5,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": 5,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 15,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 16,
+        "y": 4,
+        "z": 3
+      }
     }
   ]
 }

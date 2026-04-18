@@ -64,7 +64,7 @@ The renderer runs 3 passes per frame, all back-to-front by row:
 
 - `draw(col, row, w?, h?, yOff?)` — Blit from sprite sheet to screen
 - `drawTerrain(tv: TerrainVariants)` — Draw top face + conditional front face with edge-aware variant selection
-- `edgeFlags()` — Returns `{ n, e, w }` (0 or 1) based on neighboring terrain elevation
+- `edgeFlags()` — Returns `{ n, e, s, w }` (0 or 1) based on neighboring terrain elevation
 - `frontOccluded` — Whether the front face is hidden by terrain in the next row
 - `wx`, `wy`, `z` — World coordinates
 - `rc` — The shared `RenderContext` with spatial lookup maps
@@ -86,7 +86,7 @@ Base+8  W front        Base+10 E front
 Use `terrainVariants(row, baseCol)` to build a `TerrainVariants` object from a sprite row and base column. Named index constants:
 
 - `TOP_VARIANT`: `FLAT`, `N`, `E`, `W`, `NE`, `NW`, `EW`, `NEW`
-- `FRONT_VARIANT`: `FLAT`, `E`, `W`, `EW`
+- `FRONT_VARIANT`: `FLAT`, `E`, `W`, `EW`, `S`, `SE`, `SW`, `SEW`
 
 ## Entity Renderers
 

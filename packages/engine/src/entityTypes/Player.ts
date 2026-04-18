@@ -4,6 +4,9 @@ export class Player extends BaseEntityType {
   health = this.addTrait(new HealthTrait(this.world, this.id))
   hunger = this.addTrait(new HungerTrait(this.world, this.id))
   movement = this.addTrait(new MovementTrait(this.world, this.id, { pace: 3 }))
-  vision = this.addTrait(new VisionTrait(this.world, this.id))
+  vision = this.addTrait(new VisionTrait(this.world, this.id, {
+    horizontalRange: 20,
+    verticalRange: 2
+  }))
   playerControlled = this.addTrait(new PlayerControlledTrait(this.world, this.id))
 }
