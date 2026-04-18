@@ -1,10 +1,14 @@
 import type { RenderEntity, DrawContext } from '../types.js'
-import type { TerrainVariantCells } from '../TerrainAtlas.js'
+import type { TerrainDef, TerrainVariantCells } from '../TerrainAtlas.js'
 import { EntityRenderer } from './EntityRenderer.js'
 
 let STONE: TerrainVariantCells | undefined
 
 export class StoneRenderer extends EntityRenderer {
+  static readonly terrainDefs: Record<string, TerrainDef> = {
+    stone: placeholder('#7c877a', '#606762'),
+  }
+
   readonly terrain = true
 
   bindAtlas(stone: TerrainVariantCells) {

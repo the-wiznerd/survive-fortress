@@ -1,13 +1,10 @@
 import type { TerrainDef } from './TerrainAtlas.js'
 
 /**
- * Procedural terrain definitions.
- * Each function returns a TerrainDef with draw functions for atlas generation.
- *
- * TODO: Fill in actual pixel art per terrain type.
+ * Placeholder terrain draw functions.
+ * Used by renderers until real pixel art is filled in.
  */
-
-function placeholder(fillColor: string, edgeColor: string): TerrainDef {
+export function placeholder(fillColor: string, edgeColor: string): TerrainDef {
   return {
     top(ctx, w, h) {
       ctx.fillStyle = fillColor
@@ -44,8 +41,3 @@ function placeholder(fillColor: string, edgeColor: string): TerrainDef {
     },
   }
 }
-
-export const DIRT_DEF: TerrainDef = placeholder('#a7814e', '#7f5845')
-export const SAND_DEF: TerrainDef = placeholder('#c5a45f', '#a7814e')
-export const GRASS_DEF: TerrainDef = placeholder('#a2af50', '#627c4e')
-export const STONE_DEF: TerrainDef = placeholder('#7c877a', '#606762')

@@ -10,7 +10,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "declaration": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "~rendering/*": ["./src/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "auto-imports.d.ts"]
 }

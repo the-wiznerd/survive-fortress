@@ -1,4 +1,3 @@
-import { CELL_W, CELL_H } from './types.js'
 
 /**
  * A draw function that renders a terrain face onto a 16×12 pixel canvas.

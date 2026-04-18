@@ -1,14 +1,5 @@
-import {
-  CELL_W,
-  CELL_H,
-  DrawContext,
-  zKey,
-  posKey,
-  type RenderContext,
-  type RenderEntity,
-} from './types.js'
-import { TerrainAtlas } from './TerrainAtlas.js'
-import { DIRT_DEF, SAND_DEF, GRASS_DEF, STONE_DEF } from './terrainDefs.js'
+import { type RenderContext, type RenderEntity, DrawContext } from './types.js'
+import type { TerrainDef } from './TerrainAtlas.js'
 import { EntityRenderer } from './entities/EntityRenderer.js'
 import { DirtRenderer } from './entities/DirtRenderer.js'
 import { SandRenderer } from './entities/SandRenderer.js'
@@ -84,10 +75,14 @@ export class WorldRenderer {
       this.spriteReady = true
 
       // Register and generate terrain atlas.
-      this.terrainAtlas.register('dirt', DIRT_DEF)
-      this.terrainAtlas.register('sand', SAND_DEF)
-      this.terrainAtlas.register('grass', GRASS_DEF)
-      this.terrainAtlas.register('stone', STONE_DEF)
+      for (const renderer of Object.values(ENTITY_RENDERERS)) {
+        const defs = (renderer.constructor as { terrainDefs?: Record<string, import('./TerrainAtlas.js').TerrainDef> }).terrainDefs
+        if (defs) {
+          for (const [name, def] of Object.entries(defs)) {
+            this.terrainAtlas.register(name, def)
+          }
+        }
+      }
       await this.terrainAtlas.generate()
       this.atlasSource = this.terrainAtlas.bitmap ?? this.terrainAtlas.canvas
 
