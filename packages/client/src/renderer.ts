@@ -56,7 +56,7 @@ export class Renderer {
     // Compute known columns from the player's position + vision range.
     const knownColumns = new Set<number>()
     const player = view.entities.find(e => String(e.id) === view.playerId)
-    const vision = player?.traits.vision as { horizontalRange: number } | undefined
+    const vision = player?.traits.vision as { horizontalRange: number; verticalRange: number } | undefined
     if (player && vision) {
       const r2 = vision.horizontalRange * vision.horizontalRange
       for (let dx = -vision.horizontalRange; dx <= vision.horizontalRange; dx++) {
@@ -68,7 +68,7 @@ export class Renderer {
       }
     }
 
-    this.world.render(entities, this.cameraX, this.cameraY, knownColumns, {
+    this.world.render(entities, this.cameraX, this.cameraY, knownColumns, player?.z ?? -Infinity, vision?.verticalRange ?? 0, {
       onAfterTerrain(ctx) {
         self.drawMoveArrows(ctx, view)
       },

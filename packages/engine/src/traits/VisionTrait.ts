@@ -41,6 +41,17 @@ export class VisionTrait extends Trait<'vision'> {
   }
 
   /**
+   * True if at least one cardinal side (N/S/E/W) is NOT opaque.
+   * Used in cliff-face mode to decide if an occluded tile is visible.
+   */
+  private isSideExposed(x: number, y: number, z: number): boolean {
+    return !this.isOpaque(x - 1, y, z)
+      || !this.isOpaque(x + 1, y, z)
+      || !this.isOpaque(x, y - 1, z)
+      || !this.isOpaque(x, y + 1, z)
+  }
+
+  /**
    * Compute the set of visible positions for this entity.
    *
    * Horizontal: all columns within circular `horizontalRange` of the entity's
@@ -74,8 +85,8 @@ export class VisionTrait extends Trait<'vision'> {
 
         // ── Downward from entity z ──
         // Everything above the first occluder is fully visible. Once we hit
-        // an occluder, continue in "cliff-face" mode: only add tiles whose
-        // front face is exposed (no opaque neighbor at y+1).
+        // an occluder, continue in "cliff-face" mode: only add tiles with
+        // at least one exposed side face (N/S/E/W).
         let occluded = false
         for (let z = pos.z; z >= pos.z - verticalRange; z--) {
           const hasEntities = getEntitiesAt(this.world, wx, wy, z).length > 0
@@ -84,21 +95,30 @@ export class VisionTrait extends Trait<'vision'> {
           if (!occluded) {
             if (hasEntities) visible.add(`${wx},${wy},${z}`)
             if (opaque) occluded = true
-          } else if (opaque && hasEntities && !this.isOpaque(wx, wy + 1, z)) {
+          } else if (opaque && hasEntities && this.isSideExposed(wx, wy, z)) {
             visible.add(`${wx},${wy},${z}`)
           }
         }
 
         // ── Upward from entity z + 1 ──
+        // Before the first occluder: non-opaque entities visible freely,
+        // first opaque visible only if exposed. After the first occluder,
+        // cliff-face mode: only opaque tiles with an exposed side face.
+        let upOccluded = false
         for (let z = pos.z + 1; z <= pos.z + verticalRange; z++) {
-          if (this.isOpaque(wx, wy, z)) {
-            if (this.isExposed(wx, wy, z)
-              && getEntitiesAt(this.world, wx, wy, z).length > 0) {
+          const hasEntities = getEntitiesAt(this.world, wx, wy, z).length > 0
+          const opaque = this.isOpaque(wx, wy, z)
+
+          if (!upOccluded) {
+            if (opaque) {
+              if (this.isExposed(wx, wy, z) && hasEntities) {
+                visible.add(`${wx},${wy},${z}`)
+              }
+              upOccluded = true
+            } else if (hasEntities) {
               visible.add(`${wx},${wy},${z}`)
             }
-            break
-          }
-          if (getEntitiesAt(this.world, wx, wy, z).length > 0) {
+          } else if (opaque && hasEntities && this.isSideExposed(wx, wy, z)) {
             visible.add(`${wx},${wy},${z}`)
           }
         }
@@ -124,16 +144,19 @@ export class VisionTrait extends Trait<'vision'> {
       // Downward: check if any occluder blocks before the target.
       for (let cz = pos.z; cz > z; cz--) {
         if (this.isOpaque(x, y, cz)) {
-          // Occluded — target is only visible if it's opaque with an exposed front face.
-          return this.isOpaque(x, y, z) && !this.isOpaque(x, y + 1, z)
+          // Occluded — target visible only if opaque with an exposed side face.
+          return this.isOpaque(x, y, z) && this.isSideExposed(x, y, z)
         }
       }
       return true
     }
 
-    // Upward: any occluder between entity z+1 and target blocks visibility.
+    // Upward: any occluder between entity z+1 and target blocks visibility,
+    // unless target is opaque with an exposed side face (cliff-face).
     for (let cz = pos.z + 1; cz < z; cz++) {
-      if (this.isOpaque(x, y, cz)) return false
+      if (this.isOpaque(x, y, cz)) {
+        return this.isOpaque(x, y, z) && this.isSideExposed(x, y, z)
+      }
     }
     // If the target itself is opaque, it must be exposed.
     if (this.isOpaque(x, y, z)) return this.isExposed(x, y, z)

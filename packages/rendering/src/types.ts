@@ -14,6 +14,7 @@ export type AnimatedSprite = { frames: StaticSprite[]; interval: number }
 export interface TerrainVariants {
   topFaces: { col: number; row: number }[]
   frontFaces: { col: number; row: number }[]
+  unknownTop: { col: number; row: number }
 }
 
 /**
@@ -60,6 +61,7 @@ export function terrainVariants(baseRow: number, baseCol: number): TerrainVarian
   return {
     topFaces: TOP_OFFSETS.map(([dc, dr]) => ({ col: baseCol + dc, row: baseRow + dr })),
     frontFaces: FRONT_OFFSETS.map(([dc, dr]) => ({ col: baseCol + dc, row: baseRow + dr })),
+    unknownTop: { col: baseCol + 6, row: baseRow },
   }
 }
 
@@ -101,6 +103,10 @@ export interface RenderContext {
   typeAt: Map<number, string>
   /** Set of zKey(x,y) for columns known to be in vision (empty = show all). */
   knownColumns: Set<number>
+  /** Player's z coordinate (used for unknown-above check). -Infinity if no vision. */
+  playerZ: number
+  /** Player's vertical vision range (used for unknown-above check). */
+  verticalRange: number
   /** Current timestamp from performance.now(). */
   now: number
 }
@@ -158,7 +164,11 @@ export class DrawContext {
 
   drawTerrain(tv: TerrainVariants) {
     const { n, e, w } = this.edgeFlags()
-    const top = tv.topFaces[n * 4 + e * 2 + w]
+    const isTop = this.z === this.rc.maxZ.get(zKey(this.wx, this.wy))
+    const aboveUnknown = isTop
+      && this.rc.knownColumns.size > 0
+      && this.z + 1 > this.rc.playerZ + this.rc.verticalRange
+    const top = aboveUnknown ? tv.unknownTop : tv.topFaces[n * 4 + e * 2 + w]
     this.draw(top.col, top.row)
     if (!this.frontOccluded) {
       const front = tv.frontFaces[e * 2 + w]

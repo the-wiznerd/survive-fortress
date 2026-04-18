@@ -7,8 +7,8 @@ type PreviewSprite = TerrainPreview | UprightPreview
 
 const PREVIEW_SPRITES: Record<string, PreviewSprite> = {
   dirt: { kind: 'terrain', topCol: 0, frontCol: 4, row: 0 },
-  sand: { kind: 'terrain', topCol: 6, frontCol: 10, row: 0 },
-  stone: { kind: 'terrain', topCol: 18, frontCol: 22, row: 0 },
+  sand: { kind: 'terrain', topCol: 7, frontCol: 11, row: 0 },
+  stone: { kind: 'terrain', topCol: 21, frontCol: 25, row: 0 },
   water: { kind: 'terrain', topCol: 0, frontCol: 4, row: 2 },
   player: { kind: 'upright', col: 0, row: 14, h: 2, yOff: -0.25 },
 }
@@ -62,7 +62,7 @@ export class EditorRenderer {
     if (!this.world.ready) return
 
     const self = this
-    this.world.render(entities, this.cameraX, this.cameraY, new Set(), {
+    this.world.render(entities, this.cameraX, this.cameraY, new Set(), -Infinity, 0, {
       onAfterEntities(ctx) {
         // Origin marker at (0, 0, 0).
         const ox = -Math.floor(self.cameraX)

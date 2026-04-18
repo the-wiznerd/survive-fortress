@@ -103,6 +103,8 @@ export class WorldRenderer {
     cameraX: number,
     cameraY: number,
     knownColumns: Set<number>,
+    playerZ = -Infinity,
+    verticalRange = 0,
     hooks?: RenderHooks,
   ) {
     if (!this.spriteReady) return
@@ -149,7 +151,7 @@ export class WorldRenderer {
         typeAt.set(posKey(entity.x, entity.y, entity.z), entity.type)
       }
     }
-    const rc: RenderContext = { maxZ, occludingMaxZ, terrainAt, typeAt, knownColumns, now: performance.now() }
+    const rc: RenderContext = { maxZ, occludingMaxZ, terrainAt, typeAt, knownColumns, playerZ, verticalRange, now: performance.now() }
 
     // Pass 1: Terrain (back-to-front).
     for (const row of terrainRows) {
