@@ -99,8 +99,8 @@ export interface RenderContext {
   terrainAt: Set<number>
   /** Entity type at each (x, y, z) for neighbor checks. */
   typeAt: Map<number, string>
-  /** Set of "x,y,z" keys known to be visible (empty = show all). */
-  knownPositions: Set<string>
+  /** Set of zKey(x,y) for columns known to be in vision (empty = show all). */
+  knownColumns: Set<number>
   /** Current timestamp from performance.now(). */
   now: number
 }
@@ -143,8 +143,8 @@ export class DrawContext {
   }
 
   private isKnown(x: number, y: number): boolean {
-    if (this.rc.knownPositions.size === 0) return true
-    return this.rc.maxZ.has(zKey(x, y))
+    if (this.rc.knownColumns.size === 0) return true
+    return this.rc.knownColumns.has(zKey(x, y))
   }
 
   edgeFlags(): { n: number; e: number; w: number } {
