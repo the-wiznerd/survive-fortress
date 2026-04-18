@@ -29,20 +29,8 @@ export class VisionTrait extends Trait<'vision'> {
   }
 
   /**
-   * True if at least one of N/S/E/W/top neighbors is NOT opaque.
-   * A fully enclosed tile (all five faces surrounded) is hidden from view.
-   */
-  private isExposed(x: number, y: number, z: number): boolean {
-    return !this.isOpaque(x - 1, y, z)
-      || !this.isOpaque(x + 1, y, z)
-      || !this.isOpaque(x, y - 1, z)
-      || !this.isOpaque(x, y + 1, z)
-      || !this.isOpaque(x, y, z + 1)
-  }
-
-  /**
-   * True if at least one cardinal side (N/S/E/W) is NOT opaque.
-   * Used in cliff-face mode to decide if an occluded tile is visible.
+   * True if at least one cardinal neighbor (N/S/E/W) is NOT opaque.
+   * Used to decide if an occluded tile has a visible face.
    */
   private isSideExposed(x: number, y: number, z: number): boolean {
     return !this.isOpaque(x - 1, y, z)
@@ -57,16 +45,18 @@ export class VisionTrait extends Trait<'vision'> {
    * Horizontal: all columns within circular `horizontalRange` of the entity's
    * (x, y).
    *
-   * Per column, two vertical searches from entity z (using `verticalRange`
-   * in both directions):
+   * Per column, two vertical walks from entity z bounded by `verticalRange`.
+   * Each walk has a **clear phase** (before the first occluder) and a
+   * **cliff-face phase** (after it).
    *
-   * **Downward:** Walk from entity z toward `entity.z − verticalRange`. Every
-   * position (with entities) is visible. The first opaque position is
-   * included and stops the search. Non-opaque entities (water) don't stop it.
+   * **Downward (entity z → entity.z − verticalRange):**
+   * - Clear: all positions with entities are visible. First opaque → cliff-face.
+   * - Cliff-face: only opaque tiles with an exposed side face (N/S/E/W).
    *
-   * **Upward:** Walk from `entity.z + 1` toward `entity.z + verticalRange`.
-   * Non-opaque entities are visible. The first opaque position stops the search
-   * and is visible only if it has at least one exposed face (N/S/E/W/top).
+   * **Upward (entity.z + 1 → entity.z + verticalRange):**
+   * - Clear: non-opaque entities are visible. First opaque is always
+   *   included, then → cliff-face.
+   * - Cliff-face: same as downward.
    *
    * Returns spatial-key strings "x,y,z".
    */
@@ -111,9 +101,7 @@ export class VisionTrait extends Trait<'vision'> {
 
           if (!upOccluded) {
             if (opaque) {
-              if (this.isExposed(wx, wy, z) && hasEntities) {
-                visible.add(`${wx},${wy},${z}`)
-              }
+              if (hasEntities) visible.add(`${wx},${wy},${z}`)
               upOccluded = true
             } else if (hasEntities) {
               visible.add(`${wx},${wy},${z}`)
@@ -158,8 +146,8 @@ export class VisionTrait extends Trait<'vision'> {
         return this.isOpaque(x, y, z) && this.isSideExposed(x, y, z)
       }
     }
-    // If the target itself is opaque, it must be exposed.
-    if (this.isOpaque(x, y, z)) return this.isExposed(x, y, z)
+    // If the target itself is opaque, it's always visible (first occluder).
+    if (this.isOpaque(x, y, z)) return true
     return true
   }
 }

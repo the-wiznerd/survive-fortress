@@ -31,29 +31,26 @@ The z component does not appear as a spatial axis on screen. Instead, it becomes
 
 ## Vision
 
-Vision is per-entity, defined by two parameters: **horizontal range** and **vertical range**.
+Vision is per-entity, defined by two parameters: **horizontalRange** and **verticalRange**.
 
-**Horizontal scope:** All columns within a circular radius of `horizontal range` around the entity's (x, y).
+**Horizontal scope:** All columns within a circular radius of `horizontalRange` around the entity's (x, y).
 
-**Vertical scope per column — two searches from entity z:**
+**Vertical scope per column — two walks from entity z:**
 
-**Downward (from entity z toward lower z):**
+Each column is searched in two directions. Both walks have the same two-phase structure: a **clear phase** (before the first occluder) and a **cliff-face phase** (after the first occluder).
 
-- Find the highest occluder at or below the entity's z in this column, bounded by `entity.z - vertical range`.
-- Everything between the entity's z and that occluder (inclusive) is visible.
-- If the occluder is at the entity's own z, nothing below is visible in this column.
-- If no occluder is found, everything down to the floor of the search range is visible.
-- Non-opaque entities (e.g. water) are visible but don't stop the search.
+**Downward (from entity z toward `entity.z − verticalRange`):**
 
-**Upward (from entity z toward higher z):**
+- **Clear phase:** Every position with entities is visible. Non-opaque entities (e.g. water) don't stop the search. The first opaque position is included and triggers the transition to cliff-face phase.
+- **Cliff-face phase:** Only opaque tiles that have at least one exposed cardinal side face (N/S/E/W neighbor is not opaque) are visible. Fully surrounded tiles are skipped.
 
-- Walk upward from entity z to `entity.z + vertical range`.
-- All entities encountered are visible, including occluders.
-- The first occluder stops the search and marks the column as having a **ceiling**.
-- If no occluder is found within the range, check whether any occluder exists above the range. If one does, the column still has a ceiling. If not, the column is open sky.
+**Upward (from `entity.z + 1` toward `entity.z + verticalRange`):**
+
+- **Clear phase:** Non-opaque entities are visible. The first opaque position is always included and triggers cliff-face phase.
+- **Cliff-face phase:** Same as downward — only opaque tiles with an exposed cardinal side face are visible.
+
+**Cliff-face rationale:** After hitting a solid occluder, the player can still see tiles beyond it that have an exposed side — like looking down (or up) a cliff wall. Tiles fully enclosed in opaque terrain are hidden.
 
 **No X/Y plane occlusion.** Vision does not ray-cast horizontally — if a column is within range, it's checked. Only z-axis (vertical) occlusion matters.
-
-**Ceiling** is a per-column flag indicating that the entity is "indoors" or "underground" in that column — there's opaque terrain somewhere above the visible range.
 
 Only entities at visible positions are sent to the client. The client never receives data about positions outside the player's vision.
