@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { EditorRenderer } from './renderer'
+import { CELL_W, CELL_H } from '@repo/rendering'
 import { listSaves } from './connection'
 import {
   world,
@@ -149,16 +150,22 @@ function onCanvasMouseMove(e: MouseEvent) {
   shiftHeld.value = e.shiftKey
 
   if (panning) {
-    const dx = (e.clientX - panStartX) / renderer.destW
-    const dy = (e.clientY - panStartY) / renderer.rowStep
+    const canvas = e.target as HTMLCanvasElement
+    const rect = canvas.getBoundingClientRect()
+    const cssScale = rect.width / canvas.width
+    const dx = (e.clientX - panStartX) / (CELL_W * cssScale)
+    const dy = (e.clientY - panStartY) / (CELL_H * cssScale)
     cameraX.value = panCamStartX - dx
     cameraY.value = panCamStartY - dy
     updateCamera()
   }
 
   const rect = (e.target as HTMLCanvasElement).getBoundingClientRect()
-  const canvasX = e.clientX - rect.left
-  const canvasY = e.clientY - rect.top
+  const canvas = e.target as HTMLCanvasElement
+  const scaleX = canvas.width / rect.width
+  const scaleY = canvas.height / rect.height
+  const canvasX = (e.clientX - rect.left) * scaleX
+  const canvasY = (e.clientY - rect.top) * scaleY
   hoveredCell.value = renderer.screenToWorld(canvasX, canvasY, activeZ.value)
 }
 
@@ -171,8 +178,11 @@ function onCanvasClick(e: MouseEvent) {
   if (!renderer || !world.value) return
   shiftHeld.value = e.shiftKey
   const rect = (e.target as HTMLCanvasElement).getBoundingClientRect()
-  const canvasX = e.clientX - rect.left
-  const canvasY = e.clientY - rect.top
+  const canvas = e.target as HTMLCanvasElement
+  const scaleX = canvas.width / rect.width
+  const scaleY = canvas.height / rect.height
+  const canvasX = (e.clientX - rect.left) * scaleX
+  const canvasY = (e.clientY - rect.top) * scaleY
   const pos = renderer.screenToWorld(canvasX, canvasY, activeZ.value)
 
   if (effectiveTool.value === 'draw') {

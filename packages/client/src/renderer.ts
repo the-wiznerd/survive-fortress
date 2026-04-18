@@ -7,25 +7,22 @@ export class Renderer {
   private cameraX = 0
   private cameraY = 0
 
-  /** Scaled pixel width of one tile on screen. */
-  private destW: number
-  /** Scaled row-advance (= face height) in screen pixels. */
-  private rowStep: number
-
   constructor(
     canvas: HTMLCanvasElement,
     private viewWidth: number,
     private viewHeight: number,
-    private scale: number,
+    scale: number,
   ) {
-    this.destW = CELL_W * scale
-    this.rowStep = CELL_H * scale
     this.world = new WorldRenderer(canvas, viewWidth, viewHeight, scale, '/sprites/sprites.png')
   }
 
   /** Callback invoked when the sprite sheet finishes loading. */
   get onReady() { return this.world.onReady }
   set onReady(cb: (() => void) | null) { this.world.onReady = cb }
+
+  setScale(newScale: number) {
+    this.world.setScale(newScale)
+  }
 
   setCamera(x: number, y: number) {
     this.cameraX = x - Math.floor(this.viewWidth / 2)
@@ -34,8 +31,8 @@ export class Renderer {
 
   /** Convert canvas pixel coordinates to world (x, y). */
   screenToWorld(canvasX: number, canvasY: number): { x: number; y: number } | null {
-    const sx = Math.floor(canvasX / this.destW)
-    const sy = Math.floor(canvasY / this.rowStep)
+    const sx = Math.floor(canvasX / CELL_W)
+    const sy = Math.floor(canvasY / CELL_H)
     if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) return null
     return { x: sx + this.cameraX, y: sy + this.cameraY }
   }
@@ -94,12 +91,12 @@ export class Renderer {
     const sy = cell.y - this.cameraY
     if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) return
 
-    const px = sx * this.destW
-    const py = sy * this.rowStep
+    const px = sx * CELL_W
+    const py = sy * CELL_H
 
     ctx.strokeStyle = color
-    ctx.lineWidth = 2
-    ctx.strokeRect(px + 1, py + 1, this.destW - 2, this.rowStep - 2)
+    ctx.lineWidth = 1
+    ctx.strokeRect(px + 0.5, py + 0.5, CELL_W - 1, CELL_H - 1)
   }
 
   private drawMoveArrows(ctx: CanvasRenderingContext2D, view: GameView) {
@@ -108,9 +105,6 @@ export class Renderer {
 
     const player = view.entities.find(e => String(e.id) === view.playerId)
     if (!player) return
-
-    const cellW = CELL_W * this.scale
-    const cellH = CELL_H * this.scale
 
     let x = player.x
     let y = player.y
@@ -130,8 +124,8 @@ export class Renderer {
       const col = arrowCol(step.dx, step.dy)
       ctx.drawImage(spriteSheet,
         col * CELL_W, ARROW_ROW * CELL_H, CELL_W, CELL_H,
-        sx * cellW, sy * cellH - drawZ * cellH,
-        cellW, cellH)
+        sx * CELL_W, sy * CELL_H - drawZ * CELL_H,
+        CELL_W, CELL_H)
     }
   }
 }

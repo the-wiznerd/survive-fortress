@@ -16,6 +16,15 @@
         :entity="e"
       />
     </div>
+
+    <div class="section settings">
+      <div class="stat">
+        <span class="label">Zoom:</span>
+        <button @click="zoomOut" :disabled="scale <= 1">-</button>
+        <span class="zoom-value">{{ scale }}x</span>
+        <button @click="zoomIn">+</button>
+      </div>
+    </div>
   </aside>
 </template>
 
@@ -28,6 +37,11 @@
   const view = inject<Ref<GameView | null>>('view')!
   const inspectedCell = inject<Ref<{ x: number; y: number } | null>>('inspectedCell')!
   const inspectResult = inject<Ref<InspectResult | null>>('inspectResult')!
+  const scale = inject<Ref<number>>('scale')!
+  const setScale = inject<(s: number) => void>('setScale')!
+
+  const zoomIn = () => setScale(scale.value + 1)
+  const zoomOut = () => setScale(scale.value - 1)
 
   const TICKS_PER_DAY = 100
 

@@ -9,14 +9,14 @@
   display: flex;
   text-transform: uppercase;
   font-size: 0.75rem;
-  height: 100%;
-  width: 100%;
-  min-height: 100svh;
+  height: 100svh;
+  width: 100svw;
   overflow: hidden;
 }
 
 #game-container {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,6 +25,8 @@
 
 canvas {
   image-rendering: pixelated;
+  flex-shrink: 0;
+  max-inline-size: none;
 }
 
 #sidebar {
@@ -33,6 +35,8 @@ canvas {
   overflow-y: auto;
   line-height: 1.5;
   border-inline-start: 2px solid var(--color-darkest-gray);
+  display: flex;
+  flex-direction: column;
 }
 
 .section {
@@ -80,5 +84,36 @@ canvas {
   &.filled {
     background: var(--color-lightest-gray);
     border-color: var(--color-lightest-gray);
+  }
+}
+
+.settings {
+  margin-block-start: auto;
+  padding-block-start: 1.5rem;
+  border-block-start: 1px solid var(--color-darkest-gray);
+
+  button {
+    background: var(--color-darkest-gray);
+    color: var(--color-lightest-gray);
+    border: 1px solid var(--color-gray);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: var(--color-dark-gray);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+
+  .zoom-value {
+    display: inline-block;
+    min-width: 2.5ch;
+    text-align: center;
   }
 }

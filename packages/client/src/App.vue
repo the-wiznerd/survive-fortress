@@ -18,6 +18,7 @@
   const view = ref<GameView | null>(null)
   const inspectedCell = ref<{ x: number; y: number } | null>(null)
   const inspectResult = ref<InspectResult | null>(null)
+  const scale = ref(3)
 
   let renderer: Renderer
   let rafId = 0
@@ -25,6 +26,12 @@
   provide('view', view)
   provide('inspectedCell', inspectedCell)
   provide('inspectResult', inspectResult)
+  provide('scale', scale)
+  provide('setScale', (newScale: number) => {
+    const clamped = Math.max(1, Math.floor(newScale))
+    scale.value = clamped
+    renderer.setScale(clamped)
+  })
   provide('getTraitNames', (entity: ViewEntity): VisibleTraitName[] => {
     return ENTITY_TRAIT_NAMES[entity.type] ?? []
   })

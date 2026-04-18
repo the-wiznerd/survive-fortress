@@ -44,30 +44,26 @@ export class WorldRenderer {
   readonly terrainAtlas = new TerrainAtlas()
   private atlasSource: ImageBitmap | HTMLCanvasElement | null = null
 
-  readonly destW: number
-  readonly rowStep: number
-
   onReady: (() => void) | null = null
 
   constructor(
     private canvas: HTMLCanvasElement,
     readonly viewWidth: number,
     readonly viewHeight: number,
-    readonly scale: number,
+    initialScale: number,
     spritePath: string,
   ) {
-    this.destW = CELL_W * scale
-    this.rowStep = CELL_H * scale
-
-    canvas.width = viewWidth * this.destW
-    canvas.height = this.rowStep * 2 + (viewHeight - 1) * this.rowStep
+    canvas.width = viewWidth * CELL_W
+    canvas.height = CELL_H * 2 + (viewHeight - 1) * CELL_H
+    canvas.style.width = (canvas.width * initialScale) + 'px'
+    canvas.style.height = (canvas.height * initialScale) + 'px'
     this.ctx = canvas.getContext('2d')!
     this.ctx.imageSmoothingEnabled = false
 
     // Offscreen canvas for silhouette rendering.
     this.silhouetteCanvas = document.createElement('canvas')
-    this.silhouetteCanvas.width = 4 * this.destW
-    this.silhouetteCanvas.height = 5 * this.rowStep
+    this.silhouetteCanvas.width = 4 * CELL_W
+    this.silhouetteCanvas.height = 5 * CELL_H
     this.silhouetteCtx = this.silhouetteCanvas.getContext('2d')!
     this.silhouetteCtx.imageSmoothingEnabled = false
 
@@ -98,6 +94,12 @@ export class WorldRenderer {
     }
   }
 
+  /** Update the CSS display scale (must be a positive integer). */
+  setScale(newScale: number) {
+    this.canvas.style.width = (this.canvas.width * newScale) + 'px'
+    this.canvas.style.height = (this.canvas.height * newScale) + 'px'
+  }
+
   get ready(): boolean {
     return this.spriteReady
   }
@@ -126,7 +128,7 @@ export class WorldRenderer {
   ) {
     if (!this.spriteReady) return
 
-    const { ctx, viewWidth, viewHeight, scale } = this
+    const { ctx, viewWidth, viewHeight } = this
     const camX = Math.floor(cameraX)
     const camY = Math.floor(cameraY)
 
@@ -177,7 +179,7 @@ export class WorldRenderer {
     for (const row of terrainRows) {
       row.sort((a, b) => a.entity.z - b.entity.z)
       for (const { entity, sx, sy, renderer } of row) {
-        renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.atlasSource, scale, sx, sy, entity.x, entity.y, entity.z, rc))
+        renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.atlasSource, sx, sy, entity.x, entity.y, entity.z, rc))
       }
     }
 
@@ -191,7 +193,7 @@ export class WorldRenderer {
         if (this.isOccludedByForeground(entity, rc)) {
           this.drawSplitOccluded(entity, sx, sy, renderer, rc)
         } else {
-          renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.atlasSource, scale, sx, sy, entity.x, entity.y, entity.z, rc))
+          renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.atlasSource, sx, sy, entity.x, entity.y, entity.z, rc))
         }
       }
     }
@@ -206,25 +208,23 @@ export class WorldRenderer {
   }
 
   private drawSplitOccluded(entity: RenderEntity, sx: number, sy: number, renderer: EntityRenderer, rc: RenderContext) {
-    const { silhouetteCtx: offCtx, silhouetteCanvas: offCanvas, ctx, scale } = this
-    const cellH = CELL_H * scale
-    const cellW = CELL_W * scale
+    const { silhouetteCtx: offCtx, silhouetteCanvas: offCanvas, ctx } = this
 
     const occZ = rc.occludingMaxZ.get(zKey(entity.x, entity.y + 1))!
-    const clipY = (sy + 1) * cellH - occZ * cellH
+    const clipY = (sy + 1) * CELL_H - occZ * CELL_H
 
     // Visible above clip.
     ctx.save()
     ctx.beginPath()
     ctx.rect(0, 0, ctx.canvas.width, clipY)
     ctx.clip()
-    renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.atlasSource, scale, sx, sy, entity.x, entity.y, entity.z, rc))
+    renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.atlasSource, sx, sy, entity.x, entity.y, entity.z, rc))
     ctx.restore()
 
     // Silhouette below clip.
     const offSx = 1, offSy = 1
     offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height)
-    renderer.render(entity, new DrawContext(offCtx, this.spriteSheet, this.atlasSource, scale, offSx, offSy, entity.x, entity.y, 0, rc))
+    renderer.render(entity, new DrawContext(offCtx, this.spriteSheet, this.atlasSource, offSx, offSy, entity.x, entity.y, 0, rc))
 
     offCtx.globalCompositeOperation = 'source-in'
     offCtx.fillStyle = SILHOUETTE_COLOR
@@ -235,8 +235,8 @@ export class WorldRenderer {
     ctx.beginPath()
     ctx.rect(0, clipY, ctx.canvas.width, ctx.canvas.height - clipY)
     ctx.clip()
-    const dx = (sx - offSx) * cellW
-    const dy = (sy - entity.z - offSy) * cellH
+    const dx = (sx - offSx) * CELL_W
+    const dy = (sy - entity.z - offSy) * CELL_H
     ctx.drawImage(offCanvas, dx, dy)
     ctx.restore()
   }

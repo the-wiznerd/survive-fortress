@@ -118,15 +118,14 @@ export interface RenderContext {
 // ─── Draw Context ───
 
 /**
- * Per-entity drawing context. Captures the sprite sheet, canvas, position,
- * and scale so entity renderers just call dc.draw(col, row).
+ * Per-entity drawing context. Captures the sprite sheet, canvas, and position
+ * so entity renderers just call dc.draw(col, row). All drawing is at 1:1 scale.
  */
 export class DrawContext {
   constructor(
     private ctx: CanvasRenderingContext2D,
     private sheet: HTMLImageElement,
     private atlas: ImageBitmap | HTMLCanvasElement | null,
-    private scale: number,
     private sx: number,
     private sy: number,
     /** World X coordinate. */
@@ -140,23 +139,19 @@ export class DrawContext {
   ) { }
 
   draw(col: number, row: number, w = 1, h = 1, yOff = 0) {
-    const cellW = CELL_W * this.scale
-    const cellH = CELL_H * this.scale
     this.ctx.drawImage(this.sheet,
       col * CELL_W, row * CELL_H, CELL_W * w, CELL_H * h,
-      this.sx * cellW, this.sy * cellH - this.z * cellH + yOff * cellH,
-      cellW * w, cellH * h)
+      this.sx * CELL_W, this.sy * CELL_H - this.z * CELL_H + yOff * CELL_H,
+      CELL_W * w, CELL_H * h)
   }
 
   /** Draw a cell from the generated terrain atlas. */
   drawFromAtlas(col: number, row: number, yOff = 0) {
     if (!this.atlas) return
-    const cellW = CELL_W * this.scale
-    const cellH = CELL_H * this.scale
     this.ctx.drawImage(this.atlas,
       col * CELL_W, row * CELL_H, CELL_W, CELL_H,
-      this.sx * cellW, this.sy * cellH - this.z * cellH + yOff * cellH,
-      cellW, cellH)
+      this.sx * CELL_W, this.sy * CELL_H - this.z * CELL_H + yOff * CELL_H,
+      CELL_W, CELL_H)
   }
 
   get frontOccluded(): boolean {

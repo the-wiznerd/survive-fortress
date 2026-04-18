@@ -18,9 +18,6 @@ export class EditorRenderer {
   private cameraX = 0
   private cameraY = 0
 
-  readonly destW: number
-  readonly rowStep: number
-
   get onReady() { return this.world.onReady }
   set onReady(cb: (() => void) | null) { this.world.onReady = cb }
 
@@ -28,10 +25,8 @@ export class EditorRenderer {
     private canvas: HTMLCanvasElement,
     private viewWidth: number,
     private viewHeight: number,
-    private scale: number,
+    scale: number,
   ) {
-    this.destW = CELL_W * scale
-    this.rowStep = CELL_H * scale
     this.world = new WorldRenderer(canvas, viewWidth, viewHeight, scale, '/sprites/sprites.png')
   }
 
@@ -44,8 +39,8 @@ export class EditorRenderer {
   screenToWorld(canvasX: number, canvasY: number, z: number): { x: number; y: number } {
     const camX = Math.floor(this.cameraX)
     const camY = Math.floor(this.cameraY)
-    const sx = canvasX / this.destW
-    const sy = canvasY / this.rowStep
+    const sx = canvasX / CELL_W
+    const sy = canvasY / CELL_H
     return {
       x: Math.floor(camX + sx),
       y: Math.floor(camY + sy + z),
@@ -68,11 +63,11 @@ export class EditorRenderer {
         const ox = -Math.floor(self.cameraX)
         const oy = -activeZ - Math.floor(self.cameraY)
         if (ox >= 0 && ox < self.viewWidth && oy >= 0 && oy < self.viewHeight) {
-          const cx = ox * self.destW + self.destW / 2
-          const cy = oy * self.rowStep + self.rowStep / 2
+          const cx = ox * CELL_W + CELL_W / 2
+          const cy = oy * CELL_H + CELL_H / 2
           ctx.fillStyle = '#ffffff'
           ctx.beginPath()
-          ctx.arc(cx, cy, 3, 0, Math.PI * 2)
+          ctx.arc(cx, cy, 2, 0, Math.PI * 2)
           ctx.fill()
         }
 
@@ -81,7 +76,7 @@ export class EditorRenderer {
         ctx.lineWidth = 1
         for (let x = 0; x < self.viewWidth; x++) {
           for (let y = 0; y < self.viewHeight; y++) {
-            ctx.strokeRect(x * self.destW, y * self.rowStep, self.destW, self.rowStep)
+            ctx.strokeRect(x * CELL_W, y * CELL_H, CELL_W, CELL_H)
           }
         }
 
@@ -94,8 +89,8 @@ export class EditorRenderer {
               const sprite = PREVIEW_SPRITES[activeType]
               if (sprite) {
                 ctx.globalAlpha = 0.75
-                const dx = hx * self.destW
-                const dy = hy * self.rowStep
+                const dx = hx * CELL_W
+                const dy = hy * CELL_H
                 if (sprite.kind === 'terrain') {
                   if (sprite.atlas) {
                     const atlasSource = self.world.terrainAtlas.bitmap ?? self.world.terrainAtlas.canvas
@@ -106,12 +101,12 @@ export class EditorRenderer {
                       ctx.drawImage(
                         atlasSource,
                         topCell.col * CELL_W, topCell.row * CELL_H, CELL_W, CELL_H,
-                        dx, dy, self.destW, self.rowStep,
+                        dx, dy, CELL_W, CELL_H,
                       )
                       ctx.drawImage(
                         atlasSource,
                         frontCell.col * CELL_W, frontCell.row * CELL_H, CELL_W, CELL_H,
-                        dx, dy + self.rowStep, self.destW, self.rowStep,
+                        dx, dy + CELL_H, CELL_W, CELL_H,
                       )
                     }
                   } else {
@@ -119,26 +114,26 @@ export class EditorRenderer {
                     ctx.drawImage(
                       self.world.spriteSheet,
                       sprite.topCol * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H,
-                      dx, dy, self.destW, self.rowStep,
+                      dx, dy, CELL_W, CELL_H,
                     )
                     ctx.drawImage(
                       self.world.spriteSheet,
                       sprite.frontCol * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H,
-                      dx, dy + self.rowStep, self.destW, self.rowStep,
+                      dx, dy + CELL_H, CELL_W, CELL_H,
                     )
                   }
                 } else {
                   ctx.drawImage(
                     self.world.spriteSheet,
                     sprite.col * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H * sprite.h,
-                    dx, dy + sprite.yOff * self.rowStep, self.destW, self.rowStep * sprite.h,
+                    dx, dy + sprite.yOff * CELL_H, CELL_W, CELL_H * sprite.h,
                   )
                 }
                 ctx.globalAlpha = 1
               }
             } else {
               ctx.fillStyle = 'rgba(230, 60, 60, 0.25)'
-              ctx.fillRect(hx * self.destW, hy * self.rowStep, self.destW, self.rowStep * 2)
+              ctx.fillRect(hx * CELL_W, hy * CELL_H, CELL_W, CELL_H * 2)
             }
           }
         }
