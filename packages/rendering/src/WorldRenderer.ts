@@ -7,6 +7,8 @@ import {
   type RenderContext,
   type RenderEntity,
 } from './types.js'
+import { TerrainAtlas } from './TerrainAtlas.js'
+import { DIRT_DEF, SAND_DEF, GRASS_DEF, STONE_DEF } from './terrainDefs.js'
 import { EntityRenderer } from './entities/EntityRenderer.js'
 import { DirtRenderer } from './entities/DirtRenderer.js'
 import { SandRenderer } from './entities/SandRenderer.js'
@@ -46,6 +48,9 @@ export class WorldRenderer {
   private silhouetteCanvas: HTMLCanvasElement
   private silhouetteCtx: CanvasRenderingContext2D
 
+  readonly terrainAtlas = new TerrainAtlas()
+  private atlasSource: ImageBitmap | HTMLCanvasElement | null = null
+
   readonly destW: number
   readonly rowStep: number
 
@@ -75,8 +80,23 @@ export class WorldRenderer {
 
     this.spriteSheet = new Image()
     this.spriteSheet.src = spritePath
-    this.spriteSheet.onload = () => {
+    this.spriteSheet.onload = async () => {
       this.spriteReady = true
+
+      // Register and generate terrain atlas.
+      this.terrainAtlas.register('dirt', DIRT_DEF)
+      this.terrainAtlas.register('sand', SAND_DEF)
+      this.terrainAtlas.register('grass', GRASS_DEF)
+      this.terrainAtlas.register('stone', STONE_DEF)
+      await this.terrainAtlas.generate()
+      this.atlasSource = this.terrainAtlas.bitmap ?? this.terrainAtlas.canvas
+
+      // Bind atlas variants to renderers.
+      const dirt = ENTITY_RENDERERS.dirt as DirtRenderer
+      dirt.bindAtlas(this.terrainAtlas.getVariants('dirt')!, this.terrainAtlas.getVariants('grass')!)
+        ; (ENTITY_RENDERERS.sand as SandRenderer).bindAtlas(this.terrainAtlas.getVariants('sand')!)
+        ; (ENTITY_RENDERERS.stone as StoneRenderer).bindAtlas(this.terrainAtlas.getVariants('stone')!)
+
       this.onReady?.()
     }
   }
@@ -157,7 +177,7 @@ export class WorldRenderer {
     for (const row of terrainRows) {
       row.sort((a, b) => a.entity.z - b.entity.z)
       for (const { entity, sx, sy, renderer } of row) {
-        renderer.render(entity, new DrawContext(ctx, this.spriteSheet, scale, sx, sy, entity.x, entity.y, entity.z, rc))
+        renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.atlasSource, scale, sx, sy, entity.x, entity.y, entity.z, rc))
       }
     }
 
@@ -171,7 +191,7 @@ export class WorldRenderer {
         if (this.isOccludedByForeground(entity, rc)) {
           this.drawSplitOccluded(entity, sx, sy, renderer, rc)
         } else {
-          renderer.render(entity, new DrawContext(ctx, this.spriteSheet, scale, sx, sy, entity.x, entity.y, entity.z, rc))
+          renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.atlasSource, scale, sx, sy, entity.x, entity.y, entity.z, rc))
         }
       }
     }
@@ -198,13 +218,13 @@ export class WorldRenderer {
     ctx.beginPath()
     ctx.rect(0, 0, ctx.canvas.width, clipY)
     ctx.clip()
-    renderer.render(entity, new DrawContext(ctx, this.spriteSheet, scale, sx, sy, entity.x, entity.y, entity.z, rc))
+    renderer.render(entity, new DrawContext(ctx, this.spriteSheet, this.atlasSource, scale, sx, sy, entity.x, entity.y, entity.z, rc))
     ctx.restore()
 
     // Silhouette below clip.
     const offSx = 1, offSy = 1
     offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height)
-    renderer.render(entity, new DrawContext(offCtx, this.spriteSheet, scale, offSx, offSy, entity.x, entity.y, 0, rc))
+    renderer.render(entity, new DrawContext(offCtx, this.spriteSheet, this.atlasSource, scale, offSx, offSy, entity.x, entity.y, 0, rc))
 
     offCtx.globalCompositeOperation = 'source-in'
     offCtx.fillStyle = SILHOUETTE_COLOR

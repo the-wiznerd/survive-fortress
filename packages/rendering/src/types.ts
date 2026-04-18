@@ -121,6 +121,7 @@ export class DrawContext {
   constructor(
     private ctx: CanvasRenderingContext2D,
     private sheet: HTMLImageElement,
+    private atlas: ImageBitmap | HTMLCanvasElement | null,
     private scale: number,
     private sx: number,
     private sy: number,
@@ -143,6 +144,17 @@ export class DrawContext {
       cellW * w, cellH * h)
   }
 
+  /** Draw a cell from the generated terrain atlas. */
+  drawFromAtlas(col: number, row: number, yOff = 0) {
+    if (!this.atlas) return
+    const cellW = CELL_W * this.scale
+    const cellH = CELL_H * this.scale
+    this.ctx.drawImage(this.atlas,
+      col * CELL_W, row * CELL_H, CELL_W, CELL_H,
+      this.sx * cellW, this.sy * cellH - this.z * cellH + yOff * cellH,
+      cellW, cellH)
+  }
+
   get frontOccluded(): boolean {
     if (!this.isKnown(this.wx, this.wy + 1)) return true
     return this.rc.terrainAt.has(posKey(this.wx, this.wy + 1, this.z))
@@ -162,17 +174,25 @@ export class DrawContext {
     return { n, e, w }
   }
 
-  drawTerrain(tv: TerrainVariants) {
+  drawTerrain(tv: TerrainVariants, fromAtlas = false) {
     const { n, e, w } = this.edgeFlags()
     const isTop = this.z === this.rc.maxZ.get(zKey(this.wx, this.wy))
     const aboveUnknown = isTop
       && this.rc.knownColumns.size > 0
       && this.z + 1 > this.rc.playerZ + this.rc.verticalRange
     const top = aboveUnknown ? tv.unknownTop : tv.topFaces[n * 4 + e * 2 + w]
-    this.draw(top.col, top.row)
+    if (fromAtlas) {
+      this.drawFromAtlas(top.col, top.row)
+    } else {
+      this.draw(top.col, top.row)
+    }
     if (!this.frontOccluded) {
       const front = tv.frontFaces[e * 2 + w]
-      this.draw(front.col, front.row, 1, 1, 1)
+      if (fromAtlas) {
+        this.drawFromAtlas(front.col, front.row, 1)
+      } else {
+        this.draw(front.col, front.row, 1, 1, 1)
+      }
     }
   }
 }

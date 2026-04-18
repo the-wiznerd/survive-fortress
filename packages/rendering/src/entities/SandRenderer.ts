@@ -1,13 +1,18 @@
 import type { RenderEntity, DrawContext } from '../types.js'
-import { terrainVariants } from '../types.js'
+import type { TerrainVariantCells } from '../TerrainAtlas.js'
 import { EntityRenderer } from './EntityRenderer.js'
 
-const SAND = terrainVariants(0, 7)
+let SAND: TerrainVariantCells | undefined
 
 export class SandRenderer extends EntityRenderer {
   readonly terrain = true
 
+  bindAtlas(sand: TerrainVariantCells) {
+    SAND = sand
+  }
+
   render(entity: RenderEntity, dc: DrawContext) {
-    dc.drawTerrain(SAND)
+    if (!SAND) return
+    dc.drawTerrain(SAND, true)
   }
 }

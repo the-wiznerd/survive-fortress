@@ -1,18 +1,25 @@
 import type { RenderEntity, DrawContext } from '../types.js'
-import { terrainVariants } from '../types.js'
+import type { TerrainVariantCells } from '../TerrainAtlas.js'
 import { EntityRenderer } from './EntityRenderer.js'
 
-const DIRT = terrainVariants(0, 0)
-const GRASS = terrainVariants(0, 14)
+let DIRT: TerrainVariantCells | undefined
+let GRASS: TerrainVariantCells | undefined
 
 export class DirtRenderer extends EntityRenderer {
   readonly terrain = true
 
+  /** Called by WorldRenderer after atlas generation. */
+  bindAtlas(dirt: TerrainVariantCells, grass: TerrainVariantCells) {
+    DIRT = dirt
+    GRASS = grass
+  }
+
   render(entity: RenderEntity, dc: DrawContext) {
-    dc.drawTerrain(DIRT)
+    if (!DIRT) return
+    dc.drawTerrain(DIRT, true)
     const cover = (entity.traits.groundCover as { cover?: string } | undefined)?.cover
-    if (cover === 'grass') {
-      dc.drawTerrain(GRASS)
+    if (cover === 'grass' && GRASS) {
+      dc.drawTerrain(GRASS, true)
     }
   }
 }

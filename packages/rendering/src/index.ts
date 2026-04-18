@@ -14,6 +14,8 @@ export {
   type RenderContext,
 } from './types.js'
 
+export { TerrainAtlas, type TerrainDef, type TerrainVariantCells } from './TerrainAtlas.js'
+
 export { EntityRenderer } from './entities/EntityRenderer.js'
 export { DirtRenderer } from './entities/DirtRenderer.js'
 export { SandRenderer } from './entities/SandRenderer.js'

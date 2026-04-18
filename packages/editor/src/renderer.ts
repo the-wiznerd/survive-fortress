@@ -1,15 +1,15 @@
-import { WorldRenderer, CELL_W, CELL_H, type RenderEntity } from '@repo/rendering'
+import { WorldRenderer, CELL_W, CELL_H, type RenderEntity, type TerrainVariantCells } from '@repo/rendering'
 
 /** Preview sprite info per entity type. */
-type TerrainPreview = { kind: 'terrain'; topCol: number; frontCol: number; row: number }
+type TerrainPreview = { kind: 'terrain'; atlas: true } | { kind: 'terrain'; atlas: false; topCol: number; frontCol: number; row: number }
 type UprightPreview = { kind: 'upright'; col: number; row: number; h: number; yOff: number }
 type PreviewSprite = TerrainPreview | UprightPreview
 
 const PREVIEW_SPRITES: Record<string, PreviewSprite> = {
-  dirt: { kind: 'terrain', topCol: 0, frontCol: 4, row: 0 },
-  sand: { kind: 'terrain', topCol: 7, frontCol: 11, row: 0 },
-  stone: { kind: 'terrain', topCol: 21, frontCol: 25, row: 0 },
-  water: { kind: 'terrain', topCol: 0, frontCol: 4, row: 2 },
+  dirt: { kind: 'terrain', atlas: true },
+  sand: { kind: 'terrain', atlas: true },
+  stone: { kind: 'terrain', atlas: true },
+  water: { kind: 'terrain', atlas: false, topCol: 0, frontCol: 4, row: 2 },
   player: { kind: 'upright', col: 0, row: 14, h: 2, yOff: -0.25 },
 }
 
@@ -97,18 +97,36 @@ export class EditorRenderer {
                 const dx = hx * self.destW
                 const dy = hy * self.rowStep
                 if (sprite.kind === 'terrain') {
-                  // Top face
-                  ctx.drawImage(
-                    self.world.spriteSheet,
-                    sprite.topCol * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H,
-                    dx, dy, self.destW, self.rowStep,
-                  )
-                  // Front face
-                  ctx.drawImage(
-                    self.world.spriteSheet,
-                    sprite.frontCol * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H,
-                    dx, dy + self.rowStep, self.destW, self.rowStep,
-                  )
+                  if (sprite.atlas) {
+                    const atlasSource = self.world.terrainAtlas.bitmap ?? self.world.terrainAtlas.canvas
+                    const variants = self.world.terrainAtlas.getVariants(activeType)
+                    if (atlasSource && variants) {
+                      const topCell = variants.topFaces[0] // flat variant
+                      const frontCell = variants.frontFaces[0]
+                      ctx.drawImage(
+                        atlasSource,
+                        topCell.col * CELL_W, topCell.row * CELL_H, CELL_W, CELL_H,
+                        dx, dy, self.destW, self.rowStep,
+                      )
+                      ctx.drawImage(
+                        atlasSource,
+                        frontCell.col * CELL_W, frontCell.row * CELL_H, CELL_W, CELL_H,
+                        dx, dy + self.rowStep, self.destW, self.rowStep,
+                      )
+                    }
+                  } else {
+                    // Sprite-sheet based terrain (water).
+                    ctx.drawImage(
+                      self.world.spriteSheet,
+                      sprite.topCol * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H,
+                      dx, dy, self.destW, self.rowStep,
+                    )
+                    ctx.drawImage(
+                      self.world.spriteSheet,
+                      sprite.frontCol * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H,
+                      dx, dy + self.rowStep, self.destW, self.rowStep,
+                    )
+                  }
                 } else {
                   ctx.drawImage(
                     self.world.spriteSheet,
