@@ -1,4 +1,5 @@
 import type { World, EntityId } from '@repo/state'
+import { Trait } from '~engine/traits/Trait.js'
 
 export class TickCounter extends Trait {
   declare counter: number

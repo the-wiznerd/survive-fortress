@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
-import { EditorRenderer } from './renderer'
+import { EditorRenderer } from '~editor/renderer'
 import { CELL_W, TOP_H } from '@repo/rendering'
-import { listSaves } from './connection'
+import { listSaves } from '~editor/connection'
 import {
   world,
   currentSaveName,
@@ -12,7 +12,7 @@ import {
   placeEntity,
   deleteEntities,
   getEntities,
-} from './world'
+} from '~editor/world'
 
 const PALETTE_TYPES = ['dirt', 'sand', 'stone', 'water', 'player']
 

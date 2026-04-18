@@ -11,29 +11,23 @@ This is a Yarn 4 workspaces monorepo with Turborepo orchestration. Four packages
 
 Each library package (state, engine, server) builds to `dist/` with Vite lib mode + `vite-plugin-dts`. Package.json exports point to `dist/` (both `import` and `types`). `turbo build` runs them in dependency order.
 
-## Auto-Imports — Internal Only
+## Import Conventions
 
-Each package uses `unplugin-auto-import` to auto-import **its own internal** exports. Cross-package imports are always explicit.
+Each package has a `~pkg` path alias in both vite.config.ts and tsconfig.json (e.g., `~engine/*` → `./src/*`).
 
 ### Rules
 
-- **Do not add imports for same-package values or types.** They are auto-imported via the `~pkg` alias (e.g., `~engine`, `~client`).
-- **Do add explicit imports for cross-package dependencies.** Example: `import { createWorld, type World } from '@repo/state'` in engine code.
-- The generated `auto-imports.d.ts` in each package provides IDE support. Do not hand-edit.
-- Each package also has a `~pkg` path alias in both vite.config.ts and tsconfig.json (e.g., `~engine/*` → `./src/*`).
-
-### What still needs explicit imports
-
-- **Cross-package dependencies** like `import { World } from '@repo/state'` in engine files.
-- **Third-party libraries** like `vitest` (`import { describe, it, expect } from 'vitest'`).
+- **Use tilde imports for same-package imports.** Example: `import { Trait } from '~engine/traits/Trait.js'` in engine code.
+- **Use explicit `@repo/` imports for cross-package dependencies.** Example: `import { createWorld, type World } from '@repo/state'` in engine code.
+- **Never use relative imports** (`./` or `../`). Always use tilde aliases.
+- **Third-party libraries** like `vitest` need explicit imports (`import { describe, it, expect } from 'vitest'`).
 
 ### Adding new exports
 
 When you add a new public function or type to a package:
 1. Export it from the relevant source file as usual.
-2. **Same-package values** are auto-discovered by `scanExports()` — no manual config changes needed.
-3. If it's a **class used as a type annotation** in engine, add a corresponding entry in `src/types.d.ts`.
-4. Run `turbo build` to regenerate `auto-imports.d.ts` files.
+2. If it should be part of the package's public API, re-export it from `src/index.ts`.
+3. Run `turbo build` to regenerate declaration files.
 
 ## Server SDK
 

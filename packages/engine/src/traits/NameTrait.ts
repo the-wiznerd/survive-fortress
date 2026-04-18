@@ -1,4 +1,5 @@
 import type { Name } from '@repo/state'
+import { Trait } from '~engine/traits/Trait.js'
 
 export class NameTrait extends Trait<'name'> {
   readonly component = 'name' as const

@@ -9,9 +9,12 @@
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, provide, toRef } from 'vue'
   import type { GameView, ViewEntity, InspectResult, VisibleTraitName } from '@repo/server/sdk'
-  import { ENTITY_TRAIT_NAMES } from './entityTraits'
-  import { settings } from './settings'
-  import Sidebar from './components/Sidebar.vue'
+  import { ENTITY_TRAIT_NAMES } from '~client/entityTraits'
+  import { settings } from '~client/settings'
+  import { Renderer } from '~client/renderer'
+  import { bindInput, getHoveredCell, getInspectedCell } from '~client/input'
+  import { init, startTickLoop, getView, getGame } from '~client/game'
+  import Sidebar from '~client/components/Sidebar.vue'
 
   const canvasRef = ref<HTMLCanvasElement | null>(null)
 

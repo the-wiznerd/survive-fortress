@@ -1,3 +1,8 @@
+import { BaseEntityType } from '~engine/entityTypes/BaseEntityType.js'
+import { OccludingTrait } from '~engine/traits/OccludingTrait.js'
+import { MoistureTrait } from '~engine/traits/MoistureTrait.js'
+import { GroundCoverTrait } from '~engine/traits/GroundCoverTrait.js'
+
 const GRASS_THRESHOLD = 3
 
 export class Dirt extends BaseEntityType {

@@ -5,6 +5,7 @@ import {
   getComponent,
   getEntitiesAt
 } from '@repo/state'
+import { Trait } from '~engine/traits/Trait.js'
 
 export class VisionTrait extends Trait<'vision'> {
   readonly component = 'vision' as const

@@ -1,5 +1,5 @@
-import type { RenderEntity, DrawContext } from '../types.js'
-import { EntityRenderer } from './EntityRenderer.js'
+import type { RenderEntity, DrawContext } from '~rendering/types.js'
+import { EntityRenderer } from '~rendering/entities/EntityRenderer.js'
 
 const SPRITE_COL = 0
 const SPRITE_ROW = 14

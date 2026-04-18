@@ -1,4 +1,5 @@
 import { addComponent, type World, type EntityId, type EntityType } from '@repo/state'
+import { Trait } from '~engine/traits/Trait.js'
 
 export class EntityTypeTrait extends Trait<'entityType'> {
   readonly component = 'entityType' as const

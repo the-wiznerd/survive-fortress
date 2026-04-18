@@ -1,6 +1,6 @@
 import { WebSocketServer } from 'ws'
-import type { EditorRequest } from './sdk/types.js'
-import { handleRequest } from './handlers.js'
+import type { EditorRequest } from '~editor-server/sdk/types.js'
+import { handleRequest } from '~editor-server/handlers.js'
 
 const PORT = 5175
 

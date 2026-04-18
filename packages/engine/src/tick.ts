@@ -1,4 +1,8 @@
 import type { World } from '@repo/state'
+import { movementSystem } from '~engine/systems/movement.js'
+import { hungerSystem } from '~engine/systems/hunger.js'
+import { moistureSystem } from '~engine/systems/moisture.js'
+import { entityTypeTickSystem } from '~engine/systems/entityTypeTick.js'
 
 export type System = (world: World) => void
 

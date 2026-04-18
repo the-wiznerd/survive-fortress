@@ -11,7 +11,7 @@ import {
   importWorld,
   VisionTrait,
 } from '@repo/engine'
-import type { Game, GameView, ViewEntity, PlayerAction, VisibleTraitName } from './types.js'
+import type { Game, GameView, ViewEntity, PlayerAction, VisibleTraitName, InspectResult } from '~server/sdk/types.js'
 
 /** Trait names the client is allowed to see when inspecting entities. */
 const VISIBLE_TRAITS: VisibleTraitName[] = ['health', 'hunger', 'movement', 'moisture', 'groundCover', 'vision']

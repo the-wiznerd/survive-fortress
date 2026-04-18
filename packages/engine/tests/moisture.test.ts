@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import { createWorld, createEntity, setPosition, addComponent, getComponent, type World } from '@repo/state'
+import { registerEntityType, spawnEntity } from '~engine/registry.js'
+import { Dirt } from '~engine/entityTypes/Dirt.js'
+import { moistureSystem } from '~engine/systems/moisture.js'
+import { tick } from '~engine/tick.js'
 
 beforeAll(() => {
   registerEntityType('dirt', Dirt)

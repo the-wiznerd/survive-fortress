@@ -1,4 +1,6 @@
 import type { World, EntityId, Movement } from '@repo/state'
+import { Trait } from '~engine/traits/Trait.js'
+import { TickCounter } from '~engine/traits/TickCounter.js'
 
 export class MovementTrait extends Trait<'movement'> {
   readonly component = 'movement' as const

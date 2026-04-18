@@ -11,7 +11,7 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["scanExports.ts"],
+  "include": [],
   "references": [
     { "path": "packages/state" },
     { "path": "packages/engine" },

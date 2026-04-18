@@ -17,7 +17,7 @@ import {
   spawnEntity,
 } from '@repo/engine'
 import type { RenderEntity } from '@repo/rendering'
-import { loadWorld, saveWorld } from './connection'
+import { loadWorld, saveWorld } from '~editor/connection'
 import { ref, shallowRef } from 'vue'
 
 /** Current ECS world instance. */

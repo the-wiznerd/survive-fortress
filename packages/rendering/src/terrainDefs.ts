@@ -1,4 +1,4 @@
-import type { TerrainDef } from './TerrainAtlas.js'
+import type { TerrainDef } from '~rendering/TerrainAtlas.js'
 
 /**
  * Placeholder terrain draw functions.

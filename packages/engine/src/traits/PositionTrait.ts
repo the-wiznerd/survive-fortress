@@ -1,4 +1,5 @@
 import { removeFromSpatialIndex, addToSpatialIndex, type World, type EntityId, type Position } from '@repo/state'
+import { Trait } from '~engine/traits/Trait.js'
 
 export class PositionTrait extends Trait<'position'> {
   readonly component = 'position' as const

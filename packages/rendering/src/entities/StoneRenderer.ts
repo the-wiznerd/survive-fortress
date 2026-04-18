@@ -1,7 +1,7 @@
-import type { RenderEntity, DrawContext } from '../types.js'
-import type { TerrainDef, TerrainVariantCells } from '../TerrainAtlas.js'
-import { EntityRenderer } from './EntityRenderer.js'
-import { Colors } from '../colors.js'
+import type { RenderEntity, DrawContext } from '~rendering/types.js'
+import type { TerrainDef, TerrainVariantCells } from '~rendering/TerrainAtlas.js'
+import { EntityRenderer } from '~rendering/entities/EntityRenderer.js'
+import { Colors } from '~rendering/colors.js'
 
 let STONE: TerrainVariantCells | undefined
 

@@ -1,5 +1,6 @@
 import { createLocalGame, type Game, type GameView } from '@repo/server/sdk'
-import { setOnQueueChange, advanceQueue, type MoveStep } from './input'
+import { setOnQueueChange, advanceQueue, type MoveStep } from '~client/input'
+import { Renderer } from '~client/renderer'
 
 // ─── Game State ───
 

@@ -1,4 +1,5 @@
 import type { World, EntityId, Occluding } from '@repo/state'
+import { Trait } from '~engine/traits/Trait.js'
 
 export class OccludingTrait extends Trait<'occluding'> {
   readonly component = 'occluding' as const

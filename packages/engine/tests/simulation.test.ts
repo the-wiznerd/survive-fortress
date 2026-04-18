@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { createWorld, getComponent } from '@repo/state'
+import { registerEntityType, spawnEntity } from '~engine/registry.js'
+import { Player } from '~engine/entityTypes/Player.js'
+import { tick, simulate } from '~engine/tick.js'
 
 registerEntityType('player', Player)
 

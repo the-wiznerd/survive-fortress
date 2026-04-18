@@ -14,5 +14,5 @@
       "~engine/*": ["./src/*"]
     }
   },
-  "include": ["src", "tests", "auto-imports.d.ts"]
+  "include": ["src", "tests"]
 }

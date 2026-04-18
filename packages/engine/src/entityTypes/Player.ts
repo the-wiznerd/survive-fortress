@@ -1,3 +1,11 @@
+import { BaseEntityType } from '~engine/entityTypes/BaseEntityType.js'
+import { NameTrait } from '~engine/traits/NameTrait.js'
+import { HealthTrait } from '~engine/traits/HealthTrait.js'
+import { HungerTrait } from '~engine/traits/HungerTrait.js'
+import { MovementTrait } from '~engine/traits/MovementTrait.js'
+import { VisionTrait } from '~engine/traits/VisionTrait.js'
+import { PlayerControlledTrait } from '~engine/traits/PlayerControlledTrait.js'
+
 export class Player extends BaseEntityType {
   type = 'player'
   name = this.addTrait(new NameTrait(this.world, this.id))

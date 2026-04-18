@@ -1,4 +1,5 @@
 import { queryEntities, getComponent, type World, type Action } from '@repo/state'
+import { MovementTrait } from '~engine/traits/MovementTrait.js'
 
 export function movementSystem(world: World) {
   for (const id of queryEntities(world, 'movement', 'position')) {

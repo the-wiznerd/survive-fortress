@@ -32,17 +32,9 @@ Server SDK (GameView)
   → Sidebar.vue / EntityCard.vue show selected entity details
 ```
 
-## Auto-Imports
+## Imports
 
-`unplugin-auto-import` scans three directories and makes all exports globally available **within the client package**:
-
-- `src/`
-- `src/rendering/`
-- `src/rendering/entities/`
-
-This means `DrawContext`, `EntityRenderer`, `terrainVariants`, `CELL_W`, `posKey`, `zKey`, all renderer classes, and other exports from these dirs need no import statement. The generated `auto-imports.d.ts` provides IDE support.
-
-**Not auto-imported:** Vue components in `src/components/` and third-party libraries. These require explicit imports.
+Use tilde imports for all within-package imports: `import { Renderer } from '~client/rendering/renderer.js'`. Use `@repo/server/sdk` for server SDK imports. Never use relative imports.
 
 ## Rendering Pipeline
 

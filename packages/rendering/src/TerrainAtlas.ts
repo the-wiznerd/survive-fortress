@@ -1,4 +1,6 @@
 
+import { CELL_W, TOP_H, FRONT_H, ATLAS_ROW_H } from '~rendering/types.js'
+
 /**
  * A draw function that renders a terrain face onto a 16×12 pixel canvas.
  * The canvas context is pre-translated so (0,0) is the top-left of the cell.

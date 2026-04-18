@@ -1,4 +1,5 @@
 import type { PlayerAction } from '@repo/server/sdk'
+import type { Renderer } from '~client/renderer'
 
 // ─── Move Queue ───
 

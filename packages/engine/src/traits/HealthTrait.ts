@@ -1,4 +1,5 @@
 import type { Health } from '@repo/state'
+import { Trait } from '~engine/traits/Trait.js'
 
 export class HealthTrait extends Trait<'health'> {
   readonly component = 'health' as const

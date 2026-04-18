@@ -14,5 +14,5 @@
       "~editor-server/*": ["./src/*"]
     }
   },
-  "include": ["src", "auto-imports.d.ts"]
+  "include": ["src"]
 }

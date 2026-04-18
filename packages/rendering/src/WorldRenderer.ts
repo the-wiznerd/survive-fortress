@@ -1,11 +1,11 @@
-import { type RenderContext, type RenderEntity, DrawContext } from './types.js'
-import type { TerrainDef } from './TerrainAtlas.js'
-import { EntityRenderer } from './entities/EntityRenderer.js'
-import { DirtRenderer } from './entities/DirtRenderer.js'
-import { SandRenderer } from './entities/SandRenderer.js'
-import { StoneRenderer } from './entities/StoneRenderer.js'
-import { WaterRenderer } from './entities/WaterRenderer.js'
-import { PlayerRenderer } from './entities/PlayerRenderer.js'
+import { type RenderContext, type RenderEntity, DrawContext, CELL_W, TOP_H, FRONT_H, zKey, posKey } from '~rendering/types.js'
+import { TerrainAtlas, type TerrainDef } from '~rendering/TerrainAtlas.js'
+import { EntityRenderer } from '~rendering/entities/EntityRenderer.js'
+import { DirtRenderer } from '~rendering/entities/DirtRenderer.js'
+import { SandRenderer } from '~rendering/entities/SandRenderer.js'
+import { StoneRenderer } from '~rendering/entities/StoneRenderer.js'
+import { WaterRenderer } from '~rendering/entities/WaterRenderer.js'
+import { PlayerRenderer } from '~rendering/entities/PlayerRenderer.js'
 
 /** Registry of entity type name → renderer instance. */
 const ENTITY_RENDERERS: Record<string, EntityRenderer> = {
@@ -24,7 +24,7 @@ export interface RenderHooks {
   onAfterEntities?: (ctx: CanvasRenderingContext2D) => void
 }
 
-import { Colors } from './colors.js'
+import { Colors } from '~rendering/colors.js'
 
 /** Silhouette color for occluded upright entities. */
 const SILHOUETTE_COLOR = Colors.gray

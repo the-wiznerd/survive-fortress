@@ -1,4 +1,5 @@
 import { createEntity, addComponent, type World, type EntityId } from '@repo/state'
+import { BaseEntityType } from '~engine/entityTypes/BaseEntityType.js'
 
 // ─── Entity Type Constructor ───
 

@@ -10,6 +10,8 @@ import {
   type EntitySave,
   type WorldManifest,
 } from '@repo/state'
+import { spawnEntity } from '~engine/registry.js'
+import { BaseEntityType } from '~engine/entityTypes/BaseEntityType.js'
 
 // ─── Export: ECS → Save Format ───
 

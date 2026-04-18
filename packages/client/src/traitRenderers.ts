@@ -1,7 +1,7 @@
 import type { Component } from 'vue'
 import type { TraitViews, VisibleTraitName } from '@repo/server/sdk'
-import StatText from './components/traits/StatText.vue'
-import MovementBar from './components/traits/MovementBar.vue'
+import StatText from '~client/components/traits/StatText.vue'
+import MovementBar from '~client/components/traits/MovementBar.vue'
 
 type TraitRendererMap = {
   [K in VisibleTraitName]?: {

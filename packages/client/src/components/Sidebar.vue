@@ -32,7 +32,7 @@
   import { computed, inject } from 'vue'
   import type { Ref } from 'vue'
   import type { GameView, ViewEntity, InspectResult } from '@repo/server/sdk'
-  import EntityCard from './EntityCard.vue'
+  import EntityCard from '~client/components/EntityCard.vue'
 
   const view = inject<Ref<GameView | null>>('view')!
   const inspectedCell = inject<Ref<{ x: number; y: number } | null>>('inspectedCell')!

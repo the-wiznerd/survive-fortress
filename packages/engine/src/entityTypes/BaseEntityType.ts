@@ -1,4 +1,6 @@
 import type { World, EntityId } from '@repo/state'
+import { Trait } from '~engine/traits/Trait.js'
+import { PositionTrait } from '~engine/traits/PositionTrait.js'
 
 export abstract class BaseEntityType {
   abstract type: string

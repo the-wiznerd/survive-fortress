@@ -1,6 +1,6 @@
 import type { GameView, ViewEntity } from '@repo/server/sdk'
 import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, zKey, type RenderEntity, type EntityRenderer } from '@repo/rendering'
-import { getMoveQueue } from './input'
+import { getMoveQueue } from '~client/input'
 
 export class Renderer {
   private world: WorldRenderer
