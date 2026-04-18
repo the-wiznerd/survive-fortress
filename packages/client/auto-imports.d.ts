@@ -21,6 +21,81 @@ declare global {
   const settings: typeof import('~client/settings').settings
   const TRAIT_RENDERERS: typeof import('~client/traitRenderers').TRAIT_RENDERERS
   const renderTrait: typeof import('~client/traitRenderers').renderTrait
+  const TerrainAtlas: typeof import('~rendering/../../rendering/src/TerrainAtlas').TerrainAtlas
+  const WorldRenderer: typeof import('~rendering/../../rendering/src/WorldRenderer').WorldRenderer
+  const Colors: typeof import('~rendering/../../rendering/src/colors').Colors
+  const placeholder: typeof import('~rendering/../../rendering/src/terrainDefs').placeholder
+  const CELL_W: typeof import('~rendering/../../rendering/src/types').CELL_W
+  const CELL_H: typeof import('~rendering/../../rendering/src/types').CELL_H
+  const TOP_H: typeof import('~rendering/../../rendering/src/types').TOP_H
+  const FRONT_H: typeof import('~rendering/../../rendering/src/types').FRONT_H
+  const ATLAS_ROW_H: typeof import('~rendering/../../rendering/src/types').ATLAS_ROW_H
+  const TOP_VARIANT: typeof import('~rendering/../../rendering/src/types').TOP_VARIANT
+  const FRONT_VARIANT: typeof import('~rendering/../../rendering/src/types').FRONT_VARIANT
+  const terrainVariants: typeof import('~rendering/../../rendering/src/types').terrainVariants
+  const zKey: typeof import('~rendering/../../rendering/src/types').zKey
+  const posKey: typeof import('~rendering/../../rendering/src/types').posKey
+  const DrawContext: typeof import('~rendering/../../rendering/src/types').DrawContext
+  const DirtRenderer: typeof import('~rendering/../../rendering/src/entities/DirtRenderer').DirtRenderer
+  const EntityRenderer: typeof import('~rendering/../../rendering/src/entities/EntityRenderer').EntityRenderer
+  const PlayerRenderer: typeof import('~rendering/../../rendering/src/entities/PlayerRenderer').PlayerRenderer
+  const SandRenderer: typeof import('~rendering/../../rendering/src/entities/SandRenderer').SandRenderer
+  const StoneRenderer: typeof import('~rendering/../../rendering/src/entities/StoneRenderer').StoneRenderer
+  const WaterRenderer: typeof import('~rendering/../../rendering/src/entities/WaterRenderer').WaterRenderer
+  const bootstrap: typeof import('~engine/../../engine/src/bootstrap').bootstrap
+  const registerEntityType: typeof import('~engine/../../engine/src/registry').registerEntityType
+  const getEntityTypeConstructor: typeof import('~engine/../../engine/src/registry').getEntityTypeConstructor
+  const getRegisteredTypes: typeof import('~engine/../../engine/src/registry').getRegisteredTypes
+  const spawnEntity: typeof import('~engine/../../engine/src/registry').spawnEntity
+  const exportChunk: typeof import('~engine/../../engine/src/serialization').exportChunk
+  const exportManifest: typeof import('~engine/../../engine/src/serialization').exportManifest
+  const importChunk: typeof import('~engine/../../engine/src/serialization').importChunk
+  const importWorld: typeof import('~engine/../../engine/src/serialization').importWorld
+  const tick: typeof import('~engine/../../engine/src/tick').tick
+  const simulate: typeof import('~engine/../../engine/src/tick').simulate
+  const entityTypeTickSystem: typeof import('~engine/../../engine/src/systems/entityTypeTick').entityTypeTickSystem
+  const hungerSystem: typeof import('~engine/../../engine/src/systems/hunger').hungerSystem
+  const moistureSystem: typeof import('~engine/../../engine/src/systems/moisture').moistureSystem
+  const movementSystem: typeof import('~engine/../../engine/src/systems/movement').movementSystem
+  const EntityTypeTrait: typeof import('~engine/../../engine/src/traits/EntityTypeTrait').EntityTypeTrait
+  const GroundCoverTrait: typeof import('~engine/../../engine/src/traits/GroundCoverTrait').GroundCoverTrait
+  const HealthTrait: typeof import('~engine/../../engine/src/traits/HealthTrait').HealthTrait
+  const HungerTrait: typeof import('~engine/../../engine/src/traits/HungerTrait').HungerTrait
+  const MoistureTrait: typeof import('~engine/../../engine/src/traits/MoistureTrait').MoistureTrait
+  const MovementTrait: typeof import('~engine/../../engine/src/traits/MovementTrait').MovementTrait
+  const NameTrait: typeof import('~engine/../../engine/src/traits/NameTrait').NameTrait
+  const OccludingTrait: typeof import('~engine/../../engine/src/traits/OccludingTrait').OccludingTrait
+  const PlayerControlledTrait: typeof import('~engine/../../engine/src/traits/PlayerControlledTrait').PlayerControlledTrait
+  const PositionTrait: typeof import('~engine/../../engine/src/traits/PositionTrait').PositionTrait
+  const TickCounter: typeof import('~engine/../../engine/src/traits/TickCounter').TickCounter
+  const Trait: typeof import('~engine/../../engine/src/traits/Trait').Trait
+  const VisionTrait: typeof import('~engine/../../engine/src/traits/VisionTrait').VisionTrait
+  const BaseEntityType: typeof import('~engine/../../engine/src/entityTypes/BaseEntityType').BaseEntityType
+  const Dirt: typeof import('~engine/../../engine/src/entityTypes/Dirt').Dirt
+  const Player: typeof import('~engine/../../engine/src/entityTypes/Player').Player
+  const Sand: typeof import('~engine/../../engine/src/entityTypes/Sand').Sand
+  const Stone: typeof import('~engine/../../engine/src/entityTypes/Stone').Stone
+  const Water: typeof import('~engine/../../engine/src/entityTypes/Water').Water
+  const TICKS_PER_DAY: typeof import('~state/../../state/src/ecs').TICKS_PER_DAY
+  const createWorld: typeof import('~state/../../state/src/ecs').createWorld
+  const createEntity: typeof import('~state/../../state/src/ecs').createEntity
+  const addComponent: typeof import('~state/../../state/src/ecs').addComponent
+  const getComponent: typeof import('~state/../../state/src/ecs').getComponent
+  const hasComponent: typeof import('~state/../../state/src/ecs').hasComponent
+  const removeEntity: typeof import('~state/../../state/src/ecs').removeEntity
+  const queryEntities: typeof import('~state/../../state/src/ecs').queryEntities
+  const getEntitiesAt: typeof import('~state/../../state/src/ecs').getEntitiesAt
+  const getEntitiesInColumn: typeof import('~state/../../state/src/ecs').getEntitiesInColumn
+  const addToSpatialIndex: typeof import('~state/../../state/src/ecs').addToSpatialIndex
+  const removeFromSpatialIndex: typeof import('~state/../../state/src/ecs').removeFromSpatialIndex
+  const setPosition: typeof import('~state/../../state/src/ecs').setPosition
+  const getNeighborCoords: typeof import('~state/../../state/src/ecs').getNeighborCoords
+  const buildFaces2d: typeof import('~state/../../state/src/faces').buildFaces2d
+  const buildFaces3d: typeof import('~state/../../state/src/faces').buildFaces3d
+  const intDiv: typeof import('~state/../../state/src/math').intDiv
+  const chunkKey: typeof import('~state/../../state/src/save').chunkKey
+  const parseChunkKey: typeof import('~state/../../state/src/save').parseChunkKey
+  const createLocalGame: typeof import('~server/../../server/src/sdk/localGame').createLocalGame
 }
 // for type re-export
 declare global {
@@ -30,4 +105,106 @@ declare global {
   // @ts-ignore
   export type { Renderer } from '~client/renderer'
   import('~client/renderer')
+  // @ts-ignore
+  export type { TerrainAtlas, FaceDrawFn, TerrainDef, TerrainVariantCells } from '~rendering/../../rendering/src/TerrainAtlas'
+  import('~rendering/../../rendering/src/TerrainAtlas')
+  // @ts-ignore
+  export type { WorldRenderer, RenderHooks } from '~rendering/../../rendering/src/WorldRenderer'
+  import('~rendering/../../rendering/src/WorldRenderer')
+  // @ts-ignore
+  export type { DrawContext, StaticSprite, AnimatedSprite, TerrainVariants, RenderEntity, RenderContext } from '~rendering/../../rendering/src/types'
+  import('~rendering/../../rendering/src/types')
+  // @ts-ignore
+  export type { DirtRenderer } from '~rendering/../../rendering/src/entities/DirtRenderer'
+  import('~rendering/../../rendering/src/entities/DirtRenderer')
+  // @ts-ignore
+  export type { EntityRenderer } from '~rendering/../../rendering/src/entities/EntityRenderer'
+  import('~rendering/../../rendering/src/entities/EntityRenderer')
+  // @ts-ignore
+  export type { PlayerRenderer } from '~rendering/../../rendering/src/entities/PlayerRenderer'
+  import('~rendering/../../rendering/src/entities/PlayerRenderer')
+  // @ts-ignore
+  export type { SandRenderer } from '~rendering/../../rendering/src/entities/SandRenderer'
+  import('~rendering/../../rendering/src/entities/SandRenderer')
+  // @ts-ignore
+  export type { StoneRenderer } from '~rendering/../../rendering/src/entities/StoneRenderer'
+  import('~rendering/../../rendering/src/entities/StoneRenderer')
+  // @ts-ignore
+  export type { WaterRenderer } from '~rendering/../../rendering/src/entities/WaterRenderer'
+  import('~rendering/../../rendering/src/entities/WaterRenderer')
+  // @ts-ignore
+  export type { EntityTypeConstructor } from '~engine/../../engine/src/registry'
+  import('~engine/../../engine/src/registry')
+  // @ts-ignore
+  export type { System } from '~engine/../../engine/src/tick'
+  import('~engine/../../engine/src/tick')
+  // @ts-ignore
+  export type { EntityTypeTrait } from '~engine/../../engine/src/traits/EntityTypeTrait'
+  import('~engine/../../engine/src/traits/EntityTypeTrait')
+  // @ts-ignore
+  export type { GroundCoverTrait } from '~engine/../../engine/src/traits/GroundCoverTrait'
+  import('~engine/../../engine/src/traits/GroundCoverTrait')
+  // @ts-ignore
+  export type { HealthTrait } from '~engine/../../engine/src/traits/HealthTrait'
+  import('~engine/../../engine/src/traits/HealthTrait')
+  // @ts-ignore
+  export type { HungerTrait } from '~engine/../../engine/src/traits/HungerTrait'
+  import('~engine/../../engine/src/traits/HungerTrait')
+  // @ts-ignore
+  export type { MoistureTrait } from '~engine/../../engine/src/traits/MoistureTrait'
+  import('~engine/../../engine/src/traits/MoistureTrait')
+  // @ts-ignore
+  export type { MovementTrait } from '~engine/../../engine/src/traits/MovementTrait'
+  import('~engine/../../engine/src/traits/MovementTrait')
+  // @ts-ignore
+  export type { NameTrait } from '~engine/../../engine/src/traits/NameTrait'
+  import('~engine/../../engine/src/traits/NameTrait')
+  // @ts-ignore
+  export type { OccludingTrait } from '~engine/../../engine/src/traits/OccludingTrait'
+  import('~engine/../../engine/src/traits/OccludingTrait')
+  // @ts-ignore
+  export type { PlayerControlledTrait } from '~engine/../../engine/src/traits/PlayerControlledTrait'
+  import('~engine/../../engine/src/traits/PlayerControlledTrait')
+  // @ts-ignore
+  export type { PositionTrait } from '~engine/../../engine/src/traits/PositionTrait'
+  import('~engine/../../engine/src/traits/PositionTrait')
+  // @ts-ignore
+  export type { TickCounter } from '~engine/../../engine/src/traits/TickCounter'
+  import('~engine/../../engine/src/traits/TickCounter')
+  // @ts-ignore
+  export type { Trait } from '~engine/../../engine/src/traits/Trait'
+  import('~engine/../../engine/src/traits/Trait')
+  // @ts-ignore
+  export type { VisionTrait } from '~engine/../../engine/src/traits/VisionTrait'
+  import('~engine/../../engine/src/traits/VisionTrait')
+  // @ts-ignore
+  export type { BaseEntityType } from '~engine/../../engine/src/entityTypes/BaseEntityType'
+  import('~engine/../../engine/src/entityTypes/BaseEntityType')
+  // @ts-ignore
+  export type { Dirt } from '~engine/../../engine/src/entityTypes/Dirt'
+  import('~engine/../../engine/src/entityTypes/Dirt')
+  // @ts-ignore
+  export type { Player } from '~engine/../../engine/src/entityTypes/Player'
+  import('~engine/../../engine/src/entityTypes/Player')
+  // @ts-ignore
+  export type { Sand } from '~engine/../../engine/src/entityTypes/Sand'
+  import('~engine/../../engine/src/entityTypes/Sand')
+  // @ts-ignore
+  export type { Stone } from '~engine/../../engine/src/entityTypes/Stone'
+  import('~engine/../../engine/src/entityTypes/Stone')
+  // @ts-ignore
+  export type { Water } from '~engine/../../engine/src/entityTypes/Water'
+  import('~engine/../../engine/src/entityTypes/Water')
+  // @ts-ignore
+  export type { EntityId, ComponentTypes, ComponentName, Position, Health, Hunger, Movement, PlayerControlled, EntityType, Moisture, GroundCover, Occluding, Vision, Name, Instance, Action, World } from '~state/../../state/src/ecs'
+  import('~state/../../state/src/ecs')
+  // @ts-ignore
+  export type { Face } from '~state/../../state/src/faces'
+  import('~state/../../state/src/faces')
+  // @ts-ignore
+  export type { WorldManifest, ChunkRef, ChunkData, EntitySave } from '~state/../../state/src/save'
+  import('~state/../../state/src/save')
+  // @ts-ignore
+  export type { TraitViews, VisibleTraitName, GameView, ViewEntity, PlayerAction, InspectResult, Game } from '~server/../../server/src/sdk/types'
+  import('~server/../../server/src/sdk/types')
 }
