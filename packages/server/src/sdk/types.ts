@@ -1,4 +1,4 @@
-import type { Health, Hunger, Movement, Moisture, GroundCover } from '@repo/state'
+import type { Health, Hunger, Movement, Moisture, GroundCover, Vision } from '@repo/state'
 
 // ─── Trait Views ───
 // What the client receives for each visible trait.
@@ -11,6 +11,7 @@ export interface TraitViews {
   movement: Movement & { timer: { counter: number; threshold: number } }
   moisture: Moisture
   groundCover: GroundCover
+  vision: Vision
 }
 
 /** A trait name the client is allowed to see. */
@@ -25,7 +26,7 @@ export interface GameView {
   tick: number
   playerId: string
   entities: ViewEntity[]
-  /** Set of "x,y,z" keys the player can see — used by renderer for edge logic. */
+  /** Set of "x,y,z" keys the player can see — used by renderer for entity filtering. */
   visiblePositions: Set<string>
 }
 

@@ -1,5 +1,5 @@
 import type { GameView, ViewEntity } from '@repo/server/sdk'
-import { WorldRenderer, CELL_W, CELL_H, type RenderEntity, type EntityRenderer } from '@repo/rendering'
+import { WorldRenderer, CELL_W, CELL_H, zKey, type RenderEntity, type EntityRenderer } from '@repo/rendering'
 import { getMoveQueue } from './input'
 
 export class Renderer {
@@ -52,7 +52,23 @@ export class Renderer {
     }))
 
     const self = this
-    this.world.render(entities, this.cameraX, this.cameraY, view.visiblePositions, {
+
+    // Compute known columns from the player's position + vision range.
+    const knownColumns = new Set<number>()
+    const player = view.entities.find(e => String(e.id) === view.playerId)
+    const vision = player?.traits.vision as { range: number } | undefined
+    if (player && vision) {
+      const r2 = vision.range * vision.range
+      for (let dx = -vision.range; dx <= vision.range; dx++) {
+        for (let dy = -vision.range; dy <= vision.range; dy++) {
+          if (dx * dx + dy * dy <= r2) {
+            knownColumns.add(zKey(player.x + dx, player.y + dy))
+          }
+        }
+      }
+    }
+
+    this.world.render(entities, this.cameraX, this.cameraY, knownColumns, {
       onAfterTerrain(ctx) {
         self.drawMoveArrows(ctx, view)
       },

@@ -14,7 +14,7 @@ import {
 import type { Game, GameView, ViewEntity, PlayerAction, VisibleTraitName } from './types.js'
 
 /** Trait names the client is allowed to see when inspecting entities. */
-const VISIBLE_TRAITS: VisibleTraitName[] = ['health', 'hunger', 'movement', 'moisture', 'groundCover']
+const VISIBLE_TRAITS: VisibleTraitName[] = ['health', 'hunger', 'movement', 'moisture', 'groundCover', 'vision']
 
 /**
  * Create a local (in-process) game. Engine runs directly — no networking.
@@ -80,7 +80,12 @@ export async function createLocalGame(
       }
       entities.push(buildViewEntity(id))
     }
-    return { tick: world.tick, playerId: String(playerId), entities, visiblePositions: visiblePositions ?? new Set() }
+    return {
+      tick: world.tick,
+      playerId: String(playerId),
+      entities,
+      visiblePositions: visiblePositions ?? new Set(),
+    }
   }
 
   let currentView: GameView = buildView()

@@ -102,7 +102,7 @@ export class WorldRenderer {
     entities: RenderEntity[],
     cameraX: number,
     cameraY: number,
-    knownPositions: Set<string>,
+    knownColumns: Set<number>,
     hooks?: RenderHooks,
   ) {
     if (!this.spriteReady) return
@@ -148,15 +148,6 @@ export class WorldRenderer {
         }
         typeAt.set(posKey(entity.x, entity.y, entity.z), entity.type)
       }
-    }
-    // Build knownColumns from knownPositions.
-    const knownColumns = new Set<number>()
-    for (const key of knownPositions) {
-      const lastComma = key.lastIndexOf(',')
-      const firstComma = key.indexOf(',')
-      const x = parseInt(key.substring(0, firstComma), 10)
-      const y = parseInt(key.substring(firstComma + 1, lastComma), 10)
-      knownColumns.add(zKey(x, y))
     }
     const rc: RenderContext = { maxZ, occludingMaxZ, terrainAt, typeAt, knownColumns, now: performance.now() }
 

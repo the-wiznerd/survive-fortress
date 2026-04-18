@@ -72,9 +72,6 @@ export class VisionTrait extends Trait<'vision'> {
         const wy = pos.y + dy
 
         // ── Downward from entity z ──
-        // Find the highest occluder at or below entity z. Everything between
-        // entity z and that occluder (inclusive) is visible. Non-opaque
-        // entities are visible but don't stop the search.
         for (let z = pos.z; z >= pos.z - upward; z--) {
           if (getEntitiesAt(this.world, wx, wy, z).length > 0) {
             visible.add(`${wx},${wy},${z}`)
@@ -83,8 +80,6 @@ export class VisionTrait extends Trait<'vision'> {
         }
 
         // ── Upward from entity z + 1 ──
-        // All non-opaque entities are visible. The first occluder stops the
-        // search; it is visible only if at least one face is exposed.
         for (let z = pos.z + 1; z <= pos.z + upward; z++) {
           if (this.isOpaque(wx, wy, z)) {
             if (this.isExposed(wx, wy, z)
