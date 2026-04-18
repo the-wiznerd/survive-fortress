@@ -244,6 +244,126 @@
         "y": 1,
         "z": 6
       }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 1,
+        "y": 1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 2,
+        "y": 1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 3,
+        "y": 1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 2,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 3,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 3,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 3,
+        "y": 1,
+        "z": 3
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 3,
+        "y": 1,
+        "z": 4
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": 5
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 3,
+        "y": 1,
+        "z": 5
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": 6
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 3,
+        "y": 1,
+        "z": 6
+      }
     }
   ]
 }

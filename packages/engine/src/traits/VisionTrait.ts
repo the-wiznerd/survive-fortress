@@ -29,13 +29,34 @@ export class VisionTrait extends Trait<'vision'> {
   }
 
   /**
+   * True if at least one of N/S/E/W/top neighbors is NOT opaque.
+   * A fully enclosed tile (all five faces surrounded) is hidden from view.
+   */
+  private isExposed(x: number, y: number, z: number): boolean {
+    return !this.isOpaque(x - 1, y, z)
+      || !this.isOpaque(x + 1, y, z)
+      || !this.isOpaque(x, y - 1, z)
+      || !this.isOpaque(x, y + 1, z)
+      || !this.isOpaque(x, y, z + 1)
+  }
+
+  /**
    * Compute the set of visible positions for this entity.
    *
-   * Horizontal: all (x, y) within `range` Manhattan-ish (Chebyshev) distance.
-   * Vertical: from the lowest z at each (x, y) up to entity.z + upward.
-   * Occluding terrain at z blocks visibility of z-1 and below in that column.
+   * Horizontal: all columns within circular `range` of the entity's (x, y).
    *
-   * Returns spatial-key strings "x,y,z" matching the world's spatialIndex format.
+   * Per column, two vertical searches from entity z (using `upward` as
+   * the vertical range in both directions):
+   *
+   * **Downward:** Walk from entity z toward `entity.z − upward`. Every
+   * position (with entities) is visible. The first opaque position is
+   * included and stops the search. Non-opaque entities (water) don't stop it.
+   *
+   * **Upward:** Walk from `entity.z + 1` toward `entity.z + upward`. Non-
+   * opaque entities are visible. The first opaque position stops the search
+   * and is visible only if it has at least one exposed face (N/S/E/W/top).
+   *
+   * Returns spatial-key strings "x,y,z".
    */
   getVisiblePositions(): Set<string> {
     const pos = getComponent(this.world, this.entityId, 'position')!
@@ -43,32 +64,38 @@ export class VisionTrait extends Trait<'vision'> {
     const visible = new Set<string>()
     const r2 = range * range
 
-    // Derive world min-z from the spatial index so we don't hardcode a floor.
-    let minZ = 0
-    for (const key of this.world.spatialIndex.keys()) {
-      const z = parseInt(key.substring(key.lastIndexOf(',') + 1), 10)
-      if (z < minZ) minZ = z
-    }
-
     for (let dx = -range; dx <= range; dx++) {
       for (let dy = -range; dy <= range; dy++) {
-        // Circular range check.
         if (dx * dx + dy * dy > r2) continue
 
         const wx = pos.x + dx
         const wy = pos.y + dy
-        const maxZ = pos.z + upward
 
-        // Walk column top-down. Once we hit opaque terrain, everything below is hidden.
-        for (let z = maxZ; z >= minZ; z--) {
-          // Check if there are any entities at this position at all.
-          const entitiesHere = getEntitiesAt(this.world, wx, wy, z)
-          if (entitiesHere.length > 0) {
+        // ── Downward from entity z ──
+        // Find the highest occluder at or below entity z. Everything between
+        // entity z and that occluder (inclusive) is visible. Non-opaque
+        // entities are visible but don't stop the search.
+        for (let z = pos.z; z >= pos.z - upward; z--) {
+          if (getEntitiesAt(this.world, wx, wy, z).length > 0) {
             visible.add(`${wx},${wy},${z}`)
           }
-
-          // If opaque terrain is here, stop — can't see below.
           if (this.isOpaque(wx, wy, z)) break
+        }
+
+        // ── Upward from entity z + 1 ──
+        // All non-opaque entities are visible. The first occluder stops the
+        // search; it is visible only if at least one face is exposed.
+        for (let z = pos.z + 1; z <= pos.z + upward; z++) {
+          if (this.isOpaque(wx, wy, z)) {
+            if (this.isExposed(wx, wy, z)
+              && getEntitiesAt(this.world, wx, wy, z).length > 0) {
+              visible.add(`${wx},${wy},${z}`)
+            }
+            break
+          }
+          if (getEntitiesAt(this.world, wx, wy, z).length > 0) {
+            visible.add(`${wx},${wy},${z}`)
+          }
         }
       }
     }
@@ -85,18 +112,23 @@ export class VisionTrait extends Trait<'vision'> {
     const dx = x - pos.x
     const dy = y - pos.y
 
-    // Range check.
     if (dx * dx + dy * dy > this.range * this.range) return false
+    if (z > pos.z + this.upward || z < pos.z - this.upward) return false
 
-    // Above upward limit.
-    if (z > pos.z + this.upward) return false
-
-    // Column walk: from top down to target z, check for opaque blockers.
-    const maxZ = pos.z + this.upward
-    for (let cz = maxZ; cz > z; cz--) {
-      if (this.isOpaque(x, y, cz)) return false
+    if (z <= pos.z) {
+      // Downward: any occluder between entity z and target blocks visibility.
+      for (let cz = pos.z; cz > z; cz--) {
+        if (this.isOpaque(x, y, cz)) return false
+      }
+      return true
     }
 
+    // Upward: any occluder between entity z+1 and target blocks visibility.
+    for (let cz = pos.z + 1; cz < z; cz++) {
+      if (this.isOpaque(x, y, cz)) return false
+    }
+    // If the target itself is opaque, it must be exposed.
+    if (this.isOpaque(x, y, z)) return this.isExposed(x, y, z)
     return true
   }
 }
