@@ -40,10 +40,10 @@ export class EditorRenderer {
     const camX = Math.floor(this.cameraX)
     const camY = Math.floor(this.cameraY)
     const sx = canvasX / CELL_W
-    const sy = canvasY / TOP_H
+    const sy = (canvasY + z * FRONT_H) / TOP_H
     return {
       x: Math.floor(camX + sx),
-      y: Math.floor(camY + sy + z),
+      y: Math.floor(camY + sy),
     }
   }
 
