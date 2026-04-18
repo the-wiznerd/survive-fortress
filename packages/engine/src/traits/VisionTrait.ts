@@ -16,7 +16,7 @@ export class VisionTrait extends Trait<'vision'> {
   }
 
   defaults(): Vision {
-    return { horizontalRange: 8, verticalRange: 2, ...this.overrides }
+    return { horizontalRange: 8, verticalRange: 4, ...this.overrides }
   }
 
   /** Check whether an opaque entity exists at (x, y, z). */

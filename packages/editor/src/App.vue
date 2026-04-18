@@ -63,6 +63,21 @@ onMounted(async () => {
   } catch {
     // Server not running
   }
+
+  const param = new URLSearchParams(window.location.search).get('save')
+  if (param && saves.value.includes(param)) {
+    await editorLoadWorld(param)
+  }
+})
+
+watch(currentSaveName, (name) => {
+  const url = new URL(window.location.href)
+  if (name) {
+    url.searchParams.set('save', name)
+  } else {
+    url.searchParams.delete('save')
+  }
+  history.replaceState(null, '', url)
 })
 
 watch(canvasRef, (canvas) => {
