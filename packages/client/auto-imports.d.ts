@@ -18,6 +18,7 @@ declare global {
   const getHoveredCell: typeof import('~client/input').getHoveredCell
   const bindInput: typeof import('~client/input').bindInput
   const Renderer: typeof import('~client/renderer').Renderer
+  const settings: typeof import('~client/settings').settings
   const TRAIT_RENDERERS: typeof import('~client/traitRenderers').TRAIT_RENDERERS
   const renderTrait: typeof import('~client/traitRenderers').renderTrait
 }

@@ -88,18 +88,24 @@ canvas {
 }
 
 .settings {
-  margin-block-start: auto;
+  margin-block: auto 0;
   padding-block-start: 1.5rem;
   border-block-start: 1px solid var(--color-darkest-gray);
+
+  .label {
+    margin-inline-end: 0.75ch;
+  }
 
   button {
     background: var(--color-darkest-gray);
     color: var(--color-lightest-gray);
-    border: 1px solid var(--color-gray);
     font-family: var(--font-mono);
+    border: 0 none;
     font-size: 0.75rem;
     padding: 0.15rem 0.5rem;
     cursor: pointer;
+    position: relative;
+    top: -1px;
 
     &:hover:not(:disabled) {
       background: var(--color-dark-gray);

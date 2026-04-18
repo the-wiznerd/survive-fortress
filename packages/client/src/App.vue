@@ -7,9 +7,10 @@
 
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, provide } from 'vue'
+  import { ref, onMounted, onUnmounted, provide, toRef } from 'vue'
   import type { GameView, ViewEntity, InspectResult, VisibleTraitName } from '@repo/server/sdk'
   import { ENTITY_TRAIT_NAMES } from './entityTraits'
+  import { settings } from './settings'
   import Sidebar from './components/Sidebar.vue'
 
   const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -18,7 +19,7 @@
   const view = ref<GameView | null>(null)
   const inspectedCell = ref<{ x: number; y: number } | null>(null)
   const inspectResult = ref<InspectResult | null>(null)
-  const scale = ref(3)
+  const scale = toRef(settings, 'scale')
 
   let renderer: Renderer
   let rafId = 0
@@ -40,7 +41,7 @@
 
   onMounted(async () => {
     const canvas = canvasRef.value!
-    renderer = new Renderer(canvas, 32, 24, 3)
+    renderer = new Renderer(canvas, 32, 24, settings.scale)
 
     renderer.onReady = () => {
       if (view.value) renderer.render(view.value, getHoveredCell(), getInspectedCell())
