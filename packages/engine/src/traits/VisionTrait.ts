@@ -8,15 +8,15 @@ import {
 
 export class VisionTrait extends Trait<'vision'> {
   readonly component = 'vision' as const
-  declare range: number
-  declare upward: number
+  declare horizontalRange: number
+  declare verticalRange: number
 
   constructor(world: World, entityId: EntityId, private overrides: Partial<Vision> = {}) {
     super(world, entityId)
   }
 
   defaults(): Vision {
-    return { range: 8, upward: 2, ...this.overrides }
+    return { horizontalRange: 8, verticalRange: 2, ...this.overrides }
   }
 
   /** Check whether an opaque entity exists at (x, y, z). */
@@ -43,44 +43,54 @@ export class VisionTrait extends Trait<'vision'> {
   /**
    * Compute the set of visible positions for this entity.
    *
-   * Horizontal: all columns within circular `range` of the entity's (x, y).
+   * Horizontal: all columns within circular `horizontalRange` of the entity's
+   * (x, y).
    *
-   * Per column, two vertical searches from entity z (using `upward` as
-   * the vertical range in both directions):
+   * Per column, two vertical searches from entity z (using `verticalRange`
+   * in both directions):
    *
-   * **Downward:** Walk from entity z toward `entity.z − upward`. Every
+   * **Downward:** Walk from entity z toward `entity.z − verticalRange`. Every
    * position (with entities) is visible. The first opaque position is
    * included and stops the search. Non-opaque entities (water) don't stop it.
    *
-   * **Upward:** Walk from `entity.z + 1` toward `entity.z + upward`. Non-
-   * opaque entities are visible. The first opaque position stops the search
+   * **Upward:** Walk from `entity.z + 1` toward `entity.z + verticalRange`.
+   * Non-opaque entities are visible. The first opaque position stops the search
    * and is visible only if it has at least one exposed face (N/S/E/W/top).
    *
    * Returns spatial-key strings "x,y,z".
    */
   getVisiblePositions(): Set<string> {
     const pos = getComponent(this.world, this.entityId, 'position')!
-    const { range, upward } = this
+    const { horizontalRange, verticalRange } = this
     const visible = new Set<string>()
-    const r2 = range * range
+    const r2 = horizontalRange * horizontalRange
 
-    for (let dx = -range; dx <= range; dx++) {
-      for (let dy = -range; dy <= range; dy++) {
+    for (let dx = -horizontalRange; dx <= horizontalRange; dx++) {
+      for (let dy = -horizontalRange; dy <= horizontalRange; dy++) {
         if (dx * dx + dy * dy > r2) continue
 
         const wx = pos.x + dx
         const wy = pos.y + dy
 
         // ── Downward from entity z ──
-        for (let z = pos.z; z >= pos.z - upward; z--) {
-          if (getEntitiesAt(this.world, wx, wy, z).length > 0) {
+        // Everything above the first occluder is fully visible. Once we hit
+        // an occluder, continue in "cliff-face" mode: only add tiles whose
+        // front face is exposed (no opaque neighbor at y+1).
+        let occluded = false
+        for (let z = pos.z; z >= pos.z - verticalRange; z--) {
+          const hasEntities = getEntitiesAt(this.world, wx, wy, z).length > 0
+          const opaque = this.isOpaque(wx, wy, z)
+
+          if (!occluded) {
+            if (hasEntities) visible.add(`${wx},${wy},${z}`)
+            if (opaque) occluded = true
+          } else if (opaque && hasEntities && !this.isOpaque(wx, wy + 1, z)) {
             visible.add(`${wx},${wy},${z}`)
           }
-          if (this.isOpaque(wx, wy, z)) break
         }
 
         // ── Upward from entity z + 1 ──
-        for (let z = pos.z + 1; z <= pos.z + upward; z++) {
+        for (let z = pos.z + 1; z <= pos.z + verticalRange; z++) {
           if (this.isOpaque(wx, wy, z)) {
             if (this.isExposed(wx, wy, z)
               && getEntitiesAt(this.world, wx, wy, z).length > 0) {
@@ -107,13 +117,16 @@ export class VisionTrait extends Trait<'vision'> {
     const dx = x - pos.x
     const dy = y - pos.y
 
-    if (dx * dx + dy * dy > this.range * this.range) return false
-    if (z > pos.z + this.upward || z < pos.z - this.upward) return false
+    if (dx * dx + dy * dy > this.horizontalRange * this.horizontalRange) return false
+    if (z > pos.z + this.verticalRange || z < pos.z - this.verticalRange) return false
 
     if (z <= pos.z) {
-      // Downward: any occluder between entity z and target blocks visibility.
+      // Downward: check if any occluder blocks before the target.
       for (let cz = pos.z; cz > z; cz--) {
-        if (this.isOpaque(x, y, cz)) return false
+        if (this.isOpaque(x, y, cz)) {
+          // Occluded — target is only visible if it's opaque with an exposed front face.
+          return this.isOpaque(x, y, z) && !this.isOpaque(x, y + 1, z)
+        }
       }
       return true
     }

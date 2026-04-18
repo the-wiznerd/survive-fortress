@@ -56,11 +56,11 @@ export class Renderer {
     // Compute known columns from the player's position + vision range.
     const knownColumns = new Set<number>()
     const player = view.entities.find(e => String(e.id) === view.playerId)
-    const vision = player?.traits.vision as { range: number } | undefined
+    const vision = player?.traits.vision as { horizontalRange: number } | undefined
     if (player && vision) {
-      const r2 = vision.range * vision.range
-      for (let dx = -vision.range; dx <= vision.range; dx++) {
-        for (let dy = -vision.range; dy <= vision.range; dy++) {
+      const r2 = vision.horizontalRange * vision.horizontalRange
+      for (let dx = -vision.horizontalRange; dx <= vision.horizontalRange; dx++) {
+        for (let dy = -vision.horizontalRange; dy <= vision.horizontalRange; dy++) {
           if (dx * dx + dy * dy <= r2) {
             knownColumns.add(zKey(player.x + dx, player.y + dy))
           }

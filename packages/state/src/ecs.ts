@@ -71,8 +71,8 @@ export interface Occluding {
 }
 
 export interface Vision {
-  range: number
-  upward: number
+  horizontalRange: number
+  verticalRange: number
 }
 
 export interface Name {
