@@ -3,7 +3,7 @@
     <span class="label">{{ mode.locomotion }}:</span>
     <span class="segments">
       <span
-        v-for="i in mode.pace"
+        v-for="i in (mode.pace - 1)"
         :key="i"
         class="segment"
         :class="{ filled: i <= mode.tickCount }"

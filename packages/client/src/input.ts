@@ -6,8 +6,8 @@ import type { Renderer } from '~client/renderer'
 export interface MoveStep { dx: number; dy: number }
 
 let moveQueue: MoveStep[] = []
-let spaceHeld = false
-let arrowDuringSpace = false
+let shiftHeld = false
+let arrowDuringShift = false
 let onQueueChange: ((front: MoveStep | null) => void) | null = null
 
 /** Register callback fired when the queue front changes. */
@@ -76,18 +76,18 @@ export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelec
       case 'ArrowDown': step = { dx: 0, dy: 1 }; break
       case 'ArrowLeft': step = { dx: -1, dy: 0 }; break
       case 'ArrowRight': step = { dx: 1, dy: 0 }; break
-      case ' ':
-        spaceHeld = true
-        arrowDuringSpace = false
+      case 'Shift':
+        shiftHeld = true
+        arrowDuringShift = false
         return
       case 'r': case 'R': onReload(); return
     }
 
     if (step) {
-      if (spaceHeld) {
+      if (shiftHeld) {
         const wasEmpty = moveQueue.length === 0
         moveQueue.push(step)
-        arrowDuringSpace = true
+        arrowDuringShift = true
         if (wasEmpty) onQueueChange?.(step)
       } else {
         setQueue([step])
@@ -96,11 +96,11 @@ export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelec
   }
 
   const onKeyUp = (e: KeyboardEvent) => {
-    if (e.key === ' ') {
-      if (!arrowDuringSpace) {
+    if (e.key === 'Shift') {
+      if (!arrowDuringShift) {
         setQueue([])
       }
-      spaceHeld = false
+      shiftHeld = false
     }
   }
 
