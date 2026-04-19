@@ -108,7 +108,6 @@ export class Renderer {
 
     let x = player.x
     let y = player.y
-    const drawZ = player.z - 1
 
     // Need sprite sheet access for arrow drawing.
     const spriteSheet = this.world.spriteSheet
@@ -124,7 +123,7 @@ export class Renderer {
       const col = arrowCol(step.dx, step.dy)
       ctx.drawImage(spriteSheet,
         col * CELL_W, ARROW_ROW * CELL_H, CELL_W, CELL_H,
-        sx * CELL_W, sy * TOP_H - drawZ * FRONT_H,
+        sx * CELL_W, sy * TOP_H - player.z * FRONT_H,
         CELL_W, CELL_H)
     }
   }

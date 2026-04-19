@@ -43,18 +43,22 @@ export function getHoveredCell() { return hoveredCell }
 // ─── Binding ───
 
 export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelect: () => void, onReload: () => void): () => void {
-  canvas.addEventListener('click', (e) => {
+  const onClick = (e: MouseEvent) => {
     inspectedCell = canvasToWorld(e, canvas, renderer)
     onSelect()
-  })
+  }
 
-  canvas.addEventListener('mousemove', (e) => {
+  const onMouseMove = (e: MouseEvent) => {
     hoveredCell = canvasToWorld(e, canvas, renderer)
-  })
+  }
 
-  canvas.addEventListener('mouseleave', () => {
+  const onMouseLeave = () => {
     hoveredCell = null
-  })
+  }
+
+  canvas.addEventListener('click', onClick)
+  canvas.addEventListener('mousemove', onMouseMove)
+  canvas.addEventListener('mouseleave', onMouseLeave)
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.repeat) return
@@ -97,6 +101,9 @@ export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelec
   document.addEventListener('keyup', onKeyUp)
 
   return () => {
+    canvas.removeEventListener('click', onClick)
+    canvas.removeEventListener('mousemove', onMouseMove)
+    canvas.removeEventListener('mouseleave', onMouseLeave)
     document.removeEventListener('keydown', onKeyDown)
     document.removeEventListener('keyup', onKeyUp)
   }
