@@ -123,7 +123,7 @@ export class Renderer {
       const col = arrowCol(step.dx, step.dy)
       ctx.drawImage(spriteSheet,
         col * CELL_W, ARROW_ROW * CELL_H, CELL_W, CELL_H,
-        sx * CELL_W, sy * TOP_H - player.z * FRONT_H,
+        sx * CELL_W, (sy + 1) * TOP_H - player.z * FRONT_H,
         CELL_W, CELL_H)
     }
   }

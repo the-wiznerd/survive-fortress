@@ -27,6 +27,13 @@ export function advanceQueue() {
   onQueueChange?.(moveQueue[0] ?? null)
 }
 
+/** Clear the entire queue (called when a move fails). */
+export function clearQueue() {
+  if (moveQueue.length === 0) return
+  moveQueue = []
+  onQueueChange?.(null)
+}
+
 function setQueue(queue: MoveStep[]) {
   moveQueue = queue
   onQueueChange?.(moveQueue[0] ?? null)

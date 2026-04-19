@@ -62,7 +62,8 @@ wss.on('connection', (ws) => {
 
           // Start tick loop, push views.
           intervalId = setInterval(() => {
-            server!.tick()
+            const actionResult = server!.tick()
+            if (actionResult) send(actionResult)
             send({ type: 'view', view: serializeView(server!.getView()) })
           }, TICK_INTERVAL_MS)
           break
@@ -73,7 +74,7 @@ wss.on('connection', (ws) => {
             send({ type: 'error', message: 'Not joined yet' })
             break
           }
-          server.sendAction(msg.action)
+          server.sendAction(msg.actionId, msg.action)
           break
         }
       }

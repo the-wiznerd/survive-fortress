@@ -18,5 +18,6 @@ export type {
   JoinedMessage,
   ViewMessage,
   ServerErrorMessage,
+  ActionResultMessage,
 } from './types.js'
 export { GameServer } from './GameServer.js'

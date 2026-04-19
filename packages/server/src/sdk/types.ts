@@ -59,8 +59,11 @@ export interface Game {
   /** Subscribe to view updates. Called after each tick with the current view. */
   onViewUpdate(cb: (view: GameView) => void): void
 
-  /** Send a player action (queued for next tick). */
-  sendAction(action: PlayerAction): void
+  /** Subscribe to action results. Called when a submitted action is accepted or rejected. */
+  onActionResult(cb: (actionId: string, result: 'accepted' | 'rejected') => void): void
+
+  /** Send a player action with a unique ID (queued for next tick). */
+  sendAction(actionId: string, action: PlayerAction): void
 
   /** Request detailed info about entities at a world position. */
   inspect(x: number, y: number): InspectResult
@@ -87,6 +90,7 @@ export interface JoinMessage {
 
 export interface ActionMessage {
   type: 'action'
+  actionId: string
   action: PlayerAction
 }
 
@@ -109,7 +113,13 @@ export interface ServerErrorMessage {
   message: string
 }
 
-export type ServerMessage = JoinedMessage | ViewMessage | ServerErrorMessage
+export interface ActionResultMessage {
+  type: 'action-result'
+  actionId: string
+  result: 'accepted' | 'rejected'
+}
+
+export type ServerMessage = JoinedMessage | ViewMessage | ServerErrorMessage | ActionResultMessage
 
 /** GameView with visiblePositions as string[] for JSON serialization. */
 export interface SerializedGameView extends Omit<GameView, 'visiblePositions'> {
