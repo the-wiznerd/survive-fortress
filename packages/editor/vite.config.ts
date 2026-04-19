@@ -27,7 +27,7 @@ export default defineConfig({
   ],
   publicDir: path.resolve(import.meta.dirname, '../client/public'),
   server: {
-    port: 5174,
+    port: 5175,
     strictPort: true,
     open: false,
   },

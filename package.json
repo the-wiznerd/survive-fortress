@@ -8,10 +8,10 @@
   "scripts": {
     "test": "turbo test",
     "typecheck": "turbo typecheck",
-    "dev": "turbo watch build dev",
+    "dev": "turbo watch build dev --filter=@repo/server --filter=@repo/client",
+    "dev-all": "turbo watch build dev",
     "build": "turbo build",
-    "editor": "turbo watch build dev --filter=@repo/editor-server --filter=@repo/editor",
-    "dev:kill": "lsof -ti :5173 -ti :5174 -ti :5175 | xargs kill -9 2>/dev/null; echo 'Dev servers killed'"
+    "dev:kill": "lsof -ti :5173 -ti :5174 -ti :5175 -ti :5176 | xargs kill -9 2>/dev/null; echo 'Dev servers killed'"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",

@@ -8,7 +8,7 @@ import type {
   ErrorResponse,
 } from '@repo/editor-server/sdk'
 
-const WS_URL = 'ws://localhost:5175'
+const WS_URL = 'ws://localhost:5176'
 
 type PendingCallback = (response: EditorResponse) => void
 

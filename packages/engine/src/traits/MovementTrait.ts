@@ -8,7 +8,9 @@ export class MovementTrait extends Trait<'movement'> {
   constructor(
     world: World,
     entityId: EntityId,
-    private readonly initialModes: Omit<MovementMode, 'tickCount'>[] = [{ locomotion: 'walk', pace: 1 }],
+    private readonly initialModes: Omit<MovementMode, 'tickCount'>[] = [{
+      locomotion: 'walk', pace: 1
+    }],
   ) {
     super(world, entityId)
   }

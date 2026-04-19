@@ -22,6 +22,6 @@ export default defineConfig({
       formats: ['es'],
       fileName: (_, entryName) => `${entryName}.js`,
     },
-    rollupOptions: { external: [/^@sf\//] },
+    rollupOptions: { external: [/^@sf\//, /^node:/, /^ws/] },
   },
 })

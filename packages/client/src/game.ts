@@ -1,4 +1,4 @@
-import { createLocalGame, type Game, type GameView } from '@repo/server/sdk'
+import type { Game, GameView, ServerMessage, SerializedGameView } from '@repo/server/sdk'
 import { setOnQueueChange, advanceQueue, type MoveStep } from '~client/input'
 import { Renderer } from '~client/renderer'
 
@@ -9,26 +9,68 @@ let currentView: GameView
 let lastPlayerX: number | undefined
 let lastPlayerY: number | undefined
 
+const WS_URL = 'ws://localhost:5174'
 const DEFAULT_SAVE = 'test-world'
 const SAVE_NAME = new URLSearchParams(window.location.search).get('save') ?? DEFAULT_SAVE
-const SAVE_PATH = `/saves/${SAVE_NAME}`
 
 export function getGame(): Game { return game }
 export function getView(): GameView { return currentView }
 
-export async function init(renderer: Renderer) {
-  game = await createLocalGame(async () => {
-    const manifestResp = await fetch(`${SAVE_PATH}/world.json`)
-    const manifest = await manifestResp.json()
+function deserializeView(sv: SerializedGameView): GameView {
+  return { ...sv, visiblePositions: new Set(sv.visiblePositions) }
+}
 
-    const chunks: unknown[] = []
-    for (const ref of Object.values(manifest.chunks)) {
-      const chunkResp = await fetch(`${SAVE_PATH}/chunks/${(ref as any).cx}_${(ref as any).cy}.json`)
-      chunks.push(await chunkResp.json())
+function connectGame(save: string): Promise<Game> {
+  return new Promise((resolve, reject) => {
+    const ws = new WebSocket(WS_URL)
+
+    let viewCallback: ((view: GameView) => void) | null = null
+    let initialView: GameView | null = null
+
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ type: 'join', save }))
     }
 
-    return { manifest, chunks }
+    ws.onerror = () => {
+      reject(new Error('WebSocket connection failed'))
+    }
+
+    ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data) as ServerMessage
+
+      switch (msg.type) {
+        case 'joined':
+          initialView = deserializeView(msg.view)
+          resolve({
+            onViewUpdate(cb) { viewCallback = cb },
+            sendAction(action) { ws.send(JSON.stringify({ type: 'action', action })) },
+            inspect(x, y) {
+              const view = initialView!
+              return { entities: view.entities.filter(e => e.x === x && e.y === y) }
+            },
+            start() { /* tick loop runs on the server */ },
+            stop() { ws.close() },
+            getView() { return initialView! },
+          })
+          break
+
+        case 'view': {
+          const view = deserializeView(msg.view)
+          initialView = view
+          viewCallback?.(view)
+          break
+        }
+
+        case 'error':
+          console.error('Server error:', msg.message)
+          break
+      }
+    }
   })
+}
+
+export async function init(renderer: Renderer) {
+  game = await connectGame(SAVE_NAME)
 
   currentView = game.getView()
 

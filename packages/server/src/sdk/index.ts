@@ -8,6 +8,15 @@ export type {
   PlayerAction,
   InspectResult,
   TraitViews,
-  VisibleTraitName
+  VisibleTraitName,
+  MovementMode,
+  ClientMessage,
+  ServerMessage,
+  SerializedGameView,
+  JoinMessage,
+  ActionMessage,
+  JoinedMessage,
+  ViewMessage,
+  ServerErrorMessage,
 } from './types.js'
-export { createLocalGame } from './localGame.js'
+export { GameServer } from './GameServer.js'

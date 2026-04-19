@@ -1,4 +1,6 @@
-import type { Health, Hunger, Movement, Moisture, GroundCover, Vision } from '@repo/state'
+import type { Health, Hunger, Movement, MovementMode, Moisture, GroundCover, Vision } from '@repo/state'
+
+export type { MovementMode } from '@repo/state'
 
 // ─── Trait Views ───
 // What the client receives for each visible trait.
@@ -8,7 +10,7 @@ export interface TraitViews {
   position: { x: number; y: number; z: number }
   health: Health
   hunger: Hunger
-  movement: Movement & { timer: { counter: number; threshold: number } }
+  movement: Movement
   moisture: Moisture
   groundCover: GroundCover
   vision: Vision
@@ -71,4 +73,45 @@ export interface Game {
 
   /** Get the current view (without waiting for a tick). */
   getView(): GameView
+}
+
+// ─── Game Protocol ───
+// Type-discriminated JSON messages between client (browser) and game server (Node).
+
+// ─── Client → Server ───
+
+export interface JoinMessage {
+  type: 'join'
+  save: string
+}
+
+export interface ActionMessage {
+  type: 'action'
+  action: PlayerAction
+}
+
+export type ClientMessage = JoinMessage | ActionMessage
+
+// ─── Server → Client ───
+
+export interface JoinedMessage {
+  type: 'joined'
+  view: SerializedGameView
+}
+
+export interface ViewMessage {
+  type: 'view'
+  view: SerializedGameView
+}
+
+export interface ServerErrorMessage {
+  type: 'error'
+  message: string
+}
+
+export type ServerMessage = JoinedMessage | ViewMessage | ServerErrorMessage
+
+/** GameView with visiblePositions as string[] for JSON serialization. */
+export interface SerializedGameView extends Omit<GameView, 'visiblePositions'> {
+  visiblePositions: string[]
 }

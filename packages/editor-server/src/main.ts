@@ -2,7 +2,7 @@ import { WebSocketServer } from 'ws'
 import type { EditorRequest } from '~editor-server/sdk/types.js'
 import { handleRequest } from '~editor-server/handlers.js'
 
-const PORT = 5175
+const PORT = 5176
 
 const wss = new WebSocketServer({ port: PORT })
 

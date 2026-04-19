@@ -29,6 +29,10 @@ export function movementSystem(world: World) {
       if (mode.tickCount < mode.pace) mode.tickCount++
     }
 
+    // Only consume the action if at least one mode is ready.
+    const anyReady = movement.modes.some(m => m.tickCount >= m.pace)
+    if (!anyReady) continue
+
     let action: Action | null = null
 
     const pc = getComponent(world, id, 'playerControlled')

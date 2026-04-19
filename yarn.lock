@@ -722,8 +722,11 @@ __metadata:
   dependencies:
     "@repo/engine": "workspace:*"
     "@repo/state": "workspace:*"
+    "@types/ws": "npm:^8.18.0"
+    tsx: "npm:^4.19.0"
     vite: "npm:^6.3.0"
     vite-plugin-dts: "npm:^4.5.0"
+    ws: "npm:^8.18.0"
   languageName: unknown
   linkType: soft
 

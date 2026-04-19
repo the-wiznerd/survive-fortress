@@ -32,8 +32,7 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
   movement: {
     component: MovementBar,
     props: d => ({
-      pace: d.pace,
-      counter: d.timer.counter
+      modes: d.modes
     })
   },
   moisture: {
