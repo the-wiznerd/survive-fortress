@@ -149,7 +149,7 @@ export class DrawContext {
   draw(col: number, row: number, w = 1, h = 1) {
     this.ctx.drawImage(this.sheet,
       col * CELL_W, row * CELL_H, CELL_W * w, CELL_H * h,
-      this.sx * CELL_W, this.sy * TOP_H - (this.z - 1) * FRONT_H - h * CELL_H,
+      this.sx * CELL_W, (this.sy + 1) * TOP_H - (this.z - 1) * FRONT_H - h * CELL_H,
       CELL_W * w, CELL_H * h)
   }
 

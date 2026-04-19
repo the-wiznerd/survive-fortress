@@ -9,15 +9,31 @@ function getMaterialAt(world: World, x: number, y: number, z: number): MaterialT
   return undefined
 }
 
-/** Check whether a locomotion mode can move into dest with the given floor. */
-function canMove(locomotion: string, dest: MaterialType | undefined, floor: MaterialType | undefined): boolean {
+/** Does the floor material (dz - 1) support this locomotion? */
+function floorSupports(locomotion: string, floor: MaterialType | undefined): boolean {
   switch (locomotion) {
-    case 'walk': return dest === undefined && floor === 'solid'
-    case 'swim': return dest === 'liquid'
-    case 'sail': return dest === undefined && floor === 'liquid'
-    case 'fly': return dest === undefined
+    case 'walk': return floor === 'solid'
+    case 'swim': return true          // floor irrelevant — swimmer is immersed
+    case 'sail': return floor === 'liquid'
+    case 'fly': return true           // floor irrelevant — flyer is airborne
     default: return false
   }
+}
+
+/** Does the destination material (dz) block this locomotion? */
+function destBlocks(locomotion: string, dest: MaterialType | undefined): boolean {
+  switch (locomotion) {
+    case 'walk': return dest !== undefined   // any material blocks walking
+    case 'swim': return dest !== 'liquid'    // need liquid to swim into
+    case 'sail': return dest !== undefined   // any material blocks sailing
+    case 'fly': return dest !== undefined    // any material blocks flying
+    default: return true
+  }
+}
+
+/** Check whether a locomotion mode can move into dest with the given floor. */
+function canMove(locomotion: string, dest: MaterialType | undefined, floor: MaterialType | undefined): boolean {
+  return floorSupports(locomotion, floor) && !destBlocks(locomotion, dest)
 }
 
 export function movementSystem(world: World) {
