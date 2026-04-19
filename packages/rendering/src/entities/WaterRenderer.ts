@@ -26,11 +26,11 @@ export class WaterRenderer extends EntityRenderer {
     const water = WATER_FRAMES[frame]
 
     const top = water.topFaces[n * 4 + e * 2 + w]
-    dc.draw(top.col, top.row, 1, 1, Y_OFFSET)
+    dc.drawSheetTop(top.col, top.row, Y_OFFSET)
 
     if (!dc.frontOccluded) {
       const front = water.frontFaces[e * 2 + w]
-      dc.draw(front.col, front.row, 1, 1, 1 + Y_OFFSET)
+      dc.drawSheetFront(front.col, front.row, 1 + Y_OFFSET)
     }
   }
 

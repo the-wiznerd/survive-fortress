@@ -2982,14 +2982,6 @@
       }
     },
     {
-      "entityType": "player",
-      "position": {
-        "x": 12,
-        "y": 3,
-        "z": 1
-      }
-    },
-    {
       "entityType": "water",
       "position": {
         "x": 2,

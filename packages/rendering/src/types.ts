@@ -1,7 +1,7 @@
 /** Width of a grid cell in pixels. */
 export const CELL_W = 16
-/** Height of a sprite-sheet cell (used for non-terrain sprite source). */
-export const CELL_H = 12
+/** Height of a sprite-sheet cell (non-terrain). TOP_H + FRONT_H = 2 × CELL_H. */
+export const CELL_H = 11
 /** Height of a terrain top face and the grid row step. */
 export const TOP_H = 12
 /** Height of a terrain front (side) face. */
@@ -24,31 +24,32 @@ export interface TerrainVariants {
 }
 
 /**
- * Standard layout offsets from base (col, row) for terrain edge variants.
- * Each offset is { dc: column delta, dr: row delta }.
+ * Column offsets from baseCol for terrain edge variants (all on the same row pair).
  *
  * Top face (8 variants, indexed by N*4 + E*2 + W):
- *   Row+0: +0 flat, +1 EW, +2 NEW, +3 NW, +4 N, +5 NE
- *   Row+1: +0 W, +1 E
+ *   +0 flat, +1 EW, +2 W, +3 E, +4 NEW, +5 NW, +6 N, +7 NE
  *
- * Front face (8 variants, indexed by S*4 + E*2 + W):
- *   Row+1: +4 flat, +3 W, +5 E, +2 EW (sprite sheet lacks S variants)
+ * Front face (4 base variants, indexed by E*2 + W, duplicated for S):
+ *   Same columns as first 4 top variants: +0 flat, +1 EW, +2 W, +3 E
+ *
+ * Each row pair is TOP_H + FRONT_H = 22px = 2 × CELL_H.
+ * Top face occupies the first TOP_H pixels, front face the remaining FRONT_H.
  */
-const TOP_OFFSETS: [number, number][] = [
-  [0, 0], // flat
-  [0, 1], // W
-  [1, 1], // E
-  [1, 0], // EW
-  [4, 0], // N
-  [3, 0], // NW
-  [5, 0], // NE
-  [2, 0], // NEW
+const TOP_COL_OFFSETS: number[] = [
+  0, // flat
+  2, // W
+  3, // E
+  1, // EW
+  6, // N
+  5, // NW
+  7, // NE
+  4, // NEW
 ]
-const FRONT_OFFSETS: [number, number][] = [
-  [4, 1], // flat
-  [3, 1], // W
-  [5, 1], // E
-  [2, 1], // EW
+const FRONT_COL_OFFSETS: number[] = [
+  0, // flat
+  2, // W
+  3, // E
+  1, // EW
 ]
 
 /** Top-face edge variant names, indexed by N*4 + E*2 + W. */
@@ -63,11 +64,11 @@ export const FRONT_VARIANT = {
   S: 4, SW: 5, SE: 6, SEW: 7,
 } as const
 
-/** Build a TerrainVariants from a sprite base row and base column. */
+/** Build a TerrainVariants from a sprite-sheet row pair and base column. */
 export function terrainVariants(baseRow: number, baseCol: number): TerrainVariants {
-  const frontFaces = FRONT_OFFSETS.map(([dc, dr]) => ({ col: baseCol + dc, row: baseRow + dr }))
+  const frontFaces = FRONT_COL_OFFSETS.map(dc => ({ col: baseCol + dc, row: baseRow }))
   return {
-    topFaces: TOP_OFFSETS.map(([dc, dr]) => ({ col: baseCol + dc, row: baseRow + dr })),
+    topFaces: TOP_COL_OFFSETS.map(dc => ({ col: baseCol + dc, row: baseRow })),
     // Sprite sheets lack S variants — duplicate the 4 base entries for S=1.
     frontFaces: [...frontFaces, ...frontFaces],
     unknownTop: { col: baseCol + 6, row: baseRow },
@@ -145,11 +146,27 @@ export class DrawContext {
     readonly rc: RenderContext,
   ) { }
 
-  draw(col: number, row: number, w = 1, h = 1, yOff = 0) {
+  draw(col: number, row: number, w = 1, h = 1) {
     this.ctx.drawImage(this.sheet,
       col * CELL_W, row * CELL_H, CELL_W * w, CELL_H * h,
-      this.sx * CELL_W, this.sy * TOP_H - this.z * FRONT_H + yOff * TOP_H,
+      this.sx * CELL_W, this.sy * TOP_H - this.z * FRONT_H - (h - 1) * CELL_H,
       CELL_W * w, CELL_H * h)
+  }
+
+  /** Draw a top face (TOP_H px) from the sprite sheet. row = pair base row in CELL_H grid. */
+  drawSheetTop(col: number, row: number, yOff = 0) {
+    this.ctx.drawImage(this.sheet,
+      col * CELL_W, row * CELL_H, CELL_W, TOP_H,
+      this.sx * CELL_W, this.sy * TOP_H - this.z * FRONT_H + yOff * TOP_H,
+      CELL_W, TOP_H)
+  }
+
+  /** Draw a front face (FRONT_H px) from the sprite sheet. row = pair base row in CELL_H grid. */
+  drawSheetFront(col: number, row: number, yOff = 0) {
+    this.ctx.drawImage(this.sheet,
+      col * CELL_W, row * CELL_H + TOP_H, CELL_W, FRONT_H,
+      this.sx * CELL_W, this.sy * TOP_H - this.z * FRONT_H + yOff * TOP_H,
+      CELL_W, FRONT_H)
   }
 
   /** Draw a cell from the generated terrain atlas. */
@@ -193,14 +210,14 @@ export class DrawContext {
     if (fromAtlas) {
       this.drawFromAtlas(top.col, top.row)
     } else {
-      this.draw(top.col, top.row)
+      this.drawSheetTop(top.col, top.row)
     }
     if (!this.frontOccluded) {
       const front = tv.frontFaces[s * 4 + e * 2 + w]
       if (fromAtlas) {
         this.drawFromAtlas(front.col, front.row, 1, FRONT_H)
       } else {
-        this.draw(front.col, front.row, 1, 1, 1)
+        this.drawSheetFront(front.col, front.row, 1)
       }
     }
   }

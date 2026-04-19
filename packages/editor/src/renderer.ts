@@ -2,15 +2,15 @@ import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, ATLAS_ROW_H, type Render
 
 /** Preview sprite info per entity type. */
 type TerrainPreview = { kind: 'terrain'; atlas: true } | { kind: 'terrain'; atlas: false; topCol: number; frontCol: number; row: number }
-type UprightPreview = { kind: 'upright'; col: number; row: number; h: number; yOff: number }
+type UprightPreview = { kind: 'upright'; col: number; row: number; h: number }
 type PreviewSprite = TerrainPreview | UprightPreview
 
 const PREVIEW_SPRITES: Record<string, PreviewSprite> = {
   dirt: { kind: 'terrain', atlas: true },
   sand: { kind: 'terrain', atlas: true },
   stone: { kind: 'terrain', atlas: true },
-  water: { kind: 'terrain', atlas: false, topCol: 0, frontCol: 4, row: 2 },
-  player: { kind: 'upright', col: 0, row: 14, h: 2, yOff: -0.25 },
+  water: { kind: 'terrain', atlas: false, topCol: 0, frontCol: 0, row: 2 },
+  player: { kind: 'upright', col: 0, row: 12, h: 3 },
 }
 
 export class EditorRenderer {
@@ -114,20 +114,20 @@ export class EditorRenderer {
                     // Sprite-sheet based terrain (water).
                     ctx.drawImage(
                       self.world.spriteSheet,
-                      sprite.topCol * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H,
-                      dx, dy, CELL_W, CELL_H,
+                      sprite.topCol * CELL_W, sprite.row * CELL_H, CELL_W, TOP_H,
+                      dx, dy, CELL_W, TOP_H,
                     )
                     ctx.drawImage(
                       self.world.spriteSheet,
-                      sprite.frontCol * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H,
-                      dx, dy + TOP_H, CELL_W, CELL_H,
+                      sprite.frontCol * CELL_W, sprite.row * CELL_H + TOP_H, CELL_W, FRONT_H,
+                      dx, dy + TOP_H, CELL_W, FRONT_H,
                     )
                   }
                 } else {
                   ctx.drawImage(
                     self.world.spriteSheet,
                     sprite.col * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H * sprite.h,
-                    dx, dy + sprite.yOff * TOP_H, CELL_W, CELL_H * sprite.h,
+                    dx, dy - (sprite.h - 1) * CELL_H, CELL_W, CELL_H * sprite.h,
                   )
                 }
                 ctx.globalAlpha = 1
