@@ -32,7 +32,7 @@ export async function createLocalGame(
   let pendingAction: PlayerAction | null = null
   let viewCallback: ((view: GameView) => void) | null = null
   let intervalId: ReturnType<typeof setInterval> | null = null
-  const TICK_INTERVAL_MS = 1000
+  const TICK_INTERVAL_MS = 500
 
   function buildViewEntity(id: EntityId): ViewEntity {
     const pos = getComponent(world, id, 'position')!

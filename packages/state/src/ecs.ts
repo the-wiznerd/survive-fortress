@@ -18,6 +18,7 @@ export interface ComponentTypes {
   occluding: Occluding
   vision: Vision
   name: Name
+  material: Material
   instance: Instance
 }
 
@@ -42,9 +43,16 @@ export interface Hunger {
   drainPerTick: number
 }
 
-export interface Movement {
-  /** Move once every `pace` ticks. 1 = every tick, 3 = every 3rd tick. */
+export type Locomotion = 'walk' | 'swim' | 'sail' | 'fly'
+
+export interface MovementMode {
+  locomotion: Locomotion
   pace: number
+  tickCount: number
+}
+
+export interface Movement {
+  modes: MovementMode[]
 }
 
 export interface PlayerControlled {
@@ -77,6 +85,12 @@ export interface Vision {
 
 export interface Name {
   name: string
+}
+
+export type MaterialType = 'solid' | 'liquid'
+
+export interface Material {
+  material: MaterialType
 }
 
 export interface Instance {
@@ -118,6 +132,7 @@ export function createWorld(): World {
       occluding: new Map(),
       vision: new Map(),
       name: new Map(),
+      material: new Map(),
       instance: new Map(),
     },
     spatialIndex: new Map(),

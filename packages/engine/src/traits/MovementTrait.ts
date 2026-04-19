@@ -1,20 +1,19 @@
-import type { World, EntityId, Movement } from '@repo/state'
+import type { World, EntityId, Movement, MovementMode } from '@repo/state'
 import { Trait } from '~engine/traits/Trait.js'
-import { TickCounter } from '~engine/traits/TickCounter.js'
 
 export class MovementTrait extends Trait<'movement'> {
   readonly component = 'movement' as const
-  declare pace: number
+  declare modes: MovementMode[]
 
-  timer: TickCounter
-
-  constructor(world: World, entityId: EntityId, private overrides: Partial<Movement> = {}) {
+  constructor(
+    world: World,
+    entityId: EntityId,
+    private readonly initialModes: Omit<MovementMode, 'tickCount'>[] = [{ locomotion: 'walk', pace: 1 }],
+  ) {
     super(world, entityId)
-    const pace = this.overrides.pace ?? 1
-    this.timer = this.addSubTrait('timer', new TickCounter(world, entityId, pace))
   }
 
   defaults(): Movement {
-    return { pace: 1, ...this.overrides }
+    return { modes: this.initialModes.map(m => ({ ...m, tickCount: 0 })) }
   }
 }
