@@ -180,6 +180,11 @@ export class DrawContext {
 
   get frontOccluded(): boolean {
     if (!this.isKnown(this.wx, this.wy + 1)) return true
+    // If the south column is within horizontal vision but has no visible
+    // entities at all, treat it as unknown rather than empty — the column
+    // may be outside vertical vision or fully occluded.
+    if (this.rc.knownColumns.size > 0
+      && !this.rc.maxZ.has(zKey(this.wx, this.wy + 1))) return true
     return this.rc.terrainAt.has(posKey(this.wx, this.wy + 1, this.z))
   }
 
