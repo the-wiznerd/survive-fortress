@@ -1,1 +1,390 @@
-{"cx":1,"cy":0,"entities":[{"entityType":"stone","position":{"x":20,"y":0,"z":0}},{"entityType":"stone","position":{"x":20,"y":1,"z":0}},{"entityType":"stone","position":{"x":20,"y":2,"z":0}},{"entityType":"stone","position":{"x":20,"y":3,"z":0}},{"entityType":"dirt","position":{"x":20,"y":4,"z":0}},{"entityType":"stone","position":{"x":21,"y":3,"z":0}},{"entityType":"stone","position":{"x":21,"y":2,"z":0}},{"entityType":"stone","position":{"x":21,"y":1,"z":0}},{"entityType":"stone","position":{"x":21,"y":0,"z":0}},{"entityType":"dirt","position":{"x":20,"y":5,"z":0}},{"entityType":"dirt","position":{"x":20,"y":6,"z":0}},{"entityType":"dirt","position":{"x":20,"y":7,"z":0}},{"entityType":"dirt","position":{"x":20,"y":8,"z":0}},{"entityType":"dirt","position":{"x":20,"y":9,"z":0}},{"entityType":"dirt","position":{"x":20,"y":10,"z":0}},{"entityType":"dirt","position":{"x":20,"y":11,"z":0}},{"entityType":"dirt","position":{"x":20,"y":12,"z":0}},{"entityType":"dirt","position":{"x":20,"y":15,"z":0}},{"entityType":"dirt","position":{"x":20,"y":16,"z":0}},{"entityType":"dirt","position":{"x":20,"y":17,"z":0}},{"entityType":"dirt","position":{"x":20,"y":18,"z":0}},{"entityType":"dirt","position":{"x":20,"y":19,"z":0}},{"entityType":"stone","position":{"x":21,"y":4,"z":0}},{"entityType":"dirt","position":{"x":21,"y":5,"z":0}},{"entityType":"dirt","position":{"x":21,"y":6,"z":0}},{"entityType":"dirt","position":{"x":21,"y":7,"z":0}},{"entityType":"dirt","position":{"x":21,"y":8,"z":0}},{"entityType":"dirt","position":{"x":21,"y":19,"z":0}},{"entityType":"dirt","position":{"x":21,"y":18,"z":0}},{"entityType":"dirt","position":{"x":21,"y":17,"z":0}},{"entityType":"dirt","position":{"x":21,"y":16,"z":0}},{"entityType":"dirt","position":{"x":21,"y":15,"z":0}},{"entityType":"dirt","position":{"x":21,"y":14,"z":0}},{"entityType":"dirt","position":{"x":21,"y":13,"z":0}},{"entityType":"dirt","position":{"x":21,"y":12,"z":0}},{"entityType":"dirt","position":{"x":21,"y":11,"z":0}},{"entityType":"dirt","position":{"x":21,"y":10,"z":0}},{"entityType":"dirt","position":{"x":21,"y":9,"z":0}},{"entityType":"water","position":{"x":20,"y":13,"z":0}},{"entityType":"water","position":{"x":20,"y":14,"z":0}},{"entityType":"stone","position":{"x":21,"y":0,"z":1}},{"entityType":"stone","position":{"x":21,"y":1,"z":1}},{"entityType":"stone","position":{"x":21,"y":2,"z":1}},{"entityType":"stone","position":{"x":20,"y":0,"z":1}},{"entityType":"stone","position":{"x":20,"y":0,"z":2}},{"entityType":"stone","position":{"x":21,"y":0,"z":2}},{"entityType":"stone","position":{"x":20,"y":0,"z":3}},{"entityType":"stone","position":{"x":21,"y":0,"z":3}}]}
+{
+  "cx": 1,
+  "cy": 0,
+  "entities": [
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": 1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": 2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": 3,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 4,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": 3,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": 2,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": 1,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 5,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 6,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 7,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 8,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 9,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 10,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 11,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 12,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 15,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 16,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 17,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 18,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 20,
+        "y": 19,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": 4,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 5,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 6,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 7,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 8,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 19,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 18,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 17,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 16,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 15,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 14,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 13,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 12,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 11,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 10,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "dirt",
+      "position": {
+        "x": 21,
+        "y": 9,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "water",
+      "position": {
+        "x": 20,
+        "y": 13,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "water",
+      "position": {
+        "x": 20,
+        "y": 14,
+        "z": 0
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": 0,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": 1,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": 2,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": 0,
+        "z": 1
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": 0,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": 0,
+        "z": 2
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 20,
+        "y": 0,
+        "z": 3
+      }
+    },
+    {
+      "entityType": "stone",
+      "position": {
+        "x": 21,
+        "y": 0,
+        "z": 3
+      }
+    }
+  ]
+}

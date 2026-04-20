@@ -1,1 +1,14 @@
-{"cx":-1,"cy":1,"entities":[{"entityType":"water","position":{"x":-1,"y":20,"z":0}}]}
+{
+  "cx": -1,
+  "cy": 1,
+  "entities": [
+    {
+      "entityType": "water",
+      "position": {
+        "x": -1,
+        "y": 20,
+        "z": 0
+      }
+    }
+  ]
+}
