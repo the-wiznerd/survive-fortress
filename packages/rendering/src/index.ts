@@ -1,21 +1,31 @@
 export {
-  CELL_W,
-  CELL_H,
-  TOP_H,
-  FRONT_H,
+  TILE_W as CELL_W,
+  SPRITE_H as CELL_H,
+  TOP_FACE_H as TOP_H,
+  FRONT_FACE_H as FRONT_H,
   ATLAS_ROW_H,
+} from './constants.js'
+
+export {
   TOP_VARIANT,
   FRONT_VARIANT,
   terrainVariants,
-  zKey,
-  posKey,
-  DrawContext,
   type StaticSprite,
   type AnimatedSprite,
   type TerrainVariants,
+} from './sprites.js'
+
+export {
+  zKey,
+  posKey,
+} from './spatial.js'
+
+export {
   type RenderEntity,
   type RenderContext,
-} from './types.js'
+} from './RenderContext.js'
+
+export { DrawContext } from './DrawContext.js'
 
 export { TerrainAtlas, type TerrainDef, type TerrainVariantCells } from './TerrainAtlas.js'
 

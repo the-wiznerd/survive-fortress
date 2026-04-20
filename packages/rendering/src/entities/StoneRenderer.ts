@@ -1,4 +1,5 @@
-import type { RenderEntity, DrawContext } from '~rendering/types.js'
+import type { RenderEntity } from '~rendering/RenderContext.js'
+import type { DrawContext } from '~rendering/DrawContext.js'
 import type { TerrainDef, TerrainVariantCells } from '~rendering/TerrainAtlas.js'
 import { EntityRenderer } from '~rendering/entities/EntityRenderer.js'
 import { Colors } from '~rendering/colors.js'

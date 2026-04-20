@@ -1,5 +1,7 @@
-import type { RenderEntity, DrawContext } from '~rendering/types.js'
-import { terrainVariants, posKey } from '~rendering/types.js'
+import type { RenderEntity } from '~rendering/RenderContext.js'
+import type { DrawContext } from '~rendering/DrawContext.js'
+import { terrainVariants } from '~rendering/sprites.js'
+import { posKey } from '~rendering/spatial.js'
 import { EntityRenderer } from '~rendering/entities/EntityRenderer.js'
 
 const WATER_FRAMES = [

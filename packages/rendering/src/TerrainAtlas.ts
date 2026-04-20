@@ -1,5 +1,5 @@
 
-import { CELL_W, TOP_H, FRONT_H, ATLAS_ROW_H } from '~rendering/types.js'
+import { TILE_W, TOP_FACE_H, FRONT_FACE_H, ATLAS_ROW_H } from '~rendering/constants.js'
 
 /**
  * A draw function that renders a terrain face onto a 16×12 pixel canvas.
@@ -106,7 +106,7 @@ export class TerrainAtlas {
   async generate(): Promise<void> {
     const rows = this.defs.length
     const cols = this.atlasCols
-    const w = cols * CELL_W
+    const w = cols * TILE_W
     const h = rows * ATLAS_ROW_H
 
     const atlas = document.createElement('canvas')
@@ -117,7 +117,7 @@ export class TerrainAtlas {
 
     // Temp canvas for compositing individual cells (base + edges + corners).
     const tmp = document.createElement('canvas')
-    tmp.width = CELL_W
+    tmp.width = TILE_W
     tmp.height = ATLAS_ROW_H
     const tmpCtx = tmp.getContext('2d')!
     tmpCtx.imageSmoothingEnabled = false
@@ -131,7 +131,7 @@ export class TerrainAtlas {
       const topFaces: Cell[] = []
       for (const combo of TOP_EDGE_COMBOS) {
         this.compositeTop(tmpCtx, def, combo.n, combo.e, combo.w)
-        ctx.drawImage(tmp, 0, 0, CELL_W, TOP_H, col * CELL_W, baseY, CELL_W, TOP_H)
+        ctx.drawImage(tmp, 0, 0, TILE_W, TOP_FACE_H, col * TILE_W, baseY, TILE_W, TOP_FACE_H)
         topFaces.push({ col, row: typeIdx })
         col++
       }
@@ -140,15 +140,15 @@ export class TerrainAtlas {
       const frontFaces: Cell[] = []
       for (const combo of FRONT_EDGE_COMBOS) {
         this.compositeFront(tmpCtx, def, combo.s, combo.e, combo.w)
-        ctx.drawImage(tmp, 0, 0, CELL_W, FRONT_H, col * CELL_W, baseY, CELL_W, FRONT_H)
+        ctx.drawImage(tmp, 0, 0, TILE_W, FRONT_FACE_H, col * TILE_W, baseY, TILE_W, FRONT_FACE_H)
         frontFaces.push({ col, row: typeIdx })
         col++
       }
 
       // --- 1 unknown top ---
-      tmpCtx.clearRect(0, 0, CELL_W, TOP_H)
-      def.unknownTop(tmpCtx, CELL_W, TOP_H)
-      ctx.drawImage(tmp, 0, 0, CELL_W, TOP_H, col * CELL_W, baseY, CELL_W, TOP_H)
+      tmpCtx.clearRect(0, 0, TILE_W, TOP_FACE_H)
+      def.unknownTop(tmpCtx, TILE_W, TOP_FACE_H)
+      ctx.drawImage(tmp, 0, 0, TILE_W, TOP_FACE_H, col * TILE_W, baseY, TILE_W, TOP_FACE_H)
       const unknownTop = { col, row: typeIdx }
       col++
 
@@ -165,22 +165,22 @@ export class TerrainAtlas {
     def: TerrainDef,
     n: number, e: number, w: number,
   ) {
-    ctx.clearRect(0, 0, CELL_W, TOP_H)
+    ctx.clearRect(0, 0, TILE_W, TOP_FACE_H)
 
     // 1. Draw base top face.
     ctx.globalCompositeOperation = 'source-over'
-    def.top(ctx, CELL_W, TOP_H)
+    def.top(ctx, TILE_W, TOP_FACE_H)
 
     // 2. Draw 1px edge borders.
     ctx.fillStyle = def.topEdgeColor
-    if (n) ctx.fillRect(0, 0, CELL_W, 1)
-    if (w) ctx.fillRect(0, 0, 1, TOP_H)
-    if (e) ctx.fillRect(CELL_W - 1, 0, 1, TOP_H)
+    if (n) ctx.fillRect(0, 0, TILE_W, 1)
+    if (w) ctx.fillRect(0, 0, 1, TOP_FACE_H)
+    if (e) ctx.fillRect(TILE_W - 1, 0, 1, TOP_FACE_H)
 
     // 3. Erase corner pixels where two edges meet.
     ctx.globalCompositeOperation = 'destination-out'
     if (n && w) ctx.fillRect(0, 0, 1, 1)
-    if (n && e) ctx.fillRect(CELL_W - 1, 0, 1, 1)
+    if (n && e) ctx.fillRect(TILE_W - 1, 0, 1, 1)
 
     ctx.globalCompositeOperation = 'source-over'
   }
@@ -191,22 +191,22 @@ export class TerrainAtlas {
     def: TerrainDef,
     s: number, e: number, w: number,
   ) {
-    ctx.clearRect(0, 0, CELL_W, FRONT_H)
+    ctx.clearRect(0, 0, TILE_W, FRONT_FACE_H)
 
     // 1. Draw base front face.
     ctx.globalCompositeOperation = 'source-over'
-    def.front(ctx, CELL_W, FRONT_H)
+    def.front(ctx, TILE_W, FRONT_FACE_H)
 
     // 2. Draw 1px edge borders.
     ctx.fillStyle = def.frontEdgeColor
-    if (s) ctx.fillRect(0, FRONT_H - 1, CELL_W, 1)
-    if (w) ctx.fillRect(0, 0, 1, FRONT_H)
-    if (e) ctx.fillRect(CELL_W - 1, 0, 1, FRONT_H)
+    if (s) ctx.fillRect(0, FRONT_FACE_H - 1, TILE_W, 1)
+    if (w) ctx.fillRect(0, 0, 1, FRONT_FACE_H)
+    if (e) ctx.fillRect(TILE_W - 1, 0, 1, FRONT_FACE_H)
 
     // 3. Erase corner pixels where two edges meet.
     ctx.globalCompositeOperation = 'destination-out'
-    if (s && w) ctx.fillRect(0, FRONT_H - 1, 1, 1)
-    if (s && e) ctx.fillRect(CELL_W - 1, FRONT_H - 1, 1, 1)
+    if (s && w) ctx.fillRect(0, FRONT_FACE_H - 1, 1, 1)
+    if (s && e) ctx.fillRect(TILE_W - 1, FRONT_FACE_H - 1, 1, 1)
 
     ctx.globalCompositeOperation = 'source-over'
   }

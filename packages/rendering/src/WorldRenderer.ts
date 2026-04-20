@@ -1,4 +1,7 @@
-import { type RenderContext, type RenderEntity, DrawContext, CELL_W, TOP_H, FRONT_H, zKey, posKey } from '~rendering/types.js'
+import { TILE_W, TOP_FACE_H, FRONT_FACE_H } from '~rendering/constants.js'
+import { zKey, posKey } from '~rendering/spatial.js'
+import type { RenderContext, RenderEntity } from '~rendering/RenderContext.js'
+import { DrawContext } from '~rendering/DrawContext.js'
 import { TerrainAtlas, type TerrainDef } from '~rendering/TerrainAtlas.js'
 import { EntityRenderer } from '~rendering/entities/EntityRenderer.js'
 import { DirtRenderer } from '~rendering/entities/DirtRenderer.js'
@@ -53,8 +56,8 @@ export class WorldRenderer {
     initialScale: number,
     spritePath: string,
   ) {
-    canvas.width = viewWidth * CELL_W
-    canvas.height = viewHeight * TOP_H + FRONT_H
+    canvas.width = viewWidth * TILE_W
+    canvas.height = viewHeight * TOP_FACE_H + FRONT_FACE_H
     canvas.style.width = (canvas.width * initialScale) + 'px'
     canvas.style.height = (canvas.height * initialScale) + 'px'
     this.ctx = canvas.getContext('2d')!
@@ -62,8 +65,8 @@ export class WorldRenderer {
 
     // Offscreen canvas for silhouette rendering.
     this.silhouetteCanvas = document.createElement('canvas')
-    this.silhouetteCanvas.width = 4 * CELL_W
-    this.silhouetteCanvas.height = 5 * TOP_H
+    this.silhouetteCanvas.width = 4 * TILE_W
+    this.silhouetteCanvas.height = 5 * TOP_FACE_H
     this.silhouetteCtx = this.silhouetteCanvas.getContext('2d')!
     this.silhouetteCtx.imageSmoothingEnabled = false
 
@@ -211,7 +214,7 @@ export class WorldRenderer {
     const { silhouetteCtx: offCtx, silhouetteCanvas: offCanvas, ctx } = this
 
     const occZ = rc.occludingMaxZ.get(zKey(entity.x, entity.y + 1))!
-    const clipY = (sy + 1) * TOP_H - occZ * FRONT_H
+    const clipY = (sy + 1) * TOP_FACE_H - occZ * FRONT_FACE_H
 
     // Visible above clip.
     ctx.save()
@@ -235,8 +238,8 @@ export class WorldRenderer {
     ctx.beginPath()
     ctx.rect(0, clipY, ctx.canvas.width, ctx.canvas.height - clipY)
     ctx.clip()
-    const dx = (sx - offSx) * CELL_W
-    const dy = (sy - offSy) * TOP_H - entity.z * FRONT_H
+    const dx = (sx - offSx) * TILE_W
+    const dy = (sy - offSy) * TOP_FACE_H - entity.z * FRONT_FACE_H
     ctx.drawImage(offCanvas, dx, dy)
     ctx.restore()
   }

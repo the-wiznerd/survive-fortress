@@ -1,4 +1,5 @@
-import type { RenderEntity, DrawContext } from '~rendering/types.js'
+import type { RenderEntity } from '~rendering/RenderContext.js'
+import type { DrawContext } from '~rendering/DrawContext.js'
 
 /** Base class for entity renderers. */
 export abstract class EntityRenderer {
