@@ -36,17 +36,21 @@ export function moistureSystem(world: World) {
     netDelta.set(entityB, (netDelta.get(entityB) ?? 0) + t)
   }
 
-  // Phase 3: nudge stalled entities. If an entity got zero net delta from
-  // the main transfers but has a neighbor with different moisture, nudge it
-  // by ±1. At most one nudge per entity, so this can't cause oscillation.
+  // Phase 3: nudge stalled pairs. If both entities in a face got zero net
+  // delta from the main transfers and their diff >= 2, transfer 1 from the
+  // higher to the lower. Only one nudge per entity to prevent oscillation.
+  // Diff of 1 is treated as equilibrium to avoid ping-pong.
   for (const { entityA, entityB } of faces) {
     const mA = getComponent(world, entityA, 'moisture')!
     const mB = getComponent(world, entityB, 'moisture')!
-    if (mA.current === mB.current) continue
+    const diff = mA.current - mB.current
+    if (diff < 2 && diff > -2) continue
 
-    if (!netDelta.has(entityA) && mA.current > mB.current) {
+    if (diff > 0 && !netDelta.has(entityA) && !netDelta.has(entityB)) {
       netDelta.set(entityA, -1)
-    } else if (!netDelta.has(entityB) && mB.current > mA.current) {
+      netDelta.set(entityB, 1)
+    } else if (diff < 0 && !netDelta.has(entityA) && !netDelta.has(entityB)) {
+      netDelta.set(entityA, 1)
       netDelta.set(entityB, -1)
     }
   }
