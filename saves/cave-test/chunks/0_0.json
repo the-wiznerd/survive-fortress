@@ -3,7 +3,12 @@
   "cy": 0,
   "entities": [
     {
-      "entityType": "stone"
+      "entityType": "stone",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
     },
     {
       "entityType": "stone",
@@ -26,14 +31,6 @@
       "position": {
         "x": 3,
         "y": 0,
-        "z": 0
-      }
-    },
-    {
-      "entityType": "stone",
-      "position": {
-        "x": 3,
-        "y": 1,
         "z": 0
       }
     },
@@ -435,6 +432,15 @@
         "x": 0,
         "y": 2,
         "z": 1
+      },
+      "movement": {
+        "modes": [
+          {
+            "locomotion": "walk",
+            "pace": 1,
+            "tickCount": 0
+          }
+        ]
       }
     }
   ]

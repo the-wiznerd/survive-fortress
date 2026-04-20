@@ -1,7 +1,12 @@
 import fs from 'fs'
 import path from 'path'
 
-const chunksDir = 'saves/test-world/chunks'
+const saveName = process.argv[2]
+if (!saveName) {
+  console.error('Usage: npx tsx scripts/dedup.ts <save-name>')
+  process.exit(1)
+}
+const chunksDir = `saves/${saveName}/chunks`
 const priority: Record<string, number> = { stone: 0, sand: 1, dirt: 2, water: 3 }
 let removed = 0
 

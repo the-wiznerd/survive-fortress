@@ -3,7 +3,12 @@
   "cy": 0,
   "entities": [
     {
-      "entityType": "stone"
+      "entityType": "stone",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
     },
     {
       "entityType": "stone",
@@ -59,6 +64,15 @@
         "x": 0,
         "y": 0,
         "z": 2
+      },
+      "movement": {
+        "modes": [
+          {
+            "locomotion": "walk",
+            "pace": 1,
+            "tickCount": 0
+          }
+        ]
       }
     },
     {
@@ -122,126 +136,6 @@
       "position": {
         "x": 3,
         "y": 0,
-        "z": 6
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 0,
-        "y": 1,
-        "z": 0
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 1,
-        "y": 1,
-        "z": 0
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 2,
-        "y": 1,
-        "z": 0
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 3,
-        "y": 1,
-        "z": 0
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 0,
-        "y": 1,
-        "z": 1
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 2,
-        "y": 1,
-        "z": 1
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 3,
-        "y": 1,
-        "z": 1
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 2,
-        "y": 1,
-        "z": 2
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 3,
-        "y": 1,
-        "z": 2
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 3,
-        "y": 1,
-        "z": 3
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 3,
-        "y": 1,
-        "z": 4
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 3,
-        "y": 1,
-        "z": 5
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 0,
-        "y": 1,
-        "z": 5
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 0,
-        "y": 1,
-        "z": 6
-      }
-    },
-    {
-      "entityType": "dirt",
-      "position": {
-        "x": 3,
-        "y": 1,
         "z": 6
       }
     },
@@ -336,7 +230,7 @@
     {
       "entityType": "stone",
       "position": {
-        "x": 0,
+        "x": 3,
         "y": 1,
         "z": 5
       }
@@ -344,7 +238,7 @@
     {
       "entityType": "stone",
       "position": {
-        "x": 3,
+        "x": 0,
         "y": 1,
         "z": 5
       }
