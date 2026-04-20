@@ -23,6 +23,7 @@ let currentView: GameView
 let resolveFrames: GameView[] = []
 let resolveIndex = 0
 let resolveTimerId: ReturnType<typeof setTimeout> | null = null
+let maxPlanActions = 8
 
 const PLAYBACK_TICK_MS = 250
 
@@ -47,6 +48,7 @@ export function onPlanChange(cb: (plan: readonly PlayerAction[]) => void) { plan
 
 export function appendMove(dx: number, dy: number) {
   if (phase !== 'planning') return
+  if (plan.length >= maxPlanActions) return
   plan.push({ type: 'move', dx, dy })
   planChangeCallback?.(plan)
 }
@@ -59,7 +61,8 @@ export function clearPlan() {
 
 export function submitPlan() {
   if (phase !== 'planning') return
-  game.submitPlan(plan)
+  const actions = plan.slice(0, maxPlanActions)
+  game.submitPlan(actions)
   plan = []
   planChangeCallback?.(plan)
   setPhase('submitted')
@@ -147,6 +150,7 @@ function startPlayback(frames: GameView[], renderer: Renderer, onDone: () => voi
 
 export async function init(renderer: Renderer, onUpdate: () => void) {
   game = await connectGame(SAVE_NAME)
+  maxPlanActions = game.actionsPerRound
 
   currentView = game.getView()
 

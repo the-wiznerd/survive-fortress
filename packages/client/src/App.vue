@@ -1,5 +1,5 @@
 <template>
-  <div id="game-container">
+  <div id="game-container" :class="`phase-${phase}`">
     <canvas ref="canvasRef"></canvas>
   </div>
   <Sidebar />
@@ -13,7 +13,7 @@
   import { settings } from '~client/settings'
   import { Renderer } from '~client/renderer'
   import { bindInput, getHoveredCell, getInspectedCell, setInputPhase } from '~client/input'
-  import { init, getView, getGame, onPhaseChange } from '~client/game'
+  import { init, getView, getGame, onPhaseChange, type RoundPhase } from '~client/game'
   import { debugInit } from '~client/debug'
   import Sidebar from '~client/components/Sidebar.vue'
 
@@ -23,6 +23,7 @@
   const view = ref<GameView | null>(null)
   const inspectedCell = ref<{ x: number; y: number } | null>(null)
   const inspectResult = ref<InspectResult | null>(null)
+  const phase = ref<RoundPhase>('planning')
   const scale = toRef(settings, 'scale')
 
   let renderer: Renderer
@@ -52,9 +53,9 @@
       if (view.value) renderer.render(view.value, getHoveredCell(), getInspectedCell())
     }
 
-    onPhaseChange((phase) => {
-      renderer.phase = phase
-      setInputPhase(phase)
+    onPhaseChange((nextPhase) => {
+      phase.value = nextPhase
+      setInputPhase(nextPhase)
       refreshUI()
     })
 

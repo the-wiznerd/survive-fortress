@@ -1,6 +1,6 @@
 import type { GameView, ViewEntity, PlayerAction } from '@repo/server/sdk'
 import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, zKey, type RenderEntity, type EntityRenderer } from '@repo/rendering'
-import { getPlan, type RoundPhase } from '~client/game'
+import { getPlan } from '~client/game'
 
 export class Renderer {
   private world: WorldRenderer
@@ -38,7 +38,6 @@ export class Renderer {
   }
 
   showMoistureOverlay = false
-  phase: RoundPhase = 'planning'
 
   render(view: GameView, hoveredCell?: { x: number; y: number } | null, selectedCell?: { x: number; y: number } | null) {
     if (!this.world.ready) return
@@ -76,7 +75,6 @@ export class Renderer {
         self.drawTileHighlight(ctx, hoveredCell ?? null, 'rgba(255, 255, 255, 0.35)')
         self.drawTileHighlight(ctx, selectedCell ?? null, 'rgba(135, 206, 235, 0.6)')
         if (self.showMoistureOverlay) self.drawMoistureOverlay(ctx, entities)
-        self.drawPhaseBorder(ctx)
       },
     })
   }
@@ -154,19 +152,6 @@ export class Renderer {
     }
   }
 
-  private static PHASE_COLORS: Record<RoundPhase, string> = {
-    planning: '#518fb0',   // --color-blue
-    submitted: '#a7814e',  // --color-yellow
-    resolving: '#a2af50',  // --color-green
-  }
-
-  private drawPhaseBorder(ctx: CanvasRenderingContext2D) {
-    const w = this.viewWidth * CELL_W
-    const h = this.viewHeight * TOP_H
-    ctx.strokeStyle = Renderer.PHASE_COLORS[this.phase]
-    ctx.lineWidth = 2
-    ctx.strokeRect(1, 1, w - 2, h - 2)
-  }
 }
 
 const ARROW_ROW = 15

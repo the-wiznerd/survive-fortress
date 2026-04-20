@@ -21,6 +21,20 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  border: 8px solid transparent;
+  box-sizing: border-box;
+
+  &.phase-planning {
+    border-color: var(--color-blue);
+  }
+
+  &.phase-submitted {
+    border-color: var(--color-yellow);
+  }
+
+  &.phase-resolving {
+    border-color: var(--color-green);
+  }
 }
 
 canvas {
@@ -34,7 +48,6 @@ canvas {
   padding: 2rem 1.5rem;
   overflow-y: auto;
   line-height: 1.5;
-  border-inline-start: 2px solid var(--color-darkest-gray);
   display: flex;
   flex-direction: column;
 }
