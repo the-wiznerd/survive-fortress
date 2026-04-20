@@ -39,3 +39,20 @@
     return result
   })
 </script>
+
+<style lang="scss" scoped>
+  @use '~styles/mixins';
+
+  .entity-card {
+
+    >.label {
+      @include mixins.heading;
+    }
+
+    .traits {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+  }
+</style>

@@ -5,7 +5,6 @@
   <Sidebar />
 </template>
 
-
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, provide, toRef } from 'vue'
   import type { GameView, ViewEntity, InspectResult, VisibleTraitName } from '@repo/server/sdk'
@@ -13,7 +12,7 @@
   import { settings } from '~client/settings'
   import { Renderer } from '~client/renderer'
   import { bindInput, getHoveredCell, getInspectedCell, setInputPhase } from '~client/input'
-  import { init, getView, getGame, onPhaseChange, type RoundPhase } from '~client/game'
+  import { init, getView, getGame, onPhaseChange, stopGame, type RoundPhase } from '~client/game'
   import { debugInit } from '~client/debug'
   import Sidebar from '~client/components/Sidebar.vue'
 
@@ -37,6 +36,12 @@
     const clamped = Math.max(1, Math.floor(newScale))
     scale.value = clamped
     renderer.setScale(clamped)
+  })
+  provide('turnMode', toRef(settings, 'turnMode'))
+  provide('setTurnMode', async (mode: 'manual' | 'auto') => {
+    settings.turnMode = mode
+    stopGame()
+    await startGame()
   })
   provide('getTraitNames', (entity: ViewEntity): VisibleTraitName[] => {
     return ENTITY_TRAIT_NAMES[entity.type] ?? []
@@ -65,12 +70,13 @@
   })
 
   onUnmounted(() => {
+    stopGame()
     if (rafId) cancelAnimationFrame(rafId)
     if (unbindInput) unbindInput()
   })
 
   async function startGame() {
-    await init(renderer, refreshUI)
+    await init(renderer, refreshUI, settings.turnMode)
     refreshUI()
   }
 

@@ -5,10 +5,11 @@ import { type WorldManifest, type ChunkData } from '@repo/state'
 import { bootstrap, importWorld } from '@repo/engine'
 import { GameServer } from '~server/sdk/GameServer.js'
 import { ACTIONS_PER_ROUND } from '~server/sdk/types.js'
-import type { ClientMessage, ServerMessage, SerializedGameView, GameView } from '~server/sdk/types.js'
+import type { ClientMessage, ServerMessage, SerializedGameView, GameView, TurnMode, PlayerAction } from '~server/sdk/types.js'
 
 const PORT = 5174
 const SAVES_DIR = path.resolve(import.meta.dirname, '../../../saves')
+const AUTO_PLANNING_TIMEOUT_MS = 3000
 
 function serializeView(view: GameView): SerializedGameView {
   return { ...view, visiblePositions: [...view.visiblePositions] }
@@ -37,9 +38,38 @@ wss.on('connection', (ws) => {
   console.log('Client connected')
 
   let server: GameServer | null = null
+  let turnMode: TurnMode = 'manual'
+  let autoPlanningTimer: ReturnType<typeof setTimeout> | null = null
+  let pendingAutoPlan: PlayerAction[] = []
 
   function send(msg: ServerMessage) {
     ws.send(JSON.stringify(msg))
+  }
+
+  function clearAutoPlanningTimer() {
+    if (!autoPlanningTimer) return
+    clearTimeout(autoPlanningTimer)
+    autoPlanningTimer = null
+  }
+
+  function resolveAndSendRound(actions: PlayerAction[]) {
+    if (!server) return
+    const frames = server.resolveRound(actions)
+    send({
+      type: 'round-resolve',
+      frames: frames.map(serializeView),
+    })
+  }
+
+  function scheduleAutoPlanningTimeout() {
+    if (!server || turnMode !== 'auto') return
+    clearAutoPlanningTimer()
+    autoPlanningTimer = setTimeout(() => {
+      if (!server || turnMode !== 'auto') return
+      resolveAndSendRound(pendingAutoPlan)
+      pendingAutoPlan = []
+      scheduleAutoPlanningTimeout()
+    }, AUTO_PLANNING_TIMEOUT_MS)
   }
 
   ws.on('message', (raw) => {
@@ -55,12 +85,19 @@ wss.on('connection', (ws) => {
           const { manifest, chunks } = loadSave(msg.save)
           const { world, playerIds } = importWorld(manifest, chunks)
           server = new GameServer(world, playerIds[0])
+          turnMode = msg.turnMode ?? 'manual'
 
           send({
             type: 'joined',
             view: serializeView(server.getView()),
             actionsPerRound: ACTIONS_PER_ROUND,
+            turnMode,
           })
+
+          if (turnMode === 'auto') {
+            pendingAutoPlan = []
+            scheduleAutoPlanningTimeout()
+          }
           break
         }
 
@@ -69,17 +106,18 @@ wss.on('connection', (ws) => {
             send({ type: 'error', message: 'Not joined yet' })
             break
           }
-          const frames = server.resolveRound(msg.actions)
-          send({
-            type: 'round-resolve',
-            frames: frames.map(serializeView),
-          })
+          if (turnMode === 'auto') {
+            pendingAutoPlan = msg.actions
+          } else {
+            resolveAndSendRound(msg.actions)
+          }
           break
         }
 
         case 'debug-forward': {
           if (!server) break
           const ticks = msg.ticks ?? 0
+          clearAutoPlanningTimer()
           const allFrames: GameView[] = []
           // Run N empty rounds to advance simulation by approximately `ticks` ticks.
           const rounds = Math.ceil(ticks / ACTIONS_PER_ROUND)
@@ -92,6 +130,10 @@ wss.on('connection', (ws) => {
             type: 'round-resolve',
             frames: lastRoundFrames.map(serializeView),
           })
+          if (turnMode === 'auto') {
+            pendingAutoPlan = []
+            scheduleAutoPlanningTimeout()
+          }
           break
         }
       }
@@ -101,6 +143,7 @@ wss.on('connection', (ws) => {
   })
 
   ws.on('close', () => {
+    clearAutoPlanningTimer()
     console.log('Client disconnected')
   })
 })

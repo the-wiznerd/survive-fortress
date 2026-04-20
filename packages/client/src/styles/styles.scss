@@ -1,6 +1,8 @@
 @use 'reset';
 @use 'fonts';
 @use 'variables';
+@use 'utilities';
+@use 'mixins';
 
 #app {
   background: var(--color-black);
@@ -41,98 +43,4 @@ canvas {
   image-rendering: pixelated;
   flex-shrink: 0;
   max-inline-size: none;
-}
-
-#sidebar {
-  width: 300px;
-  padding: 2rem 1.5rem;
-  overflow-y: auto;
-  line-height: 1.5;
-  display: flex;
-  flex-direction: column;
-}
-
-.section {
-  margin-block-end: 2.5rem;
-}
-
-.entity-card {
-
-  >.label {
-    color: var(--color-lightest-yellow);
-    margin-bottom: 1em;
-    font-size: 0.85rem;
-    font-weight: bold;
-  }
-
-  .traits {
-    display: flex;
-    flex-direction: column;
-    gap: 1em;
-  }
-}
-
-.stat {
-  >.label {
-    color: var(--color-white);
-  }
-}
-
-
-.segments {
-  display: inline-flex;
-  gap: 0.25em;
-  vertical-align: middle;
-  margin-inline-start: 0.7ch;
-}
-
-.segment {
-  display: inline-block;
-  width: 0.75em;
-  height: 0.98em;
-  border: 2px solid var(--color-gray);
-  position: relative;
-  top: -1px;
-
-  &.filled {
-    background: var(--color-lightest-gray);
-    border-color: var(--color-lightest-gray);
-  }
-}
-
-.settings {
-  margin-block: auto 0;
-  padding-block-start: 1.5rem;
-  border-block-start: 1px solid var(--color-darkest-gray);
-
-  .label {
-    margin-inline-end: 0.75ch;
-  }
-
-  button {
-    background: var(--color-darkest-gray);
-    color: var(--color-lightest-gray);
-    font-family: var(--font-mono);
-    border: 0 none;
-    font-size: 0.75rem;
-    padding: 0.15rem 0.5rem;
-    cursor: pointer;
-    position: relative;
-    top: -1px;
-
-    &:hover:not(:disabled) {
-      background: var(--color-dark-gray);
-    }
-
-    &:disabled {
-      opacity: 0.4;
-      cursor: default;
-    }
-  }
-
-  .zoom-value {
-    display: inline-block;
-    min-width: 2.5ch;
-    text-align: center;
-  }
 }

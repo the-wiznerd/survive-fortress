@@ -1,13 +1,18 @@
 <template>
   <div class="debug-panel section">
-    <h3>Debug</h3>
+    <h2>Debug</h2>
     <label>
-      <input type="checkbox" :checked="moistureOn" @change="toggleMoisture"> Moisture overlay
+      <input type="checkbox" :checked="moistureOn" @change="toggleMoisture"> Moisture
     </label>
     <div class="debug-actions">
-      <button @click="forward(0.5)">+½ day</button>
-      <button @click="forward(1)">+1 day</button>
-      <button @click="forward(5)">+5 days</button>
+       <span class="label">
+        FF:
+      </span>
+      <div class="buttons">
+        <button @click="forward(0.5)">+0.5 d</button>
+        <button @click="forward(1)">+1 d</button>
+        <button @click="forward(5)">+5 d</button>
+      </div>
     </div>
   </div>
 </template>
@@ -28,31 +33,44 @@ function forward(days: number) {
 }
 </script>
 
-<style scoped>
-.debug-panel {
-  border-top: 1px solid #444;
-  padding-top: 8px;
-  margin-top: 8px;
-}
-.debug-panel h3 {
-  margin: 0 0 6px;
-  font-size: 12px;
-  color: #aaa;
-  text-transform: uppercase;
-}
-.debug-panel label {
-  display: block;
-  font-size: 12px;
-  margin-bottom: 6px;
-  cursor: pointer;
-}
-.debug-actions {
-  display: flex;
-  gap: 4px;
-}
-.debug-actions button {
-  font-size: 11px;
-  padding: 2px 6px;
-  cursor: pointer;
-}
+<style lang="scss" scoped>
+  @use '~styles/mixins';
+
+  .debug-panel {
+    border-block-start: 1px solid #444;
+    padding-block-start: 1rem;
+    margin-block: 1.25rem 0;
+  }
+
+  h2 {
+    @include mixins.heading;
+  }
+
+  label {
+    display: block;
+    margin-block-end: 0.5rem;
+    cursor: pointer;
+  }
+
+  label,
+  .label {
+    @include mixins.label;
+  }
+
+  .debug-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75ch;
+
+    .buttons {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    button {
+      font-size: 11px;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+  }
 </style>

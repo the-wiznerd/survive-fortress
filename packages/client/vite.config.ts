@@ -10,6 +10,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '~client': clientSrc,
+      '~styles': path.resolve(clientSrc, 'styles'),
       '~rendering': renderingSrc,
       '@repo/rendering': path.join(renderingSrc, 'index.ts'),
       '@repo/server/sdk': path.join(serverSrc, 'sdk/index.ts'),

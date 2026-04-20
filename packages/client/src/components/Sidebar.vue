@@ -17,14 +17,13 @@
       />
     </div>
 
-    <div class="section settings">
-      <div class="stat">
-        <span class="label">Zoom:</span>
-        <button @click="zoomOut" :disabled="scale <= 1">-</button>
-        <span class="zoom-value">{{ scale }}x</span>
-        <button @click="zoomIn">+</button>
-      </div>
-    </div>
+    <SidebarSettings
+      :scale="scale"
+      :turn-mode="turnMode"
+      @zoom-in="zoomIn"
+      @zoom-out="zoomOut"
+      @turn-mode-change="setTurnMode"
+    />
 
     <DebugPanel v-if="debugEnabled" />
   </aside>
@@ -36,6 +35,7 @@
   import type { GameView, ViewEntity, InspectResult } from '@repo/server/sdk'
   import EntityCard from '~client/components/EntityCard.vue'
   import DebugPanel from '~client/components/DebugPanel.vue'
+  import SidebarSettings from '~client/components/SidebarSettings.vue'
   import { DEBUG_ENABLED } from '~client/debug'
 
   const debugEnabled = DEBUG_ENABLED
@@ -45,6 +45,8 @@
   const inspectResult = inject<Ref<InspectResult | null>>('inspectResult')!
   const scale = inject<Ref<number>>('scale')!
   const setScale = inject<(s: number) => void>('setScale')!
+  const turnMode = inject<Ref<'manual' | 'auto'>>('turnMode')!
+  const setTurnMode = inject<(mode: 'manual' | 'auto') => Promise<void>>('setTurnMode')!
 
   const zoomIn = () => setScale(scale.value + 1)
   const zoomOut = () => setScale(scale.value - 1)
@@ -67,3 +69,14 @@
     }
   })
 </script>
+
+<style lang="scss" scoped>
+  #sidebar {
+    width: 300px;
+    padding: 2rem 1.5rem;
+    overflow-y: auto;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+  }
+</style>

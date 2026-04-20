@@ -4,6 +4,7 @@ const STORAGE_KEY = 'survive-fortress-settings'
 
 const DEFAULTS = {
   scale: 3,
+  turnMode: 'auto' as 'manual' | 'auto',
 }
 
 type Settings = typeof DEFAULTS

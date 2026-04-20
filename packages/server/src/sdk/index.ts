@@ -6,6 +6,7 @@ export type {
   GameView,
   ViewEntity,
   PlayerAction,
+  TurnMode,
   InspectResult,
   TraitViews,
   VisibleTraitName,

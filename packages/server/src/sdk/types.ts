@@ -49,6 +49,8 @@ export type PlayerAction =
   | { type: 'move'; dx: number; dy: number }
   | { type: 'wait' }
 
+export type TurnMode = 'manual' | 'auto'
+
 /** Inspected entity details for the sidebar. */
 export interface InspectResult {
   entities: ViewEntity[]
@@ -78,6 +80,9 @@ export interface Game {
   /** The number of actions (ticks) per round. */
   actionsPerRound: number
 
+  /** Turn mode selected for this session. */
+  turnMode: TurnMode
+
   /** Send a raw message (for debug commands). */
   sendRaw(msg: Record<string, unknown>): void
 }
@@ -90,6 +95,7 @@ export interface Game {
 export interface JoinMessage {
   type: 'join'
   save: string
+  turnMode?: TurnMode
 }
 
 export interface SubmitPlanMessage {
@@ -105,6 +111,7 @@ export interface JoinedMessage {
   type: 'joined'
   view: SerializedGameView
   actionsPerRound: number
+  turnMode: TurnMode
 }
 
 export interface RoundResolveMessage {

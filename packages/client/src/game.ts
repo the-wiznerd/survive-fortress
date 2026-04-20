@@ -1,4 +1,4 @@
-import type { Game, GameView, ServerMessage, SerializedGameView, PlayerAction } from '@repo/server/sdk'
+import type { Game, GameView, ServerMessage, SerializedGameView, PlayerAction, TurnMode } from '@repo/server/sdk'
 import { Renderer } from '~client/renderer'
 
 // ─── Round Phase ───
@@ -19,9 +19,8 @@ function setPhase(p: RoundPhase) {
 // ─── Game State ───
 
 let game: Game
+let gameInitialized = false
 let currentView: GameView
-let resolveFrames: GameView[] = []
-let resolveIndex = 0
 let resolveTimerId: ReturnType<typeof setTimeout> | null = null
 let maxPlanActions = 8
 
@@ -33,6 +32,16 @@ const SAVE_NAME = new URLSearchParams(window.location.search).get('save') ?? DEF
 
 export function getGame(): Game { return game }
 export function getView(): GameView { return currentView }
+
+export function stopGame() {
+  if (resolveTimerId) {
+    clearTimeout(resolveTimerId)
+    resolveTimerId = null
+  }
+  if (!gameInitialized) return
+  game.stop()
+  gameInitialized = false
+}
 
 function deserializeView(sv: SerializedGameView): GameView {
   return { ...sv, visiblePositions: new Set(sv.visiblePositions) }
@@ -61,6 +70,7 @@ export function clearPlan() {
 
 export function submitPlan() {
   if (phase !== 'planning') return
+  if (!gameInitialized) return
   const actions = plan.slice(0, maxPlanActions)
   game.submitPlan(actions)
   plan = []
@@ -70,16 +80,17 @@ export function submitPlan() {
 
 // ─── Connection ───
 
-function connectGame(save: string): Promise<Game> {
+function connectGame(save: string, turnMode: TurnMode): Promise<Game> {
   return new Promise((resolve, reject) => {
     const ws = new WebSocket(WS_URL)
 
     let resolveCallback: ((frames: GameView[]) => void) | null = null
     let latestView: GameView | null = null
     let actionsPerRound = 8
+    let serverTurnMode: TurnMode = turnMode
 
     ws.onopen = () => {
-      ws.send(JSON.stringify({ type: 'join', save }))
+      ws.send(JSON.stringify({ type: 'join', save, turnMode }))
     }
 
     ws.onerror = () => {
@@ -93,6 +104,7 @@ function connectGame(save: string): Promise<Game> {
         case 'joined':
           latestView = deserializeView(msg.view)
           actionsPerRound = msg.actionsPerRound
+          serverTurnMode = msg.turnMode
           resolve({
             onRoundResolve(cb) { resolveCallback = cb },
             submitPlan(actions) { ws.send(JSON.stringify({ type: 'submit-plan', actions })) },
@@ -103,13 +115,16 @@ function connectGame(save: string): Promise<Game> {
             stop() { ws.close() },
             getView() { return latestView! },
             get actionsPerRound() { return actionsPerRound },
+            get turnMode() { return serverTurnMode },
             sendRaw(msg) { ws.send(JSON.stringify(msg)) },
           })
           break
 
         case 'round-resolve': {
           const frames = msg.frames.map(deserializeView)
-          latestView = frames[frames.length - 1]
+          if (frames.length > 0) {
+            latestView = frames[frames.length - 1]
+          }
           resolveCallback?.(frames)
           break
         }
@@ -125,17 +140,33 @@ function connectGame(save: string): Promise<Game> {
 // ─── Playback ───
 
 function startPlayback(frames: GameView[], renderer: Renderer, onDone: () => void) {
-  resolveFrames = frames
-  resolveIndex = 0
+  if (resolveTimerId) {
+    clearTimeout(resolveTimerId)
+    resolveTimerId = null
+  }
+
+  if (frames.length === 0) {
+    onDone()
+    return
+  }
+
   setPhase('resolving')
+  let frameIndex = 0
 
   function step() {
-    currentView = resolveFrames[resolveIndex]
+    const frame = frames[frameIndex]
+    if (!frame) {
+      resolveTimerId = null
+      onDone()
+      return
+    }
+
+    currentView = frame
     const player = currentView.entities.find(e => String(e.id) === currentView.playerId)
     if (player) renderer.setCamera(player.x, player.y)
 
-    resolveIndex++
-    if (resolveIndex < resolveFrames.length) {
+    frameIndex++
+    if (frameIndex < frames.length) {
       resolveTimerId = setTimeout(step, PLAYBACK_TICK_MS)
     } else {
       resolveTimerId = null
@@ -148,8 +179,10 @@ function startPlayback(frames: GameView[], renderer: Renderer, onDone: () => voi
 
 // ─── Init ───
 
-export async function init(renderer: Renderer, onUpdate: () => void) {
-  game = await connectGame(SAVE_NAME)
+export async function init(renderer: Renderer, onUpdate: () => void, turnMode: TurnMode) {
+  stopGame()
+  game = await connectGame(SAVE_NAME, turnMode)
+  gameInitialized = true
   maxPlanActions = game.actionsPerRound
 
   currentView = game.getView()
