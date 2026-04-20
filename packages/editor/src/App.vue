@@ -51,7 +51,7 @@
       <div class="hints">
         <kbd>Click</kbd> Draw &nbsp; <kbd>Shift+Click</kbd> Delete<br>
         <kbd>Z</kbd> Z up &nbsp; <kbd>Shift+Z</kbd> Z down<br>
-        <kbd>Right-drag</kbd> Pan
+        <kbd>X</kbd> Toggle show all &nbsp; <kbd>Right-drag</kbd> Pan
       </div>
     </div>
 
@@ -279,6 +279,7 @@
     switch (e.key) {
       case 'z': activeZ.value++; break
       case 'Z': activeZ.value--; break
+      case 'x': showAllZ.value = !showAllZ.value; break
       default: return
     }
     e.preventDefault()
