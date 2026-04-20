@@ -42,14 +42,16 @@ export abstract class Trait<K extends string = string> {
     const d = this.defaults() as Record<string, unknown>
     const keys = Object.keys(d)
 
-    // Collect own changed fields.
+    // Collect own fields that differ from defaults.
     const self = this as unknown as Record<string, unknown>
     const dRec = d as Record<string, unknown>
     const result: Record<string, unknown> = {}
     let hasOwn = false
     for (const key of keys) {
-      if (self[key] !== dRec[key]) hasOwn = true
-      result[key] = self[key]
+      if (self[key] !== dRec[key]) {
+        result[key] = self[key]
+        hasOwn = true
+      }
     }
 
     // Recursively save sub-traits.

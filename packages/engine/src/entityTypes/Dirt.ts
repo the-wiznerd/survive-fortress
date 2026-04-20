@@ -12,8 +12,8 @@ export class Dirt extends BaseEntityType {
   material = this.addTrait(new MaterialTrait(this.world, this.id, 'solid'))
   moisture = this.addTrait(new MoistureTrait(this.world, this.id, {
     current: 2,
-    capacity: 10,
-    conductivity: 20
+    capacity: 15,
+    conductivity: 75
   }))
   groundCover = this.addTrait(new GroundCoverTrait(this.world, this.id))
 
