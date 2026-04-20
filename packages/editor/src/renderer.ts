@@ -11,6 +11,7 @@ const PREVIEW_SPRITES: Record<string, PreviewSprite> = {
   stone: { kind: 'terrain', atlas: true },
   water: { kind: 'terrain', atlas: false, topCol: 0, frontCol: 0, row: 2 },
   player: { kind: 'upright', col: 0, row: 12, h: 3 },
+  bush: { kind: 'upright', col: 1, row: 12, h: 2 },
 }
 
 export class EditorRenderer {

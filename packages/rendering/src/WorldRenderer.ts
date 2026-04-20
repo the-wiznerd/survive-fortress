@@ -9,6 +9,7 @@ import { SandRenderer } from '~rendering/entities/SandRenderer.js'
 import { StoneRenderer } from '~rendering/entities/StoneRenderer.js'
 import { WaterRenderer } from '~rendering/entities/WaterRenderer.js'
 import { PlayerRenderer } from '~rendering/entities/PlayerRenderer.js'
+import { BushRenderer } from '~rendering/entities/BushRenderer.js'
 
 /** Registry of entity type name → renderer instance. */
 const ENTITY_RENDERERS: Record<string, EntityRenderer> = {
@@ -17,6 +18,7 @@ const ENTITY_RENDERERS: Record<string, EntityRenderer> = {
   stone: new StoneRenderer(),
   water: new WaterRenderer(),
   player: new PlayerRenderer(),
+  bush: new BushRenderer(),
 }
 
 /** Stage callbacks for consumer-specific overlays between render passes. */

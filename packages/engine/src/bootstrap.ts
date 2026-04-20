@@ -7,6 +7,7 @@ import { Water } from '~engine/entityTypes/Water.js'
 import { Sand } from '~engine/entityTypes/Sand.js'
 import { Stone } from '~engine/entityTypes/Stone.js'
 import { Player } from '~engine/entityTypes/Player.js'
+import { Bush } from '~engine/entityTypes/Bush.js'
 
 export function bootstrap() {
   registerEntityType('dirt', Dirt)
@@ -14,4 +15,5 @@ export function bootstrap() {
   registerEntityType('sand', Sand)
   registerEntityType('stone', Stone)
   registerEntityType('player', Player)
+  registerEntityType('bush', Bush)
 }

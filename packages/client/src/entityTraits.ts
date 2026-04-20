@@ -7,4 +7,5 @@ export const ENTITY_TRAIT_NAMES: Record<string, VisibleTraitName[]> = {
   stone: ['position'],
   water: ['moisture', 'position'],
   player: ['health', 'hunger', 'movement', 'position'],
+  bush: ['position'],
 }
