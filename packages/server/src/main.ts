@@ -77,6 +77,20 @@ wss.on('connection', (ws) => {
           server.sendAction(msg.actionId, msg.action)
           break
         }
+
+        case 'debug-forward': {
+          if (!server) {
+            send({ type: 'error', message: 'Not joined yet' })
+            break
+          }
+          const count = Math.min(msg.ticks, 1000) // safety cap
+          for (let i = 0; i < count; i++) {
+            const actionResult = server.tick()
+            if (actionResult) send(actionResult)
+          }
+          send({ type: 'view', view: serializeView(server.getView()) })
+          break
+        }
       }
     } catch (err) {
       send({ type: 'error', message: 'Invalid message' })

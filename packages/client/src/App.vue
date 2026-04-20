@@ -14,6 +14,7 @@
   import { Renderer } from '~client/renderer'
   import { bindInput, getHoveredCell, getInspectedCell } from '~client/input'
   import { init, startTickLoop, getView, getGame } from '~client/game'
+  import { debugInit } from '~client/debug'
   import Sidebar from '~client/components/Sidebar.vue'
 
   const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -45,6 +46,7 @@
   onMounted(async () => {
     const canvas = canvasRef.value!
     renderer = new Renderer(canvas, 32, 24, settings.scale)
+    debugInit(renderer)
 
     renderer.onReady = () => {
       if (view.value) renderer.render(view.value, getHoveredCell(), getInspectedCell())

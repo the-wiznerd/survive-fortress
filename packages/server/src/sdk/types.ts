@@ -76,6 +76,9 @@ export interface Game {
 
   /** Get the current view (without waiting for a tick). */
   getView(): GameView
+
+  /** Send a raw message (for debug commands). */
+  sendRaw(msg: Record<string, unknown>): void
 }
 
 // ─── Game Protocol ───
@@ -94,7 +97,12 @@ export interface ActionMessage {
   action: PlayerAction
 }
 
-export type ClientMessage = JoinMessage | ActionMessage
+export interface DebugForwardMessage {
+  type: 'debug-forward'
+  ticks: number
+}
+
+export type ClientMessage = JoinMessage | ActionMessage | DebugForwardMessage
 
 // ─── Server → Client ───
 

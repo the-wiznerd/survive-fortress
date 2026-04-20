@@ -25,6 +25,8 @@
         <button @click="zoomIn">+</button>
       </div>
     </div>
+
+    <DebugPanel v-if="debugEnabled" />
   </aside>
 </template>
 
@@ -33,6 +35,10 @@
   import type { Ref } from 'vue'
   import type { GameView, ViewEntity, InspectResult } from '@repo/server/sdk'
   import EntityCard from '~client/components/EntityCard.vue'
+  import DebugPanel from '~client/components/DebugPanel.vue'
+  import { DEBUG_ENABLED } from '~client/debug'
+
+  const debugEnabled = DEBUG_ENABLED
 
   const view = inject<Ref<GameView | null>>('view')!
   const inspectedCell = inject<Ref<{ x: number; y: number } | null>>('inspectedCell')!

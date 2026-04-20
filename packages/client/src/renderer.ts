@@ -74,7 +74,7 @@ export class Renderer {
       onAfterEntities(ctx) {
         self.drawTileHighlight(ctx, hoveredCell ?? null, 'rgba(255, 255, 255, 0.35)')
         self.drawTileHighlight(ctx, selectedCell ?? null, 'rgba(135, 206, 235, 0.6)')
-        self.drawMoistureOverlay(ctx, entities)
+        if (self.showMoistureOverlay) self.drawMoistureOverlay(ctx, entities)
       },
     })
   }

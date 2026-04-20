@@ -53,6 +53,7 @@ function connectGame(save: string): Promise<Game> {
             start() { /* tick loop runs on the server */ },
             stop() { ws.close() },
             getView() { return initialView! },
+            sendRaw(msg) { ws.send(JSON.stringify(msg)) },
           })
           break
 
