@@ -47,6 +47,12 @@
           {{ hoveredCell.x }}, {{ hoveredCell.y }}, z={{ activeZ }}
         </template>
       </div>
+
+      <div class="hints">
+        <kbd>Click</kbd> Draw &nbsp; <kbd>Shift+Click</kbd> Delete<br>
+        <kbd>Z</kbd> Z up &nbsp; <kbd>Shift+Z</kbd> Z down<br>
+        <kbd>Right-drag</kbd> Pan
+      </div>
     </div>
 
     <div class="viewport">
@@ -65,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+  import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
   import { EditorRenderer } from '~editor/renderer'
   import { CELL_W, TOP_H } from '@repo/rendering'
   import { listSaves } from '~editor/connection'
@@ -298,5 +304,20 @@
 }
 .viewport {
   position: relative;
+}
+.hints {
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #888;
+}
+.hints kbd {
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 10px;
+  color: #ccc;
 }
 </style>

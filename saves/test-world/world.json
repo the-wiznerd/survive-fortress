@@ -15,12 +15,6 @@
       "state": "frozen",
       "freezeTick": 0
     },
-    "-1_1": {
-      "cx": -1,
-      "cy": 1,
-      "state": "frozen",
-      "freezeTick": 0
-    },
     "0_-1": {
       "cx": 0,
       "cy": -1,
