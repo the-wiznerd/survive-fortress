@@ -37,6 +37,8 @@ export class Renderer {
     return { x: sx + this.cameraX, y: sy + this.cameraY }
   }
 
+  showMoistureOverlay = false
+
   render(view: GameView, hoveredCell?: { x: number; y: number } | null, selectedCell?: { x: number; y: number } | null) {
     if (!this.world.ready) return
 
@@ -72,6 +74,7 @@ export class Renderer {
       onAfterEntities(ctx) {
         self.drawTileHighlight(ctx, hoveredCell ?? null, 'rgba(255, 255, 255, 0.35)')
         self.drawTileHighlight(ctx, selectedCell ?? null, 'rgba(135, 206, 235, 0.6)')
+        self.drawMoistureOverlay(ctx, entities)
       },
     })
   }
@@ -97,6 +100,26 @@ export class Renderer {
     ctx.strokeStyle = color
     ctx.lineWidth = 1
     ctx.strokeRect(px + 0.5, py + 0.5, CELL_W - 1, TOP_H - 1)
+  }
+
+  private drawMoistureOverlay(ctx: CanvasRenderingContext2D, entities: RenderEntity[]) {
+    ctx.font = '8px monospace'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillStyle = '#fff'
+
+    for (const e of entities) {
+      const m = e.traits.moisture as { current: number; capacity: number } | undefined
+      if (!m) continue
+      const sx = e.x - this.cameraX
+      const sy = e.y - this.cameraY
+      if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) continue
+
+      const px = Math.round(sx * CELL_W + CELL_W / 2)
+      const py = Math.round(sy * TOP_H + TOP_H / 2)
+
+      ctx.fillText(String(m.current), px, py)
+    }
   }
 
   private drawMoveArrows(ctx: CanvasRenderingContext2D, view: GameView) {
