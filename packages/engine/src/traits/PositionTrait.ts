@@ -31,4 +31,9 @@ export class PositionTrait extends Trait<'position'> {
   defaults(): Position {
     return { x: 0, y: 0, z: 0 }
   }
+
+  /** Position always saves all fields — coordinates have no meaningful default. */
+  save(): unknown {
+    return { x: this._x, y: this._y, z: this._z }
+  }
 }

@@ -91,10 +91,11 @@ export async function editorSaveWorld(name?: string) {
   currentSaveName.value = saveName
 }
 
-/** Place an entity of the given type at world position. */
+/** Place an entity of the given type at world position, replacing any existing entity there. */
 export function placeEntity(type: string, x: number, y: number, z: number) {
   const w = world.value
   if (!w) return
+  deleteEntities(x, y, z)
   spawnEntity(w, type, { position: { x, y, z } })
 }
 
