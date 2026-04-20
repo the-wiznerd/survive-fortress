@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createWorld, getComponent } from '@repo/state'
+import { createWorld, getComponent, createEntity, addComponent, setPosition } from '@repo/state'
 import { registerEntityType, spawnEntity } from '~engine/registry.js'
 import { Player } from '~engine/entityTypes/Player.js'
 import { tick, simulate } from '~engine/tick.js'
@@ -9,6 +9,14 @@ registerEntityType('player', Player)
 /** Convenience: spawn a player at (x, y) using the registry. */
 function spawnPlayer(world: ReturnType<typeof createWorld>, x: number, y: number) {
   return spawnEntity(world, 'player', { entityType: 'player', position: { x, y, z: 0 } }).id
+}
+
+/** Place a solid ground tile at (x, y, z). Walk locomotion needs solid floor at z-1. */
+function placeGround(world: ReturnType<typeof createWorld>, x: number, y: number, z: number) {
+  const id = createEntity(world)
+  setPosition(world, id, x, y, z)
+  addComponent(world, id, 'material', { material: 'solid' })
+  return id
 }
 
 describe('hunger system', () => {
@@ -76,15 +84,20 @@ describe('hunger system', () => {
 })
 
 describe('movement system', () => {
-  it('moves player when action submitted and timer ready', () => {
+  it('moves player when plan submitted and timer ready', () => {
     const world = createWorld()
     const player = spawnPlayer(world, 10, 10)
 
-    // Player pace=3: need 3 ticks to fill the timer before first move.
-    simulate(world, 3)
+    // Place solid ground at z=-1 for the start and destination.
+    placeGround(world, 10, 10, -1)
+    placeGround(world, 11, 10, -1)
+
+    // Player pace=1: ready after 1 tick.
+    simulate(world, 1)
 
     const pc = getComponent(world, player, 'playerControlled')!
-    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
+    pc.plan = [{ type: 'move', dx: 1, dy: 0 }]
+    pc.planIndex = 0
 
     tick(world)
 
@@ -97,49 +110,61 @@ describe('movement system', () => {
     const world = createWorld()
     const player = spawnPlayer(world, 10, 10)
 
-    // Player pace=3: timer starts at 0, fills after 3 ticks.
-    const pc = getComponent(world, player, 'playerControlled')!
+    // Place ground along the path.
+    for (let x = 10; x <= 12; x++) placeGround(world, x, 10, -1)
 
-    // Ticks 0-2: timer filling (0→1→2→3), not ready until counter reaches 3.
-    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
+    // Override pace to 3 so we can test the timer.
+    const movement = getComponent(world, player, 'movement')!
+    movement.modes[0].pace = 3
+
+    const pc = getComponent(world, player, 'playerControlled')!
+    pc.plan = [
+      { type: 'move', dx: 1, dy: 0 },
+      { type: 'move', dx: 1, dy: 0 },
+    ]
+    pc.planIndex = 0
+
+    // Ticks 1-2: timer filling, not ready yet.
     tick(world) // counter: 1
     expect(getComponent(world, player, 'position')!.x).toBe(10)
 
-    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
     tick(world) // counter: 2
     expect(getComponent(world, player, 'position')!.x).toBe(10)
 
-    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
     tick(world) // counter: 3 → ready, moves, resets to 0
     expect(getComponent(world, player, 'position')!.x).toBe(11)
+    expect(pc.planIndex).toBe(1)
 
     // Immediately after move: counter reset to 0, can't move again.
-    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
     tick(world) // counter: 1
     expect(getComponent(world, player, 'position')!.x).toBe(11)
 
     // Fill up again.
-    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
     tick(world) // counter: 2
-    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
     tick(world) // counter: 3 → ready, moves
     expect(getComponent(world, player, 'position')!.x).toBe(12)
+    expect(pc.planIndex).toBe(2)
   })
 
-  it('clears pending action after processing', () => {
+  it('idles when plan is exhausted', () => {
     const world = createWorld()
     const player = spawnPlayer(world, 10, 10)
 
-    // Fill the movement timer first (pace=3).
-    simulate(world, 3)
+    // Place ground for start and destination.
+    placeGround(world, 10, 10, -1)
+    placeGround(world, 11, 10, -1)
+
+    // Fill the movement timer (pace=1).
+    simulate(world, 1)
 
     const pc = getComponent(world, player, 'playerControlled')!
-    pc.pendingAction = { type: 'move', dx: 1, dy: 0 }
+    pc.plan = [{ type: 'move', dx: 1, dy: 0 }]
+    pc.planIndex = 0
     tick(world)
 
-    expect(pc.pendingAction).toBeNull()
+    expect(pc.planIndex).toBe(1)
 
-    // Fill timer again, then tick with no input: player doesn't move.
+    // Plan exhausted — further ticks don't move.
     simulate(world, 3)
     tick(world)
     expect(getComponent(world, player, 'position')!.x).toBe(11)

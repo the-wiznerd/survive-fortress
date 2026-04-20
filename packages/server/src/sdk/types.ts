@@ -54,28 +54,29 @@ export interface InspectResult {
   entities: ViewEntity[]
 }
 
+// ─── Round Constants ───
+
+export const ACTIONS_PER_ROUND = 8
+
 /** The game interface — same shape whether local or remote. */
 export interface Game {
-  /** Subscribe to view updates. Called after each tick with the current view. */
-  onViewUpdate(cb: (view: GameView) => void): void
+  /** Subscribe to round resolve results. Called with an array of per-tick GameViews. */
+  onRoundResolve(cb: (frames: GameView[]) => void): void
 
-  /** Subscribe to action results. Called when a submitted action is accepted or rejected. */
-  onActionResult(cb: (actionId: string, result: 'accepted' | 'rejected') => void): void
-
-  /** Send a player action with a unique ID (queued for next tick). */
-  sendAction(actionId: string, action: PlayerAction): void
+  /** Submit the player's plan for this round. */
+  submitPlan(actions: PlayerAction[]): void
 
   /** Request detailed info about entities at a world position. */
   inspect(x: number, y: number): InspectResult
 
-  /** Start the tick loop. */
-  start(): void
-
-  /** Stop the tick loop. */
+  /** Stop the game (close connection). */
   stop(): void
 
-  /** Get the current view (without waiting for a tick). */
+  /** Get the current view (the latest planning-phase view). */
   getView(): GameView
+
+  /** The number of actions (ticks) per round. */
+  actionsPerRound: number
 
   /** Send a raw message (for debug commands). */
   sendRaw(msg: Record<string, unknown>): void
@@ -91,29 +92,24 @@ export interface JoinMessage {
   save: string
 }
 
-export interface ActionMessage {
-  type: 'action'
-  actionId: string
-  action: PlayerAction
+export interface SubmitPlanMessage {
+  type: 'submit-plan'
+  actions: PlayerAction[]
 }
 
-export interface DebugForwardMessage {
-  type: 'debug-forward'
-  ticks: number
-}
-
-export type ClientMessage = JoinMessage | ActionMessage | DebugForwardMessage
+export type ClientMessage = JoinMessage | SubmitPlanMessage
 
 // ─── Server → Client ───
 
 export interface JoinedMessage {
   type: 'joined'
   view: SerializedGameView
+  actionsPerRound: number
 }
 
-export interface ViewMessage {
-  type: 'view'
-  view: SerializedGameView
+export interface RoundResolveMessage {
+  type: 'round-resolve'
+  frames: SerializedGameView[]
 }
 
 export interface ServerErrorMessage {
@@ -121,13 +117,7 @@ export interface ServerErrorMessage {
   message: string
 }
 
-export interface ActionResultMessage {
-  type: 'action-result'
-  actionId: string
-  result: 'accepted' | 'rejected'
-}
-
-export type ServerMessage = JoinedMessage | ViewMessage | ServerErrorMessage | ActionResultMessage
+export type ServerMessage = JoinedMessage | RoundResolveMessage | ServerErrorMessage
 
 /** GameView with visiblePositions as string[] for JSON serialization. */
 export interface SerializedGameView extends Omit<GameView, 'visiblePositions'> {

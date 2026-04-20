@@ -14,10 +14,10 @@ export type {
   ServerMessage,
   SerializedGameView,
   JoinMessage,
-  ActionMessage,
+  SubmitPlanMessage,
   JoinedMessage,
-  ViewMessage,
+  RoundResolveMessage,
   ServerErrorMessage,
-  ActionResultMessage,
 } from './types.js'
+export { ACTIONS_PER_ROUND } from './types.js'
 export { GameServer } from './GameServer.js'

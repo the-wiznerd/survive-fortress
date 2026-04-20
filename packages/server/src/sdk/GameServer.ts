@@ -5,19 +5,14 @@ import {
   queryEntities,
 } from '@repo/state'
 import { tick, VisionTrait } from '@repo/engine'
-import type { GameView, ViewEntity, PlayerAction, VisibleTraitName, InspectResult, ActionResultMessage } from '~server/sdk/types.js'
+import { ACTIONS_PER_ROUND } from '~server/sdk/types.js'
+import type { GameView, ViewEntity, PlayerAction, VisibleTraitName, InspectResult } from '~server/sdk/types.js'
 
 /** Trait names the client is allowed to see when inspecting entities. */
 const VISIBLE_TRAITS: VisibleTraitName[] = ['health', 'hunger', 'movement', 'moisture', 'groundCover', 'vision']
 
 export class GameServer {
-  private pendingAction: PlayerAction | null = null
-  private pendingActionId: string | null = null
-  /** Action ID waiting to be resolved (action placed on component but not yet consumed by movement system). */
-  private inflightActionId: string | null = null
-  private inflightAction: PlayerAction | null = null
   private currentView: GameView
-  private viewCallback: ((view: GameView) => void) | null = null
 
   constructor(
     private readonly world: World,
@@ -26,61 +21,24 @@ export class GameServer {
     this.currentView = this.buildView()
   }
 
-  /** Queue a player action for the next tick. */
-  sendAction(actionId: string, action: PlayerAction): void {
-    this.pendingActionId = actionId
-    this.pendingAction = action
-  }
-
-  /** Subscribe to view updates (called after each tick). */
-  onViewUpdate(cb: (view: GameView) => void): void {
-    this.viewCallback = cb
-  }
-
-  /** Run one game tick: apply pending action, advance the world, rebuild the view. */
-  tick(): ActionResultMessage | null {
-    // Transfer newly submitted action onto the player component.
-    if (this.pendingAction) {
-      const pc = getComponent(this.world, this.playerId, 'playerControlled')
-      if (pc) pc.pendingAction = this.pendingAction
-      this.inflightActionId = this.pendingActionId
-      this.inflightAction = this.pendingAction
-      this.pendingActionId = null
-      this.pendingAction = null
+  /** Load a plan onto the player's PlayerControlled component and run a full round.
+   *  Returns an array of GameView frames (one per tick). */
+  resolveRound(actions: PlayerAction[]): GameView[] {
+    const pc = getComponent(this.world, this.playerId, 'playerControlled')
+    if (pc) {
+      pc.plan = actions.map(a => ({ ...a }))
+      pc.planIndex = 0
     }
 
-    const posBefore = getComponent(this.world, this.playerId, 'position')!
-    const xBefore = posBefore.x
-    const yBefore = posBefore.y
-
-    tick(this.world)
-    this.currentView = this.buildView()
-    this.viewCallback?.(this.currentView)
-
-    // Resolve the inflight action only once the movement system has consumed it
-    // (pendingAction on the component is null). This avoids false "rejected" when
-    // the movement system defers the action due to pace.
-    if (this.inflightActionId && this.inflightAction) {
-      const pc = getComponent(this.world, this.playerId, 'playerControlled')
-      const consumed = !pc || pc.pendingAction === null
-
-      if (consumed) {
-        let result: 'accepted' | 'rejected'
-        if (this.inflightAction.type === 'wait') {
-          result = 'accepted'
-        } else {
-          const posAfter = getComponent(this.world, this.playerId, 'position')!
-          result = (posAfter.x !== xBefore || posAfter.y !== yBefore) ? 'accepted' : 'rejected'
-        }
-        const actionId = this.inflightActionId
-        this.inflightActionId = null
-        this.inflightAction = null
-        return { type: 'action-result', actionId, result }
-      }
-      // Not consumed yet (pace wait) — don't report anything this tick.
+    const frames: GameView[] = []
+    for (let i = 0; i < ACTIONS_PER_ROUND; i++) {
+      tick(this.world)
+      const view = this.buildView()
+      frames.push(view)
     }
 
-    return null
+    this.currentView = frames[frames.length - 1]
+    return frames
   }
 
   /** Get the current view snapshot. */

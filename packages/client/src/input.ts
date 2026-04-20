@@ -1,43 +1,5 @@
-import type { PlayerAction } from '@repo/server/sdk'
 import type { Renderer } from '~client/renderer'
-
-// ─── Move Queue ───
-
-export interface MoveStep { dx: number; dy: number }
-
-let moveQueue: MoveStep[] = []
-let shiftHeld = false
-let arrowDuringShift = false
-let onQueueChange: ((front: MoveStep | null) => void) | null = null
-
-/** Register callback fired when the queue front changes. */
-export function setOnQueueChange(cb: (front: MoveStep | null) => void) {
-  onQueueChange = cb
-}
-
-/** Read the current queue (for arrow rendering). */
-export function getMoveQueue(): readonly Readonly<MoveStep>[] {
-  return moveQueue
-}
-
-/** Shift the front off the queue (called when a move is confirmed). */
-export function advanceQueue() {
-  if (moveQueue.length === 0) return
-  moveQueue.shift()
-  onQueueChange?.(moveQueue[0] ?? null)
-}
-
-/** Clear the entire queue (called when a move fails). */
-export function clearQueue() {
-  if (moveQueue.length === 0) return
-  moveQueue = []
-  onQueueChange?.(null)
-}
-
-function setQueue(queue: MoveStep[]) {
-  moveQueue = queue
-  onQueueChange?.(moveQueue[0] ?? null)
-}
+import { appendMove, clearPlan, submitPlan, getPlan, type RoundPhase } from '~client/game'
 
 // ─── Inspector State ───
 
@@ -48,6 +10,12 @@ export function getInspectedCell() { return inspectedCell }
 export function getHoveredCell() { return hoveredCell }
 
 // ─── Binding ───
+
+let currentPhase: RoundPhase = 'planning'
+
+export function setInputPhase(phase: RoundPhase) {
+  currentPhase = phase
+}
 
 export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelect: () => void, onReload: () => void): () => void {
   const onClick = (e: MouseEvent) => {
@@ -70,49 +38,32 @@ export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelec
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.repeat) return
 
-    let step: MoveStep | null = null
+    // Reload shortcut always works.
+    if (e.key === 'r' || e.key === 'R') {
+      onReload()
+      return
+    }
+
+    // Plan-building only works in planning phase.
+    if (currentPhase !== 'planning') return
+
     switch (e.key) {
-      case 'ArrowUp': step = { dx: 0, dy: -1 }; break
-      case 'ArrowDown': step = { dx: 0, dy: 1 }; break
-      case 'ArrowLeft': step = { dx: -1, dy: 0 }; break
-      case 'ArrowRight': step = { dx: 1, dy: 0 }; break
-      case 'Shift':
-        shiftHeld = true
-        arrowDuringShift = false
-        return
-      case 'r': case 'R': onReload(); return
-    }
-
-    if (step) {
-      if (shiftHeld) {
-        const wasEmpty = moveQueue.length === 0
-        moveQueue.push(step)
-        arrowDuringShift = true
-        if (wasEmpty) onQueueChange?.(step)
-      } else {
-        setQueue([step])
-      }
-    }
-  }
-
-  const onKeyUp = (e: KeyboardEvent) => {
-    if (e.key === 'Shift') {
-      if (!arrowDuringShift) {
-        setQueue([])
-      }
-      shiftHeld = false
+      case 'ArrowUp': appendMove(0, -1); break
+      case 'ArrowDown': appendMove(0, 1); break
+      case 'ArrowLeft': appendMove(-1, 0); break
+      case 'ArrowRight': appendMove(1, 0); break
+      case 'Backspace': clearPlan(); break
+      case 'Enter': submitPlan(); break
     }
   }
 
   document.addEventListener('keydown', onKeyDown)
-  document.addEventListener('keyup', onKeyUp)
 
   return () => {
     canvas.removeEventListener('click', onClick)
     canvas.removeEventListener('mousemove', onMouseMove)
     canvas.removeEventListener('mouseleave', onMouseLeave)
     document.removeEventListener('keydown', onKeyDown)
-    document.removeEventListener('keyup', onKeyUp)
   }
 }
 

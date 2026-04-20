@@ -12,8 +12,8 @@
   import { ENTITY_TRAIT_NAMES } from '~client/entityTraits'
   import { settings } from '~client/settings'
   import { Renderer } from '~client/renderer'
-  import { bindInput, getHoveredCell, getInspectedCell } from '~client/input'
-  import { init, startTickLoop, getView, getGame } from '~client/game'
+  import { bindInput, getHoveredCell, getInspectedCell, setInputPhase } from '~client/input'
+  import { init, getView, getGame, onPhaseChange } from '~client/game'
   import { debugInit } from '~client/debug'
   import Sidebar from '~client/components/Sidebar.vue'
 
@@ -52,6 +52,12 @@
       if (view.value) renderer.render(view.value, getHoveredCell(), getInspectedCell())
     }
 
+    onPhaseChange((phase) => {
+      renderer.phase = phase
+      setInputPhase(phase)
+      refreshUI()
+    })
+
     unbindInput = bindInput(canvas, renderer, refreshUI, () => { startGame() })
     rafId = requestAnimationFrame(animationLoop)
     await startGame()
@@ -63,8 +69,7 @@
   })
 
   async function startGame() {
-    await init(renderer)
-    startTickLoop(renderer, refreshUI)
+    await init(renderer, refreshUI)
     refreshUI()
   }
 

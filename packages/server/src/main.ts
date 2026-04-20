@@ -4,10 +4,10 @@ import { WebSocketServer } from 'ws'
 import { type WorldManifest, type ChunkData } from '@repo/state'
 import { bootstrap, importWorld } from '@repo/engine'
 import { GameServer } from '~server/sdk/GameServer.js'
+import { ACTIONS_PER_ROUND } from '~server/sdk/types.js'
 import type { ClientMessage, ServerMessage, SerializedGameView, GameView } from '~server/sdk/types.js'
 
 const PORT = 5174
-const TICK_INTERVAL_MS = 500
 const SAVES_DIR = path.resolve(import.meta.dirname, '../../../saves')
 
 function serializeView(view: GameView): SerializedGameView {
@@ -37,7 +37,6 @@ wss.on('connection', (ws) => {
   console.log('Client connected')
 
   let server: GameServer | null = null
-  let intervalId: ReturnType<typeof setInterval> | null = null
 
   function send(msg: ServerMessage) {
     ws.send(JSON.stringify(msg))
@@ -45,7 +44,7 @@ wss.on('connection', (ws) => {
 
   ws.on('message', (raw) => {
     try {
-      const msg = JSON.parse(String(raw)) as ClientMessage
+      const msg = JSON.parse(String(raw)) as ClientMessage | { type: 'debug-forward'; ticks: number }
 
       switch (msg.type) {
         case 'join': {
@@ -57,38 +56,42 @@ wss.on('connection', (ws) => {
           const { world, playerIds } = importWorld(manifest, chunks)
           server = new GameServer(world, playerIds[0])
 
-          // Send initial view.
-          send({ type: 'joined', view: serializeView(server.getView()) })
-
-          // Start tick loop, push views.
-          intervalId = setInterval(() => {
-            const actionResult = server!.tick()
-            if (actionResult) send(actionResult)
-            send({ type: 'view', view: serializeView(server!.getView()) })
-          }, TICK_INTERVAL_MS)
+          send({
+            type: 'joined',
+            view: serializeView(server.getView()),
+            actionsPerRound: ACTIONS_PER_ROUND,
+          })
           break
         }
 
-        case 'action': {
+        case 'submit-plan': {
           if (!server) {
             send({ type: 'error', message: 'Not joined yet' })
             break
           }
-          server.sendAction(msg.actionId, msg.action)
+          const frames = server.resolveRound(msg.actions)
+          send({
+            type: 'round-resolve',
+            frames: frames.map(serializeView),
+          })
           break
         }
 
         case 'debug-forward': {
-          if (!server) {
-            send({ type: 'error', message: 'Not joined yet' })
-            break
+          if (!server) break
+          const ticks = msg.ticks ?? 0
+          const allFrames: GameView[] = []
+          // Run N empty rounds to advance simulation by approximately `ticks` ticks.
+          const rounds = Math.ceil(ticks / ACTIONS_PER_ROUND)
+          for (let i = 0; i < rounds; i++) {
+            allFrames.push(...server.resolveRound([]))
           }
-          const count = Math.min(msg.ticks, 1000) // safety cap
-          for (let i = 0; i < count; i++) {
-            const actionResult = server.tick()
-            if (actionResult) send(actionResult)
-          }
-          send({ type: 'view', view: serializeView(server.getView()) })
+          // Send only the final frame set as a round-resolve so the client stays in sync.
+          const lastRoundFrames = allFrames.slice(-ACTIONS_PER_ROUND)
+          send({
+            type: 'round-resolve',
+            frames: lastRoundFrames.map(serializeView),
+          })
           break
         }
       }
@@ -98,7 +101,6 @@ wss.on('connection', (ws) => {
   })
 
   ws.on('close', () => {
-    if (intervalId) clearInterval(intervalId)
     console.log('Client disconnected')
   })
 })

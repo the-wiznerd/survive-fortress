@@ -1,6 +1,6 @@
-import type { GameView, ViewEntity } from '@repo/server/sdk'
+import type { GameView, ViewEntity, PlayerAction } from '@repo/server/sdk'
 import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, zKey, type RenderEntity, type EntityRenderer } from '@repo/rendering'
-import { getMoveQueue } from '~client/input'
+import { getPlan, type RoundPhase } from '~client/game'
 
 export class Renderer {
   private world: WorldRenderer
@@ -38,6 +38,7 @@ export class Renderer {
   }
 
   showMoistureOverlay = false
+  phase: RoundPhase = 'planning'
 
   render(view: GameView, hoveredCell?: { x: number; y: number } | null, selectedCell?: { x: number; y: number } | null) {
     if (!this.world.ready) return
@@ -75,6 +76,7 @@ export class Renderer {
         self.drawTileHighlight(ctx, hoveredCell ?? null, 'rgba(255, 255, 255, 0.35)')
         self.drawTileHighlight(ctx, selectedCell ?? null, 'rgba(135, 206, 235, 0.6)')
         if (self.showMoistureOverlay) self.drawMoistureOverlay(ctx, entities)
+        self.drawPhaseBorder(ctx)
       },
     })
   }
@@ -123,8 +125,8 @@ export class Renderer {
   }
 
   private drawMoveArrows(ctx: CanvasRenderingContext2D, view: GameView) {
-    const queue = getMoveQueue()
-    if (queue.length === 0) return
+    const plan = getPlan()
+    if (plan.length === 0) return
 
     const player = view.entities.find(e => String(e.id) === view.playerId)
     if (!player) return
@@ -135,20 +137,35 @@ export class Renderer {
     // Need sprite sheet access for arrow drawing.
     const spriteSheet = this.world.spriteSheet
 
-    for (const step of queue) {
-      x += step.dx
-      y += step.dy
+    for (const action of plan) {
+      if (action.type !== 'move') continue
+      x += action.dx
+      y += action.dy
 
       const sx = x - this.cameraX
       const sy = y - this.cameraY
       if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) continue
 
-      const col = arrowCol(step.dx, step.dy)
+      const col = arrowCol(action.dx, action.dy)
       ctx.drawImage(spriteSheet,
         col * CELL_W, ARROW_ROW * CELL_H, CELL_W, CELL_H,
         sx * CELL_W, (sy + 1) * TOP_H - player.z * FRONT_H,
         CELL_W, CELL_H)
     }
+  }
+
+  private static PHASE_COLORS: Record<RoundPhase, string> = {
+    planning: '#518fb0',   // --color-blue
+    submitted: '#a7814e',  // --color-yellow
+    resolving: '#a2af50',  // --color-green
+  }
+
+  private drawPhaseBorder(ctx: CanvasRenderingContext2D) {
+    const w = this.viewWidth * CELL_W
+    const h = this.viewHeight * TOP_H
+    ctx.strokeStyle = Renderer.PHASE_COLORS[this.phase]
+    ctx.lineWidth = 2
+    ctx.strokeRect(1, 1, w - 2, h - 2)
   }
 }
 

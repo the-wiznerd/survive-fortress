@@ -49,12 +49,15 @@ export function movementSystem(world: World) {
     const anyReady = movement.modes.some(m => m.tickCount >= m.pace)
     if (!anyReady) continue
 
+    // Pull next action from the plan queue (player-controlled entities).
     let action: Action | null = null
-
     const pc = getComponent(world, id, 'playerControlled')
     if (pc) {
-      action = pc.pendingAction
-      pc.pendingAction = null
+      if (pc.planIndex < pc.plan.length) {
+        action = pc.plan[pc.planIndex]
+      } else {
+        continue // plan exhausted — idle
+      }
     }
 
     if (action?.type === 'move') {
@@ -68,11 +71,18 @@ export function movementSystem(world: World) {
 
       // Find first ready mode that permits the move.
       const mode = movement.modes.find(m => m.tickCount >= m.pace && canMove(m.locomotion, dest, floor))
-      if (!mode) continue
+      if (!mode) {
+        // Move blocked — terminate plan.
+        if (pc) pc.planIndex = pc.plan.length
+        continue
+      }
 
       pos.x = destX
       pos.y = destY
       mode.tickCount = 0
+      if (pc) pc.planIndex++
+    } else if (action?.type === 'wait') {
+      if (pc) pc.planIndex++
     }
   }
 }

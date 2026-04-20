@@ -1,13 +1,30 @@
-import type { Game, GameView, ServerMessage, SerializedGameView } from '@repo/server/sdk'
-import { setOnQueueChange, advanceQueue, clearQueue, type MoveStep } from '~client/input'
+import type { Game, GameView, ServerMessage, SerializedGameView, PlayerAction } from '@repo/server/sdk'
 import { Renderer } from '~client/renderer'
+
+// ─── Round Phase ───
+
+export type RoundPhase = 'planning' | 'submitted' | 'resolving'
+
+let phase: RoundPhase = 'planning'
+let phaseCallback: ((phase: RoundPhase) => void) | null = null
+
+export function getPhase(): RoundPhase { return phase }
+export function onPhaseChange(cb: (phase: RoundPhase) => void) { phaseCallback = cb }
+
+function setPhase(p: RoundPhase) {
+  phase = p
+  phaseCallback?.(p)
+}
 
 // ─── Game State ───
 
 let game: Game
 let currentView: GameView
-let nextActionId = 0
-let latestActionId: string | null = null
+let resolveFrames: GameView[] = []
+let resolveIndex = 0
+let resolveTimerId: ReturnType<typeof setTimeout> | null = null
+
+const PLAYBACK_TICK_MS = 250
 
 const WS_URL = 'ws://localhost:5174'
 const DEFAULT_SAVE = 'test-world'
@@ -20,13 +37,43 @@ function deserializeView(sv: SerializedGameView): GameView {
   return { ...sv, visiblePositions: new Set(sv.visiblePositions) }
 }
 
+// ─── Plan Management ───
+
+let plan: PlayerAction[] = []
+let planChangeCallback: ((plan: readonly PlayerAction[]) => void) | null = null
+
+export function getPlan(): readonly PlayerAction[] { return plan }
+export function onPlanChange(cb: (plan: readonly PlayerAction[]) => void) { planChangeCallback = cb }
+
+export function appendMove(dx: number, dy: number) {
+  if (phase !== 'planning') return
+  plan.push({ type: 'move', dx, dy })
+  planChangeCallback?.(plan)
+}
+
+export function clearPlan() {
+  if (phase !== 'planning') return
+  plan = []
+  planChangeCallback?.(plan)
+}
+
+export function submitPlan() {
+  if (phase !== 'planning') return
+  game.submitPlan(plan)
+  plan = []
+  planChangeCallback?.(plan)
+  setPhase('submitted')
+}
+
+// ─── Connection ───
+
 function connectGame(save: string): Promise<Game> {
   return new Promise((resolve, reject) => {
     const ws = new WebSocket(WS_URL)
 
-    let viewCallback: ((view: GameView) => void) | null = null
-    let actionResultCallback: ((actionId: string, result: 'accepted' | 'rejected') => void) | null = null
-    let initialView: GameView | null = null
+    let resolveCallback: ((frames: GameView[]) => void) | null = null
+    let latestView: GameView | null = null
+    let actionsPerRound = 8
 
     ws.onopen = () => {
       ws.send(JSON.stringify({ type: 'join', save }))
@@ -41,32 +88,28 @@ function connectGame(save: string): Promise<Game> {
 
       switch (msg.type) {
         case 'joined':
-          initialView = deserializeView(msg.view)
+          latestView = deserializeView(msg.view)
+          actionsPerRound = msg.actionsPerRound
           resolve({
-            onViewUpdate(cb) { viewCallback = cb },
-            onActionResult(cb) { actionResultCallback = cb },
-            sendAction(actionId, action) { ws.send(JSON.stringify({ type: 'action', actionId, action })) },
+            onRoundResolve(cb) { resolveCallback = cb },
+            submitPlan(actions) { ws.send(JSON.stringify({ type: 'submit-plan', actions })) },
             inspect(x, y) {
-              const view = initialView!
+              const view = latestView!
               return { entities: view.entities.filter(e => e.x === x && e.y === y) }
             },
-            start() { /* tick loop runs on the server */ },
             stop() { ws.close() },
-            getView() { return initialView! },
+            getView() { return latestView! },
+            get actionsPerRound() { return actionsPerRound },
             sendRaw(msg) { ws.send(JSON.stringify(msg)) },
           })
           break
 
-        case 'view': {
-          const view = deserializeView(msg.view)
-          initialView = view
-          viewCallback?.(view)
+        case 'round-resolve': {
+          const frames = msg.frames.map(deserializeView)
+          latestView = frames[frames.length - 1]
+          resolveCallback?.(frames)
           break
         }
-
-        case 'action-result':
-          actionResultCallback?.(msg.actionId, msg.result)
-          break
 
         case 'error':
           console.error('Server error:', msg.message)
@@ -76,17 +119,33 @@ function connectGame(save: string): Promise<Game> {
   })
 }
 
-function sendNextAction(front: MoveStep | null) {
-  const actionId = String(++nextActionId)
-  latestActionId = actionId
-  if (front) {
-    game.sendAction(actionId, { type: 'move', dx: front.dx, dy: front.dy })
-  } else {
-    game.sendAction(actionId, { type: 'wait' })
+// ─── Playback ───
+
+function startPlayback(frames: GameView[], renderer: Renderer, onDone: () => void) {
+  resolveFrames = frames
+  resolveIndex = 0
+  setPhase('resolving')
+
+  function step() {
+    currentView = resolveFrames[resolveIndex]
+    const player = currentView.entities.find(e => String(e.id) === currentView.playerId)
+    if (player) renderer.setCamera(player.x, player.y)
+
+    resolveIndex++
+    if (resolveIndex < resolveFrames.length) {
+      resolveTimerId = setTimeout(step, PLAYBACK_TICK_MS)
+    } else {
+      resolveTimerId = null
+      onDone()
+    }
   }
+
+  step()
 }
 
-export async function init(renderer: Renderer) {
+// ─── Init ───
+
+export async function init(renderer: Renderer, onUpdate: () => void) {
   game = await connectGame(SAVE_NAME)
 
   currentView = game.getView()
@@ -97,34 +156,13 @@ export async function init(renderer: Renderer) {
     renderer.setCamera(player.x, player.y)
   }
 
-  // Wire queue changes to game actions.
-  setOnQueueChange((front: MoveStep | null) => {
-    sendNextAction(front)
-  })
-}
-
-export function startTickLoop(renderer: Renderer, onTick: () => void) {
-  game.onViewUpdate((view) => {
-    currentView = view
-    const player = view.entities.find(e => String(e.id) === view.playerId)
-    if (player) {
-      renderer.setCamera(player.x, player.y)
-    }
-    onTick()
+  game.onRoundResolve((frames) => {
+    startPlayback(frames, renderer, () => {
+      setPhase('planning')
+      onUpdate()
+    })
   })
 
-  game.onActionResult((actionId, result) => {
-    if (actionId !== latestActionId) {
-      // Stale result — we've already sent a newer action. Out of sync.
-      clearQueue()
-      return
-    }
-    if (result === 'accepted') {
-      advanceQueue()
-    } else {
-      clearQueue()
-    }
-  })
-
-  game.start()
+  setPhase('planning')
+  onUpdate()
 }

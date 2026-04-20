@@ -56,8 +56,10 @@ export interface Movement {
 }
 
 export interface PlayerControlled {
-  /** Queued action for the current tick, if any. */
-  pendingAction: Action | null
+  /** Ordered list of actions for this round. */
+  plan: Action[]
+  /** Index of the next action to consume. When >= plan.length, the plan is exhausted. */
+  planIndex: number
 }
 
 export interface EntityType {
