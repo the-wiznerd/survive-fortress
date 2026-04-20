@@ -53,7 +53,7 @@
       padding: 0.15rem 0.5rem;
       cursor: pointer;
       position: relative;
-      top: -1px;
+      inset-block-start: -1px;
 
       &:hover:not(:disabled) {
         background: var(--color-dark-gray);
@@ -76,7 +76,7 @@
     }
 
     .mode-picker {
-      margin-top: 0.6rem;
+      margin-block-start: 0.6rem;
     }
 
     .zoom-value {
