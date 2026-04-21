@@ -24,9 +24,9 @@ export class Renderer {
     this.world.setScale(newScale)
   }
 
-  setCamera(x: number, y: number) {
+  setCamera(x: number, y: number, z = 0) {
     this.cameraX = x - Math.floor(this.viewWidth / 2)
-    this.cameraY = y - Math.floor(this.viewHeight / 2)
+    this.cameraY = y - Math.floor(this.viewHeight / 2) - z * FRONT_H / TOP_H
   }
 
   /** Convert canvas pixel coordinates to world (x, y). */
@@ -72,8 +72,8 @@ export class Renderer {
         self.drawMoveArrows(ctx, view)
       },
       onAfterEntities(ctx) {
-        self.drawTileHighlight(ctx, hoveredCell ?? null, 'rgba(255, 255, 255, 0.35)')
-        self.drawTileHighlight(ctx, selectedCell ?? null, 'rgba(135, 206, 235, 0.6)')
+        self.drawCellSprite(ctx, hoveredCell ?? null, HOVER_SPRITE_COL, view)
+        self.drawCellSprite(ctx, selectedCell ?? null, SELECTED_SPRITE_COL, view)
         if (self.showMoistureOverlay) self.drawMoistureOverlay(ctx, entities)
       },
     })
@@ -84,22 +84,25 @@ export class Renderer {
     return this.world.getEntityRenderer(typeName)
   }
 
-  private drawTileHighlight(
+  private drawCellSprite(
     ctx: CanvasRenderingContext2D,
     cell: { x: number; y: number } | null,
-    color: string,
+    spriteCol: number,
+    view: GameView,
   ) {
     if (!cell) return
     const sx = cell.x - this.cameraX
     const sy = cell.y - this.cameraY
     if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) return
 
-    const px = sx * CELL_W
-    const py = sy * TOP_H
+    const z = view.entities
+      .filter(e => e.x === cell.x && e.y === cell.y && this.world.getEntityRenderer(e.type)?.terrain)
+      .reduce((max, e) => Math.max(max, e.z), 0)
 
-    ctx.strokeStyle = color
-    ctx.lineWidth = 1
-    ctx.strokeRect(px + 0.5, py + 0.5, CELL_W - 1, TOP_H - 1)
+    ctx.drawImage(this.world.spriteSheet,
+      spriteCol * CELL_W, ARROW_ROW * CELL_H, CELL_W, TOP_H,
+      sx * CELL_W, sy * TOP_H - z * FRONT_H,
+      CELL_W, TOP_H)
   }
 
   private drawMoistureOverlay(ctx: CanvasRenderingContext2D, entities: RenderEntity[]) {
@@ -169,11 +172,13 @@ export class Renderer {
 }
 
 const ARROW_ROW = 15
-const ACTION_SPRITE_COL = 4
+const HOVER_SPRITE_COL = 0
+const SELECTED_SPRITE_COL = 1
+const ACTION_SPRITE_COL = 6
 
 function arrowCol(dx: number, dy: number): number {
-  if (dy < 0) return 0 // up
-  if (dx > 0) return 1 // right
-  if (dy > 0) return 2 // down
-  return 3             // left
+  if (dy < 0) return 2 // up
+  if (dx > 0) return 3 // right
+  if (dy > 0) return 4 // down
+  return 5             // left
 }

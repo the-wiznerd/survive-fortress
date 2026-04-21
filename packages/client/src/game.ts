@@ -185,7 +185,7 @@ function startPlayback(frames: GameView[], renderer: Renderer, onDone: () => voi
 
     currentView = frame
     const player = currentView.entities.find(e => String(e.id) === currentView.playerId)
-    if (player) renderer.setCamera(player.x, player.y)
+    if (player) renderer.setCamera(player.x, player.y, player.z)
 
     frameIndex++
     if (frameIndex < frames.length) {
@@ -212,7 +212,7 @@ export async function init(renderer: Renderer, onUpdate: () => void, turnMode: T
   // Center camera on player.
   const player = currentView.entities.find(e => String(e.id) === currentView.playerId)
   if (player) {
-    renderer.setCamera(player.x, player.y)
+    renderer.setCamera(player.x, player.y, player.z)
   }
 
   game.onRoundResolve((frames) => {

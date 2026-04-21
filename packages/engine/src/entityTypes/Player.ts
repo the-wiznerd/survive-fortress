@@ -16,7 +16,7 @@ export class Player extends BaseEntityType {
   ]))
   vision = this.addTrait(new VisionTrait(this.world, this.id, {
     horizontalRange: 20,
-    verticalRange: 2
+    verticalRange: 5
   }))
   playerControlled = this.addTrait(new PlayerControlledTrait(this.world, this.id))
 }
