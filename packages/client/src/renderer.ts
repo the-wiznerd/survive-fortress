@@ -104,11 +104,11 @@ export class Renderer {
 
     this.world.render(entities, this.cameraX, this.cameraY, knownColumns, player?.z ?? -Infinity, vision?.verticalRange ?? 0, {
       onAfterTerrain(ctx) {
+        self.drawCellSprite(ctx, hoveredCell ?? null, HOVER_SPRITE_COL, view)
+        self.drawCellSprite(ctx, selectedCell ?? null, SELECTED_SPRITE_COL, view)
         self.drawMoveArrows(ctx, view)
       },
       onAfterEntities(ctx) {
-        self.drawCellSprite(ctx, hoveredCell ?? null, HOVER_SPRITE_COL, view)
-        self.drawCellSprite(ctx, selectedCell ?? null, SELECTED_SPRITE_COL, view)
         if (self.showMoistureOverlay) self.drawMoistureOverlay(ctx, entities)
       },
     })
@@ -136,7 +136,7 @@ export class Renderer {
 
     ctx.drawImage(this.world.spriteSheet,
       spriteCol * CELL_W, ARROW_ROW * CELL_H, CELL_W, TOP_H,
-      sx * CELL_W, sy * TOP_H - z * FRONT_H,
+      sx * CELL_W, sy * TOP_H - z * FRONT_H + 2,
       CELL_W, TOP_H)
   }
 
