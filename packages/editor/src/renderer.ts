@@ -99,8 +99,8 @@ export class EditorRenderer {
                     const atlasSource = self.world.terrainAtlas.bitmap ?? self.world.terrainAtlas.canvas
                     const variants = self.world.terrainAtlas.getVariants(activeType)
                     if (atlasSource && variants) {
-                      const topCell = variants.topFaces[0] // flat variant
-                      const frontCell = variants.frontFaces[0]
+                      const topCell = variants.topFaces[0]! // flat variant
+                      const frontCell = variants.frontFaces[0]!
                       ctx.drawImage(
                         atlasSource,
                         topCell.col * CELL_W, topCell.row * ATLAS_ROW_H, CELL_W, TOP_H,

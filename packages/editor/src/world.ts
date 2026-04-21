@@ -75,7 +75,9 @@ export async function editorSaveWorld(name?: string) {
   }
 
   const chunkCoords = [...chunkSet].map(k => {
-    const [cx, cy] = k.split('_').map(Number)
+    const parts = k.split('_')
+    const cx = Number(parts[0])
+    const cy = Number(parts[1])
     return { cx, cy }
   })
 

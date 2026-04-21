@@ -170,7 +170,7 @@
       if (!showAllZ.value) {
         entities = entities.filter(e => e.z === activeZ.value)
       }
-      renderer.render(entities, activeZ.value, hoveredCell.value, effectiveTool.value, activeType.value)
+      renderer.render(entities, activeZ.value, hoveredCell.value, effectiveTool.value, activeType.value!)
     }
     rafId = requestAnimationFrame(renderLoop)
   }
@@ -273,7 +273,7 @@
     const pos = renderer.screenToWorld(canvasX, canvasY, activeZ.value)
 
     if (effectiveTool.value === 'draw') {
-      const type = activeType.value === 'bushSmall' ? 'bush' : activeType.value
+      const type = activeType.value === 'bushSmall' ? 'bush' : activeType.value!
       const state = activeType.value === 'bushSmall'
         ? { size: 'small' }
         : activeType.value === 'bush'
