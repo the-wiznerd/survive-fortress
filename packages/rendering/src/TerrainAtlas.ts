@@ -123,7 +123,7 @@ export class TerrainAtlas {
     tmpCtx.imageSmoothingEnabled = false
 
     for (let typeIdx = 0; typeIdx < this.defs.length; typeIdx++) {
-      const { name, def } = this.defs[typeIdx]
+      const { name, def } = this.defs[typeIdx]!
       const baseY = typeIdx * ATLAS_ROW_H
       let col = 0
 

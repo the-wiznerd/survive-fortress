@@ -54,7 +54,7 @@ export function movementSystem(world: World) {
     const pc = getComponent(world, id, 'playerControlled')
     if (pc) {
       if (pc.planIndex < pc.plan.length) {
-        action = pc.plan[pc.planIndex]
+        action = pc.plan[pc.planIndex]!
       } else {
         continue // plan exhausted — idle
       }

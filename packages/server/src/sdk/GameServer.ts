@@ -37,7 +37,7 @@ export class GameServer {
       frames.push(view)
     }
 
-    this.currentView = frames[frames.length - 1]
+    this.currentView = frames[frames.length - 1]!
     return frames
   }
 

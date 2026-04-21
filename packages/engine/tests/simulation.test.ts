@@ -115,7 +115,7 @@ describe('movement system', () => {
 
     // Override pace to 3 so we can test the timer.
     const movement = getComponent(world, player, 'movement')!
-    movement.modes[0].pace = 3
+    movement.modes[0]!.pace = 3
 
     const pc = getComponent(world, player, 'playerControlled')!
     pc.plan = [

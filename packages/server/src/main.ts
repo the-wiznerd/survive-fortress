@@ -84,7 +84,7 @@ wss.on('connection', (ws) => {
           }
           const { manifest, chunks } = loadSave(msg.save)
           const { world, playerIds } = importWorld(manifest, chunks)
-          server = new GameServer(world, playerIds[0])
+          server = new GameServer(world, playerIds[0]!)
           turnMode = msg.turnMode ?? 'manual'
 
           send({

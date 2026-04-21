@@ -154,7 +154,7 @@ export class WorldRenderer {
       const er = ENTITY_RENDERERS[entity.type]
       if (!er) continue
       const bucket = er.terrain ? terrainRows : uprightRows
-      bucket[sy].push({ entity, sx, sy, renderer: er })
+      bucket[sy]!.push({ entity, sx, sy, renderer: er })
     }
 
     // Build per-frame render context.

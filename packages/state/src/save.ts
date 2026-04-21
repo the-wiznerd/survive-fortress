@@ -44,6 +44,8 @@ export function chunkKey(cx: number, cy: number): string {
 }
 
 export function parseChunkKey(key: string): { cx: number; cy: number } {
-  const [cx, cy] = key.split('_').map(Number)
+  const parts = key.split('_')
+  const cx = Number(parts[0])
+  const cy = Number(parts[1])
   return { cx, cy }
 }

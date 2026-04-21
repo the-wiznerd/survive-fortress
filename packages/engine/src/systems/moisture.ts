@@ -29,9 +29,9 @@ export function moistureSystem(world: World) {
   // Phase 2: accumulate net delta per entity.
   const netDelta = new Map<EntityId, number>()
   for (let i = 0; i < faces.length; i++) {
-    const t = transfers[i]
+    const t = transfers[i]!
     if (t === 0) continue
-    const { entityA, entityB } = faces[i]
+    const { entityA, entityB } = faces[i]!
     netDelta.set(entityA, (netDelta.get(entityA) ?? 0) - t)
     netDelta.set(entityB, (netDelta.get(entityB) ?? 0) + t)
   }

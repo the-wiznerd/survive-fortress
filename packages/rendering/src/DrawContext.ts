@@ -89,14 +89,14 @@ export class DrawContext {
     const aboveUnknown = isTop
       && this.rc.knownColumns.size > 0
       && this.z + 1 > this.rc.playerZ + this.rc.verticalRange
-    const top = aboveUnknown ? tv.unknownTop : tv.topFaces[n * 4 + e * 2 + w]
+    const top = aboveUnknown ? tv.unknownTop : tv.topFaces[n * 4 + e * 2 + w]!
     if (fromAtlas) {
       this.drawFromAtlas(top.col, top.row)
     } else {
       this.drawSheetTop(top.col, top.row)
     }
     if (!this.frontOccluded) {
-      const front = tv.frontFaces[s * 4 + e * 2 + w]
+      const front = tv.frontFaces[s * 4 + e * 2 + w]!
       if (fromAtlas) {
         this.drawFromAtlas(front.col, front.row, 1, FRONT_FACE_H)
       } else {

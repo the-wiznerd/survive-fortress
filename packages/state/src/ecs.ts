@@ -200,7 +200,7 @@ export function queryEntities(
   if (required.length === 0) return []
 
   // Start with the smallest store for efficiency.
-  let smallest: Map<EntityId, unknown> = world.components[required[0]]
+  let smallest: Map<EntityId, unknown> = world.components[required[0]!]!
   for (const name of required) {
     const store = world.components[name] as Map<EntityId, unknown>
     if (store.size < smallest.size) smallest = store

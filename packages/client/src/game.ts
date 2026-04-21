@@ -145,7 +145,7 @@ function connectGame(save: string, turnMode: TurnMode): Promise<Game> {
         case 'round-resolve': {
           const frames = msg.frames.map(deserializeView)
           if (frames.length > 0) {
-            latestView = frames[frames.length - 1]
+            latestView = frames[frames.length - 1]!
           }
           resolveCallback?.(frames)
           break

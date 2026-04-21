@@ -25,13 +25,13 @@ export class WaterRenderer extends EntityRenderer {
     const w = this.hasNonWaterNeighbor(rc.typeAt, wx - 1, wy, z) ? 1 : 0
 
     const frame = ((Math.floor(rc.now / ANIM_INTERVAL) + wx + wy) % WATER_FRAMES.length + WATER_FRAMES.length) % WATER_FRAMES.length
-    const water = WATER_FRAMES[frame]
+    const water = WATER_FRAMES[frame]!
 
-    const top = water.topFaces[n * 4 + e * 2 + w]
+    const top = water.topFaces[n * 4 + e * 2 + w]!
     dc.drawSheetTop(top.col, top.row, Y_OFFSET)
 
     if (!dc.frontOccluded) {
-      const front = water.frontFaces[e * 2 + w]
+      const front = water.frontFaces[e * 2 + w]!
       dc.drawSheetFront(front.col, front.row, 1 + Y_OFFSET)
     }
   }
