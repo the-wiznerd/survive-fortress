@@ -20,6 +20,7 @@ export interface ComponentTypes {
   name: Name
   material: Material
   instance: Instance
+  harvestable: Harvestable
 }
 
 export type ComponentName = keyof ComponentTypes
@@ -99,11 +100,17 @@ export interface Instance {
   ref: unknown
 }
 
+export interface Harvestable {
+  /** Current available amount. 0 = nothing to harvest. */
+  amount: number
+}
+
 // ─── Actions ───
 
 export type Action =
   | { type: 'move'; dx: number; dy: number }
   | { type: 'wait' }
+  | { type: 'harvest'; targetId: number }
 
 // ─── World ───
 
@@ -136,6 +143,7 @@ export function createWorld(): World {
       name: new Map(),
       material: new Map(),
       instance: new Map(),
+      harvestable: new Map(),
     },
     spatialIndex: new Map(),
   }

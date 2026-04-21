@@ -15,6 +15,7 @@ export interface TraitViews {
   moisture: Moisture
   groundCover: GroundCover
   vision: Vision
+  harvestable: { available: boolean }
 }
 
 /** A trait name the client is allowed to see. */
@@ -49,6 +50,7 @@ export interface ViewEntity {
 export type PlayerAction =
   | { type: 'move'; dx: number; dy: number }
   | { type: 'wait' }
+  | { type: 'harvest'; targetId: number }
 
 export type TurnMode = 'manual' | 'auto'
 

@@ -1,5 +1,5 @@
 import type { Renderer } from '~client/renderer'
-import { appendMove, clearPlan, submitPlan, getPlan, type RoundPhase } from '~client/game'
+import { appendMove, appendHarvest, clearPlan, submitPlan, getPlanCursor, getView, type RoundPhase } from '~client/game'
 
 // ─── Inspector State ───
 
@@ -47,14 +47,20 @@ export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelec
     // Plan-building only works in planning phase.
     if (currentPhase !== 'planning') return
 
+    let dx = 0
+    let dy = 0
     switch (e.key) {
-      case 'ArrowUp': appendMove(0, -1); break
-      case 'ArrowDown': appendMove(0, 1); break
-      case 'ArrowLeft': appendMove(-1, 0); break
-      case 'ArrowRight': appendMove(1, 0); break
-      case 'Backspace': clearPlan(); break
-      case 'Enter': submitPlan(); break
+      case 'w': case 'W': dy = -1; break
+      case 's': case 'S': dy = 1; break
+      case 'a': case 'A': dx = -1; break
+      case 'd': case 'D': dx = 1; break
+      case 'Backspace': clearPlan(); return
+      case ' ': submitPlan(); return
+      default: return
     }
+
+    e.preventDefault()
+    handleDirectional(dx, dy)
   }
 
   document.addEventListener('keydown', onKeyDown)
@@ -64,6 +70,31 @@ export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelec
     canvas.removeEventListener('mousemove', onMouseMove)
     canvas.removeEventListener('mouseleave', onMouseLeave)
     document.removeEventListener('keydown', onKeyDown)
+  }
+}
+
+// ─── Directional Action ───
+
+function handleDirectional(dx: number, dy: number) {
+  const cursor = getPlanCursor()
+  if (!cursor) { appendMove(dx, dy); return }
+
+  const view = getView()
+  if (!view) { appendMove(dx, dy); return }
+
+  const tx = cursor.x + dx
+  const ty = cursor.y + dy
+
+  // Check if there's a harvestable entity at the target cell.
+  const target = view.entities.find(e =>
+    e.x === tx && e.y === ty &&
+    (e.traits.harvestable as { available: boolean } | undefined)?.available === true
+  )
+
+  if (target) {
+    appendHarvest(target.id)
+  } else {
+    appendMove(dx, dy)
   }
 }
 

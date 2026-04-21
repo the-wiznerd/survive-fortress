@@ -79,6 +79,11 @@ export class GameServer {
       }
     }
 
+    const harvestable = getComponent(this.world, id, 'harvestable')
+    if (harvestable) {
+      traits.harvestable = { available: harvestable.amount > 0 }
+    }
+
     return {
       id,
       type: et.type,

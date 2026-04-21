@@ -1,6 +1,6 @@
 import type { GameView, ViewEntity, PlayerAction } from '@repo/server/sdk'
 import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, zKey, type RenderEntity, type EntityRenderer } from '@repo/rendering'
-import { getPlan } from '~client/game'
+import { getPlan, getPlanCursor } from '~client/game'
 
 export class Renderer {
   private world: WorldRenderer
@@ -132,23 +132,53 @@ export class Renderer {
     let x = player.x
     let y = player.y
 
-    // Need sprite sheet access for arrow drawing.
     const spriteSheet = this.world.spriteSheet
 
     for (const action of plan) {
-      if (action.type !== 'move') continue
-      x += action.dx
-      y += action.dy
+      if (action.type === 'move') {
+        x += action.dx
+        y += action.dy
 
-      const sx = x - this.cameraX
-      const sy = y - this.cameraY
-      if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) continue
+        const sx = x - this.cameraX
+        const sy = y - this.cameraY
+        if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) continue
 
-      const col = arrowCol(action.dx, action.dy)
-      ctx.drawImage(spriteSheet,
-        col * CELL_W, ARROW_ROW * CELL_H, CELL_W, CELL_H,
-        sx * CELL_W, (sy + 1) * TOP_H - player.z * FRONT_H,
-        CELL_W, CELL_H)
+        const col = arrowCol(action.dx, action.dy)
+        ctx.drawImage(spriteSheet,
+          col * CELL_W, ARROW_ROW * CELL_H, CELL_W, CELL_H,
+          sx * CELL_W, (sy + 1) * TOP_H - player.z * FRONT_H,
+          CELL_W, CELL_H)
+      } else if (action.type === 'harvest') {
+        // Find the target entity to determine direction from cursor.
+        const target = view.entities.find(e => e.id === action.targetId)
+        if (!target) continue
+
+        const dx = target.x - x
+        const dy = target.y - y
+        const sx = x - this.cameraX
+        const sy = y - this.cameraY
+        if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) continue
+
+        const col = arrowCol(dx, dy)
+        ctx.globalAlpha = 0.6
+        ctx.drawImage(spriteSheet,
+          col * CELL_W, ARROW_ROW * CELL_H, CELL_W, CELL_H,
+          sx * CELL_W, (sy + 1) * TOP_H - player.z * FRONT_H,
+          CELL_W, CELL_H)
+        ctx.globalAlpha = 1
+      }
+    }
+
+    // Draw plan cursor at final position.
+    const cursor = getPlanCursor()
+    if (cursor) {
+      const sx = cursor.x - this.cameraX
+      const sy = cursor.y - this.cameraY
+      if (sx >= 0 && sx < this.viewWidth && sy >= 0 && sy < this.viewHeight) {
+        ctx.strokeStyle = 'rgba(255, 220, 80, 0.85)'
+        ctx.lineWidth = 1
+        ctx.strokeRect(sx * CELL_W + 0.5, sy * TOP_H + 0.5 - player.z * FRONT_H, CELL_W - 1, TOP_H - 1)
+      }
     }
   }
 

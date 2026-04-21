@@ -55,10 +55,32 @@ let planChangeCallback: ((plan: readonly PlayerAction[]) => void) | null = null
 export function getPlan(): readonly PlayerAction[] { return plan }
 export function onPlanChange(cb: (plan: readonly PlayerAction[]) => void) { planChangeCallback = cb }
 
+/** Returns the world position the player will be at after all planned moves. */
+export function getPlanCursor(): { x: number; y: number } | null {
+  if (!currentView) return null
+  const player = currentView.entities.find(e => String(e.id) === currentView.playerId)
+  if (!player) return null
+  let x = player.x
+  let y = player.y
+  for (const action of plan) {
+    if (action.type === 'move') { x += action.dx; y += action.dy }
+  }
+  return { x, y }
+}
+
 export function appendMove(dx: number, dy: number) {
   if (phase !== 'planning') return
   if (plan.length >= maxPlanActions) return
   plan.push({ type: 'move', dx, dy })
+  planChangeCallback?.(plan)
+}
+
+export function appendHarvest(targetId: number) {
+  if (phase !== 'planning') return
+  if (plan.length >= maxPlanActions) return
+  // No-op if already queued a harvest on this target.
+  if (plan.some(a => a.type === 'harvest' && a.targetId === targetId)) return
+  plan.push({ type: 'harvest', targetId })
   planChangeCallback?.(plan)
 }
 
