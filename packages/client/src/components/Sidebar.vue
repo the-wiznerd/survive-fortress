@@ -6,6 +6,8 @@
 
     <EntityCard v-if="player" :entity="player" />
 
+    <InventoryPanel />
+
     <div v-if="selection" class="section selection">
       <div v-if="selection.entities.length === 0" class="stat">Empty</div>
       <EntityCard
@@ -35,6 +37,7 @@
   import EntityCard from '~client/components/EntityCard.vue'
   import DebugPanel from '~client/components/DebugPanel.vue'
   import SidebarSettings from '~client/components/SidebarSettings.vue'
+  import InventoryPanel from '~client/components/InventoryPanel.vue'
   import { DEBUG_ENABLED } from '~client/debug'
 
   const debugEnabled = DEBUG_ENABLED

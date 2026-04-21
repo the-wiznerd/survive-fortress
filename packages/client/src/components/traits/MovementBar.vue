@@ -6,7 +6,6 @@
         v-for="i in (mode.pace - 1)"
         :key="i"
         class="segment"
-        :class="{ filled: i <= mode.tickCount }"
       />
     </span>
   </div>

@@ -21,6 +21,13 @@ export interface ComponentTypes {
   material: Material
   instance: Instance
   harvestable: Harvestable
+  carriable: Carriable
+  container: Container
+  contained: Contained
+  edible: Edible
+  equipment: Equipment
+  wearable: Wearable
+  tool: Tool
 }
 
 export type ComponentName = keyof ComponentTypes
@@ -48,8 +55,8 @@ export type Locomotion = 'walk' | 'swim' | 'sail' | 'fly'
 
 export interface MovementMode {
   locomotion: Locomotion
+  /** Ticks per move step using this locomotion. Lower = faster. */
   pace: number
-  tickCount: number
 }
 
 export interface Movement {
@@ -61,6 +68,8 @@ export interface PlayerControlled {
   plan: Action[]
   /** Index of the next action to consume. When >= plan.length, the plan is exhausted. */
   planIndex: number
+  /** Ticks already spent on the current action (plan[planIndex]). Resets when an action completes or a plan terminates. */
+  actionTicksElapsed: number
 }
 
 export interface EntityType {
@@ -105,12 +114,52 @@ export interface Harvestable {
   amount: number
 }
 
+export interface Carriable {
+  /** Storage size in container slots. Items larger than a container's capacity cannot be held. */
+  size: number
+}
+
+export interface Container {
+  /** Maximum total Carriable.size of contents. */
+  capacity: number
+  /** Entity ids currently held. Each must also have a Contained component pointing back. */
+  contents: EntityId[]
+}
+
+export interface Contained {
+  /** The entity (container or equipment-bearing entity) holding this one. */
+  parentId: EntityId
+}
+
+export interface Edible {
+  /** Amount of Hunger.current restored when this entity is eaten. */
+  nutrition: number
+}
+
+export interface Equipment {
+  /** Named slot → equipped entity id (or null). Slot names are entity-specific, e.g. 'leftHand', 'back'. */
+  slots: Record<string, EntityId | null>
+}
+
+export interface Wearable {
+  /** The slot name this item fits into. */
+  slot: string
+}
+
+export interface Tool {
+  /** Action affordances this tool provides, e.g. ['chop'], ['dig']. */
+  affordances: string[]
+}
+
 // ─── Actions ───
 
 export type Action =
   | { type: 'move'; dx: number; dy: number }
   | { type: 'wait' }
   | { type: 'harvest'; targetId: number }
+  | { type: 'pickup'; targetId: number }
+  | { type: 'drop'; targetId: number; dx: number; dy: number }
+  | { type: 'eat'; targetId: number }
 
 // ─── World ───
 
@@ -144,6 +193,13 @@ export function createWorld(): World {
       material: new Map(),
       instance: new Map(),
       harvestable: new Map(),
+      carriable: new Map(),
+      container: new Map(),
+      contained: new Map(),
+      edible: new Map(),
+      equipment: new Map(),
+      wearable: new Map(),
+      tool: new Map(),
     },
     spatialIndex: new Map(),
   }

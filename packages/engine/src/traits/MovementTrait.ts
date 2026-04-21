@@ -8,7 +8,7 @@ export class MovementTrait extends Trait<'movement'> {
   constructor(
     world: World,
     entityId: EntityId,
-    private readonly initialModes: Omit<MovementMode, 'tickCount'>[] = [{
+    private readonly initialModes: MovementMode[] = [{
       locomotion: 'walk', pace: 1
     }],
   ) {
@@ -16,6 +16,6 @@ export class MovementTrait extends Trait<'movement'> {
   }
 
   defaults(): Movement {
-    return { modes: this.initialModes.map(m => ({ ...m, tickCount: 0 })) }
+    return { modes: this.initialModes.map(m => ({ ...m })) }
   }
 }

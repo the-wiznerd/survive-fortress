@@ -1,4 +1,4 @@
-import type { Health, Hunger, Movement, Moisture, GroundCover, Vision } from '@repo/state'
+import type { Health, Hunger, Movement, Moisture, GroundCover, Vision, Carriable, Edible, Wearable, Tool, EntityId } from '@repo/state'
 export { TICKS_PER_DAY } from '@repo/state'
 
 export type { MovementMode } from '@repo/state'
@@ -16,6 +16,13 @@ export interface TraitViews {
   groundCover: GroundCover
   vision: Vision
   harvestable: { available: boolean }
+  carriable: Carriable
+  contained: { parentId: EntityId }
+  container: { capacity: number; usedCapacity: number; contents: EntityId[] }
+  edible: Edible
+  equipment: { slots: Record<string, EntityId | null> }
+  wearable: Wearable
+  tool: Tool
 }
 
 /** A trait name the client is allowed to see. */
@@ -51,6 +58,9 @@ export type PlayerAction =
   | { type: 'move'; dx: number; dy: number }
   | { type: 'wait' }
   | { type: 'harvest'; targetId: number }
+  | { type: 'pickup'; targetId: number }
+  | { type: 'drop'; targetId: number; dx: number; dy: number }
+  | { type: 'eat'; targetId: number }
 
 export type TurnMode = 'manual' | 'auto'
 

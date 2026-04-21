@@ -77,13 +77,15 @@ export class Renderer {
   render(view: GameView, hoveredCell?: { x: number; y: number } | null, selectedCell?: { x: number; y: number } | null) {
     if (!this.world.ready) return
 
-    const entities: RenderEntity[] = view.entities.map(e => ({
-      type: e.type,
-      x: e.x,
-      y: e.y,
-      z: e.z,
-      traits: e.traits as Record<string, unknown>,
-    }))
+    const entities: RenderEntity[] = view.entities
+      .filter(e => !e.traits.contained)
+      .map(e => ({
+        type: e.type,
+        x: e.x,
+        y: e.y,
+        z: e.z,
+        traits: e.traits as Record<string, unknown>,
+      }))
 
     const self = this
 

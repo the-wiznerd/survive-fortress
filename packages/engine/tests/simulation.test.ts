@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeAll } from 'vitest'
 import { createWorld, getComponent, createEntity, addComponent, setPosition } from '@repo/state'
-import { registerEntityType, spawnEntity } from '~engine/registry.js'
-import { Player } from '~engine/entityTypes/Player.js'
+import { spawnEntity } from '~engine/registry.js'
+import { bootstrap } from '~engine/bootstrap.js'
 import { tick, simulate } from '~engine/tick.js'
 
-registerEntityType('player', Player)
+beforeAll(() => bootstrap())
 
 /** Convenience: spawn a player at (x, y) using the registry. */
 function spawnPlayer(world: ReturnType<typeof createWorld>, x: number, y: number) {
@@ -92,8 +92,8 @@ describe('movement system', () => {
     placeGround(world, 10, 10, -1)
     placeGround(world, 11, 10, -1)
 
-    // Player pace=1: ready after 1 tick.
-    simulate(world, 1)
+    // Override pace to 1 so this exercises the simplest move path.
+    getComponent(world, player, 'movement')!.modes[0]!.pace = 1
 
     const pc = getComponent(world, player, 'playerControlled')!
     pc.plan = [{ type: 'move', dx: 1, dy: 0 }]
@@ -113,7 +113,7 @@ describe('movement system', () => {
     // Place ground along the path.
     for (let x = 10; x <= 12; x++) placeGround(world, x, 10, -1)
 
-    // Override pace to 3 so we can test the timer.
+    // Override pace to 3 so each move takes 3 ticks.
     const movement = getComponent(world, player, 'movement')!
     movement.modes[0]!.pace = 3
 
@@ -124,24 +124,27 @@ describe('movement system', () => {
     ]
     pc.planIndex = 0
 
-    // Ticks 1-2: timer filling, not ready yet.
-    tick(world) // counter: 1
+    // Ticks 1–2: action in progress, not yet committed.
+    tick(world)
     expect(getComponent(world, player, 'position')!.x).toBe(10)
+    expect(pc.actionTicksElapsed).toBe(1)
 
-    tick(world) // counter: 2
+    tick(world)
     expect(getComponent(world, player, 'position')!.x).toBe(10)
+    expect(pc.actionTicksElapsed).toBe(2)
 
-    tick(world) // counter: 3 → ready, moves, resets to 0
+    // Tick 3: cost paid, move commits, counter resets.
+    tick(world)
     expect(getComponent(world, player, 'position')!.x).toBe(11)
     expect(pc.planIndex).toBe(1)
+    expect(pc.actionTicksElapsed).toBe(0)
 
-    // Immediately after move: counter reset to 0, can't move again.
-    tick(world) // counter: 1
+    // Second move: starts fresh, takes another 3 ticks.
+    tick(world)
     expect(getComponent(world, player, 'position')!.x).toBe(11)
-
-    // Fill up again.
-    tick(world) // counter: 2
-    tick(world) // counter: 3 → ready, moves
+    tick(world)
+    expect(getComponent(world, player, 'position')!.x).toBe(11)
+    tick(world)
     expect(getComponent(world, player, 'position')!.x).toBe(12)
     expect(pc.planIndex).toBe(2)
   })
@@ -154,14 +157,14 @@ describe('movement system', () => {
     placeGround(world, 10, 10, -1)
     placeGround(world, 11, 10, -1)
 
-    // Fill the movement timer (pace=1).
-    simulate(world, 1)
+    // Override pace to 1 so the move completes in a single tick.
+    getComponent(world, player, 'movement')!.modes[0]!.pace = 1
 
     const pc = getComponent(world, player, 'playerControlled')!
     pc.plan = [{ type: 'move', dx: 1, dy: 0 }]
     pc.planIndex = 0
-    tick(world)
 
+    tick(world)
     expect(pc.planIndex).toBe(1)
 
     // Plan exhausted — further ticks don't move.

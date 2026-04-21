@@ -7,9 +7,11 @@ import {
 import { tick, VisionTrait } from '@repo/engine'
 import { ACTIONS_PER_ROUND } from '~server/sdk/types.js'
 import type { GameView, ViewEntity, PlayerAction, VisibleTraitName, InspectResult } from '~server/sdk/types.js'
-
 /** Trait names the client is allowed to see when inspecting entities. */
-const VISIBLE_TRAITS: VisibleTraitName[] = ['health', 'hunger', 'movement', 'moisture', 'groundCover', 'vision']
+const VISIBLE_TRAITS: VisibleTraitName[] = [
+  'health', 'hunger', 'movement', 'moisture', 'groundCover', 'vision',
+  'carriable', 'contained', 'edible', 'wearable', 'tool',
+]
 
 export class GameServer {
   private currentView: GameView
@@ -46,9 +48,13 @@ export class GameServer {
     return this.currentView
   }
 
-  /** Inspect entities at a world position. */
+  /** Inspect entities at a world position. Carried items are excluded — they live inside containers, not on the tile. */
   inspect(x: number, y: number): InspectResult {
-    return { entities: this.currentView.entities.filter(e => e.x === x && e.y === y) }
+    return {
+      entities: this.currentView.entities.filter(
+        e => e.x === x && e.y === y && !e.traits.contained,
+      ),
+    }
   }
 
   // ─── View Building ───
@@ -65,11 +71,32 @@ export class GameServer {
         const plain: Record<string, unknown> = {}
         for (const [k, v] of Object.entries(data)) {
           if (typeof v === 'function') continue
-          // Clone arrays to avoid sharing live ECS references.
-          plain[k] = Array.isArray(v) ? v.map(e => ({ ...e })) : v
+          // Clone arrays to avoid sharing live ECS references. Keep primitive elements as-is.
+          plain[k] = Array.isArray(v)
+            ? v.map(e => (typeof e === 'object' && e !== null ? { ...e } : e))
+            : v
         }
         traits[traitName] = plain
       }
+    }
+
+    const container = getComponent(this.world, id, 'container')
+    if (container) {
+      let usedCapacity = 0
+      for (const childId of container.contents) {
+        const c = getComponent(this.world, childId, 'carriable')
+        if (c) usedCapacity += c.size
+      }
+      traits.container = {
+        capacity: container.capacity,
+        usedCapacity,
+        contents: [...container.contents],
+      }
+    }
+
+    const equipment = getComponent(this.world, id, 'equipment')
+    if (equipment) {
+      traits.equipment = { slots: { ...equipment.slots } }
     }
 
     if (et.type === 'bush') {

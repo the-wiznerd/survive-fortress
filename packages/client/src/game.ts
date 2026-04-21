@@ -84,6 +84,30 @@ export function appendHarvest(targetId: number) {
   planChangeCallback?.(plan)
 }
 
+export function appendPickup(targetId: number) {
+  if (phase !== 'planning') return
+  if (plan.length >= maxPlanActions) return
+  if (plan.some(a => a.type === 'pickup' && a.targetId === targetId)) return
+  plan.push({ type: 'pickup', targetId })
+  planChangeCallback?.(plan)
+}
+
+export function appendDrop(targetId: number, dx = 0, dy = 0) {
+  if (phase !== 'planning') return
+  if (plan.length >= maxPlanActions) return
+  if (plan.some(a => a.type === 'drop' && a.targetId === targetId)) return
+  plan.push({ type: 'drop', targetId, dx, dy })
+  planChangeCallback?.(plan)
+}
+
+export function appendEat(targetId: number) {
+  if (phase !== 'planning') return
+  if (plan.length >= maxPlanActions) return
+  if (plan.some(a => a.type === 'eat' && a.targetId === targetId)) return
+  plan.push({ type: 'eat', targetId })
+  planChangeCallback?.(plan)
+}
+
 export function clearPlan() {
   if (phase !== 'planning') return
   plan = []

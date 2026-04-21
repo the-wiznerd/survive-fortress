@@ -53,6 +53,33 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
     component: ActionBadge,
     props: d => d.available ? { action: 'Harvest' } : null
   },
+  carriable: {
+    component: StatText,
+    props: d => ({ label: 'Size', value: String(d.size) })
+  },
+  container: {
+    component: StatText,
+    props: d => ({ label: 'Bag', value: `${d.usedCapacity}/${d.capacity}` })
+  },
+  edible: {
+    component: StatText,
+    props: d => ({ label: 'Nutrition', value: String(d.nutrition) })
+  },
+  wearable: {
+    component: StatText,
+    props: d => ({ label: 'Wears', value: d.slot })
+  },
+  equipment: {
+    component: StatText,
+    props: d => {
+      const entries = Object.entries(d.slots)
+      if (entries.length === 0) return null
+      const summary = entries
+        .map(([slot, id]) => `${slot}: ${id === null ? '∅' : '#' + id}`)
+        .join(', ')
+      return { label: 'Equipment', value: summary }
+    }
+  },
 }
 
 /** Look up and apply a trait renderer. The renderer ↔ data correlation is
