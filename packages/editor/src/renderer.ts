@@ -1,4 +1,4 @@
-import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, ATLAS_ROW_H, type RenderEntity, type TerrainVariantCells } from '@repo/rendering'
+import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, ATLAS_ROW_H, type RenderEntity } from '@repo/rendering'
 
 /** Preview sprite info per entity type. */
 type TerrainPreview = { kind: 'terrain'; atlas: true } | { kind: 'terrain'; atlas: false; topCol: number; frontCol: number; row: number }

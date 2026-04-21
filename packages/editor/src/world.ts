@@ -11,7 +11,6 @@ import {
 import {
   bootstrap,
   importWorld,
-  importChunk,
   exportChunk,
   exportManifest,
   spawnEntity,

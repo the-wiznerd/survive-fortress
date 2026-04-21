@@ -21,23 +21,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { debugToggleMoisture, debugGetMoistureOverlay, debugForward, debugTogglePositionTraits, showPositionTraits } from '~client/debug'
+  import { ref } from 'vue'
+  import { debugToggleMoisture, debugGetMoistureOverlay, debugForward, debugTogglePositionTraits, showPositionTraits } from '~client/debug'
 
-const moistureOn = ref(debugGetMoistureOverlay())
+  const moistureOn = ref(debugGetMoistureOverlay())
 
-function togglePosition() {
-  debugTogglePositionTraits()
-}
+  function togglePosition() {
+    debugTogglePositionTraits()
+  }
 
-function toggleMoisture() {
-  debugToggleMoisture()
-  moistureOn.value = debugGetMoistureOverlay()
-}
+  function toggleMoisture() {
+    debugToggleMoisture()
+    moistureOn.value = debugGetMoistureOverlay()
+  }
 
-function forward(days: number) {
-  debugForward(days)
-}
+  function forward(days: number) {
+    debugForward(days)
+  }
 </script>
 
 <style lang="scss" scoped>

@@ -1,4 +1,4 @@
-import type { GameView, ViewEntity, PlayerAction } from '@repo/server/sdk'
+import type { GameView } from '@repo/server/sdk'
 import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, zKey, type RenderEntity, type EntityRenderer } from '@repo/rendering'
 import { getPlan } from '~client/game'
 

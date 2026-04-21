@@ -55,7 +55,7 @@ describe('moisture system', () => {
 
   it('clamps to capacity', () => {
     const world = createWorld()
-    const a = placeMoist(world, 0, 0, 100, 100, 50)
+    placeMoist(world, 0, 0, 100, 100, 50)
     const b = placeMoist(world, 1, 0, 80, 85, 50)
 
     // diff=20, rate=50, transfer = intDiv(20*50, 200) = 5  →  B would go to 85 but capacity=85

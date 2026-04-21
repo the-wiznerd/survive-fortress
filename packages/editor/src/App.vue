@@ -161,6 +161,7 @@
   onUnmounted(() => {
     window.removeEventListener('keydown', onKeyDown)
     window.removeEventListener('keyup', onKeyUp)
+    cancelAnimationFrame(rafId)
   })
 
   function renderLoop() {

@@ -8,19 +8,28 @@
   "scripts": {
     "test": "turbo test",
     "typecheck": "turbo typecheck",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "dev": "turbo watch build dev --filter=@repo/server --filter=@repo/client",
     "dev-all": "turbo watch build dev",
     "build": "turbo build",
     "dev:kill": "lsof -ti :5173 -ti :5174 -ti :5175 -ti :5176 | xargs kill -9 2>/dev/null; echo 'Dev servers killed'"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^25.6.0",
+    "eslint": "^10.2.1",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "eslint-plugin-vue": "^10.8.0",
+    "globals": "^17.5.0",
     "tsx": "^4.19.0",
     "turbo": "^2.9.6",
     "typescript": "^5.8.0",
+    "typescript-eslint": "^8.59.0",
     "vite": "^6.3.0",
     "vite-plugin-dts": "^4.5.4",
-    "vitest": "^3.1.0"
+    "vitest": "^3.1.0",
+    "vue-eslint-parser": "^10.4.0"
   },
   "packageManager": "yarn@4.13.0",
   "engines": {

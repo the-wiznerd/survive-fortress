@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-  const props = defineProps<{
+  defineProps<{
     scale: number
     turnMode: 'manual' | 'auto'
   }>()

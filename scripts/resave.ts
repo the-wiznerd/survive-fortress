@@ -7,7 +7,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { type WorldManifest, type ChunkData, chunkKey } from '@repo/state'
+import { type WorldManifest, type ChunkData } from '@repo/state'
 import { bootstrap, importWorld, exportChunk, exportManifest } from '@repo/engine'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))

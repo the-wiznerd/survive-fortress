@@ -137,7 +137,7 @@ wss.on('connection', (ws) => {
           break
         }
       }
-    } catch (err) {
+    } catch (_err) {
       send({ type: 'error', message: 'Invalid message' })
     }
   })

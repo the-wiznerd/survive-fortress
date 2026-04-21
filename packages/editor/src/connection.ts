@@ -1,5 +1,4 @@
 import type {
-  EditorRequest,
   EditorResponse,
   ListSavesResponse,
   LoadWorldResponse,
