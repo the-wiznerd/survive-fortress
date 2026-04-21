@@ -1,12 +1,17 @@
 <template>
-  <div class="debug-panel section">
-    <h2>Debug</h2>
+  <Disclosure class="debug-panel">
+    <template #label>
+      Debug
+    </template>
+    
     <label>
       <input type="checkbox" :checked="showPositionTraits" @change="togglePosition"> Positions
     </label>
+
     <label>
       <input type="checkbox" :checked="moistureOn" @change="toggleMoisture"> Moisture
     </label>
+
     <div class="debug-actions">
        <span class="label">
         FF:
@@ -17,12 +22,13 @@
         <button @click="forward(5)">+5 d</button>
       </div>
     </div>
-  </div>
+  </Disclosure>
 </template>
 
 <script setup lang="ts">
   import { ref } from 'vue'
   import { debugToggleMoisture, debugGetMoistureOverlay, debugForward, debugTogglePositionTraits, showPositionTraits } from '~client/debug'
+  import Disclosure from './Disclosure.vue'
 
   const moistureOn = ref(debugGetMoistureOverlay())
 
@@ -43,19 +49,8 @@
 <style lang="scss" scoped>
   @use '~styles/mixins';
 
-  .debug-panel {
-    border-block-start: 1px solid #444;
-    padding-block-start: 2rem;
-    margin-block: 2rem 0;
-  }
-
-  h2 {
-    @include mixins.heading;
-  }
-
   label {
     display: block;
-    margin-block-end: 0.5rem;
     cursor: pointer;
   }
 

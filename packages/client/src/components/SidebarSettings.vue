@@ -1,11 +1,16 @@
 <template>
-  <div class="section settings">
+  <Disclosure class="settings">
+    <template #label>
+      Settings
+    </template>
+
     <div class="stat">
       <span class="label">Zoom:</span>
       <button @click="$emit('zoom-out')" :disabled="scale <= 1">-</button>
       <span class="zoom-value">{{ scale }}x</span>
       <button @click="$emit('zoom-in')">+</button>
     </div>
+
     <div class="stat mode-picker">
       <span class="label">Turns:</span>
       <select :value="turnMode" @change="onTurnModeChange">
@@ -13,10 +18,12 @@
         <option value="auto">Auto</option>
       </select>
     </div>
-  </div>
+  </Disclosure>
 </template>
 
 <script setup lang="ts">
+  import Disclosure from './Disclosure.vue'
+
   defineProps<{
     scale: number
     turnMode: 'manual' | 'auto'
@@ -37,8 +44,6 @@
 <style lang="scss" scoped>
   .settings {
     margin-block: auto 0;
-    padding-block-start: 2rem;
-    border-block-start: 1px solid var(--color-darkest-gray);
 
     .label {
       margin-inline-end: 0.75ch;
@@ -73,10 +78,6 @@
       font-size: 0.75rem;
       padding: 0.2rem 0.35rem;
       text-transform: uppercase;
-    }
-
-    .mode-picker {
-      margin-block-start: 0.6rem;
     }
 
     .zoom-value {

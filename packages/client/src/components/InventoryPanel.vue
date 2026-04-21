@@ -1,5 +1,5 @@
 <template>
-  <div v-if="bag" class="inventory section">
+  <div v-if="bag" class="inventory">
     <h2 class="label">{{ bagLabel }}</h2>
     <div v-if="items.length === 0" class="empty">Empty</div>
     <ul v-else class="items">

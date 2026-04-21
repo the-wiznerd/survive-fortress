@@ -1,6 +1,6 @@
 <template>
   <aside id="sidebar">
-    <div v-if="view" class="section">
+    <div v-if="view">
       <div class="stat"><span class="label">Day:</span> {{ day }}.{{ tickOfDay }}</div>
     </div>
 
@@ -8,7 +8,7 @@
 
     <InventoryPanel />
 
-    <div v-if="selection" class="section selection">
+    <div v-if="selection" class="selection">
       <div v-if="selection.entities.length === 0" class="stat">Empty</div>
       <EntityCard
         v-for="e in selection.entities"
@@ -73,7 +73,7 @@
 <style lang="scss" scoped>
   #sidebar {
     width: 300px;
-    padding: 2rem 1.5rem;
+    padding: 2rem 1.5rem 1rem;
     overflow-y: auto;
     line-height: 1.5;
     display: flex;
@@ -82,6 +82,5 @@
 
   .selection {
     padding-top: 2rem;
-    border-top: 1px solid var(--color-darkest-gray);
   }
 </style>

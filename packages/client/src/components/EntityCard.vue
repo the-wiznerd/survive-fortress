@@ -1,6 +1,8 @@
 <template>
-  <div class="entity-card section">
-    <h2 class="label">{{ label }}</h2>
+  <Disclosure class="entity-card">
+    <template #label>
+      {{ label }}
+    </template>
     <div v-if="traits.length" class="traits">
       <component
         v-for="t in traits"
@@ -9,7 +11,7 @@
         v-bind="t.props"
       />
     </div>
-  </div>
+  </Disclosure>
 </template>
 
 <script setup lang="ts">
@@ -17,6 +19,7 @@
   import type { ViewEntity, VisibleTraitName } from '@repo/server/sdk'
   import { renderTrait } from '../traitRenderers'
   import { showPositionTraits } from '~client/debug'
+  import Disclosure from './Disclosure.vue'
 
   const props = defineProps<{
     entity: ViewEntity
@@ -45,16 +48,9 @@
 <style lang="scss" scoped>
   @use '~styles/mixins';
 
-  .entity-card {
-
-    >.label {
-      @include mixins.heading;
-    }
-
-    .traits {
-      display: flex;
-      flex-direction: column;
-      gap: 1em;
-    }
+  .traits {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
   }
 </style>
