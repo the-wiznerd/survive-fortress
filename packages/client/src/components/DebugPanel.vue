@@ -38,8 +38,8 @@ function forward(days: number) {
 
   .debug-panel {
     border-block-start: 1px solid #444;
-    padding-block-start: 1rem;
-    margin-block: 1.25rem 0;
+    padding-block-start: 2rem;
+    margin-block: 2rem 0;
   }
 
   h2 {

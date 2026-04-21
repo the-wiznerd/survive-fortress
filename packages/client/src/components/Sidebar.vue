@@ -6,7 +6,7 @@
 
     <EntityCard v-if="player" :entity="player" />
 
-    <div v-if="selection" class="section">
+    <div v-if="selection" class="section selection">
       <div v-if="selection.entities.length === 0" class="stat">Empty</div>
       <EntityCard
         v-for="e in selection.entities"
@@ -75,5 +75,10 @@
     line-height: 1.5;
     display: flex;
     flex-direction: column;
+  }
+
+  .selection {
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-darkest-gray);
   }
 </style>

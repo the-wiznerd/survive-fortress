@@ -37,7 +37,7 @@
 <style lang="scss" scoped>
   .settings {
     margin-block: auto 0;
-    padding-block-start: 1.5rem;
+    padding-block-start: 2rem;
     border-block-start: 1px solid var(--color-darkest-gray);
 
     .label {
