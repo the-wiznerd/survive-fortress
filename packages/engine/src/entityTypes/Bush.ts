@@ -17,7 +17,7 @@ export class Bush extends BaseEntityType {
     super.init(state)
     const savedSize = state.size
     if (savedSize === 'small' || savedSize === 'large') this.size = savedSize
-    this.berryYield = this.size === 'small' ? 2 : 4
+    this.berryYield = this.size === 'small' ? 4 : 8
     this.harvestable.amount = this.berryYield
     this.harvestable.onHarvest = (harvesterId) => {
       console.log(`[Bush] Harvested ${this.harvestable.amount} berries by entity ${harvesterId}`)

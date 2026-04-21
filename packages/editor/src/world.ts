@@ -123,9 +123,12 @@ export function getEntities(): RenderEntity[] {
     const gc = getComponent(w, id, 'groundCover')
     if (gc) traits.groundCover = gc
     if (et.type === 'bush') {
-      const inst = getComponent(w, id, 'instance')?.ref as { size?: unknown } | undefined
+      const inst = getComponent(w, id, 'instance')?.ref as { size?: unknown; harvestable?: { amount: number } } | undefined
       if (inst?.size === 'small' || inst?.size === 'large') {
         traits.size = inst.size
+      }
+      if (inst?.harvestable) {
+        traits.harvestable = { available: inst.harvestable.amount > 0 }
       }
     }
     result.push({ type: et.type, x: pos.x, y: pos.y, z: pos.z, traits })

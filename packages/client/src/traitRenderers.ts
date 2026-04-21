@@ -2,6 +2,7 @@ import type { Component } from 'vue'
 import type { TraitViews, VisibleTraitName } from '@repo/server/sdk'
 import StatText from '~client/components/traits/StatText.vue'
 import MovementBar from '~client/components/traits/MovementBar.vue'
+import ActionBadge from '~client/components/traits/ActionBadge.vue'
 
 type TraitRendererMap = {
   [K in VisibleTraitName]?: {
@@ -47,6 +48,10 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
     props: d => d.cover
       ? { label: 'Ground Cover', value: String(d.cover) }
       : null
+  },
+  harvestable: {
+    component: ActionBadge,
+    props: d => d.available ? { action: 'Harvest' } : null
   },
 }
 
