@@ -57,7 +57,7 @@ export class GameServer {
     const pos = getComponent(this.world, id, 'position')!
     const et = getComponent(this.world, id, 'entityType')!
     const nameComp = getComponent(this.world, id, 'name')
-    const traits: Record<string, Record<string, unknown>> = {}
+    const traits: Record<string, unknown> = {}
 
     for (const traitName of VISIBLE_TRAITS) {
       const data = getComponent(this.world, id, traitName)
@@ -69,6 +69,13 @@ export class GameServer {
           plain[k] = Array.isArray(v) ? v.map(e => ({ ...e })) : v
         }
         traits[traitName] = plain
+      }
+    }
+
+    if (et.type === 'bush') {
+      const inst = getComponent(this.world, id, 'instance')?.ref as { size?: unknown } | undefined
+      if (inst?.size === 'small' || inst?.size === 'large') {
+        traits.size = inst.size
       }
     }
 

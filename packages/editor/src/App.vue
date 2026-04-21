@@ -86,7 +86,7 @@
     getEntities,
   } from '~editor/world'
 
-  const PALETTE_TYPES = ['dirt', 'sand', 'stone', 'water', 'player']
+  const PALETTE_TYPES = ['dirt', 'sand', 'stone', 'water', 'player', 'bush', 'bushSmall']
 
   // State
   const saves = ref<string[]>([])
@@ -268,7 +268,13 @@
     const pos = renderer.screenToWorld(canvasX, canvasY, activeZ.value)
 
     if (effectiveTool.value === 'draw') {
-      placeEntity(activeType.value, pos.x, pos.y, activeZ.value)
+      const type = activeType.value === 'bushSmall' ? 'bush' : activeType.value
+      const state = activeType.value === 'bushSmall'
+        ? { size: 'small' }
+        : activeType.value === 'bush'
+          ? { size: 'large' }
+          : undefined
+      placeEntity(type, pos.x, pos.y, activeZ.value, state)
     } else {
       deleteEntities(pos.x, pos.y, activeZ.value)
     }

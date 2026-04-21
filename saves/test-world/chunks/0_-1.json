@@ -1857,6 +1857,9 @@
             "tickCount": 0
           }
         ]
+      },
+      "playerControlled": {
+        "plan": []
       }
     },
     {
@@ -1873,6 +1876,14 @@
         "x": 12,
         "y": -1,
         "z": 0
+      }
+    },
+    {
+      "entityType": "bush",
+      "position": {
+        "x": 6,
+        "y": -3,
+        "z": 1
       }
     }
   ]

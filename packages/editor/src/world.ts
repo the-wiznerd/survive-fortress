@@ -92,11 +92,11 @@ export async function editorSaveWorld(name?: string) {
 }
 
 /** Place an entity of the given type at world position, replacing any existing entity there. */
-export function placeEntity(type: string, x: number, y: number, z: number) {
+export function placeEntity(type: string, x: number, y: number, z: number, state?: Record<string, unknown>) {
   const w = world.value
   if (!w) return
   deleteEntities(x, y, z)
-  spawnEntity(w, type, { position: { x, y, z } })
+  spawnEntity(w, type, { position: { x, y, z }, ...(state ?? {}) })
 }
 
 /** Remove all entities at a world position. */
@@ -122,6 +122,12 @@ export function getEntities(): RenderEntity[] {
     const traits: Record<string, unknown> = {}
     const gc = getComponent(w, id, 'groundCover')
     if (gc) traits.groundCover = gc
+    if (et.type === 'bush') {
+      const inst = getComponent(w, id, 'instance')?.ref as { size?: unknown } | undefined
+      if (inst?.size === 'small' || inst?.size === 'large') {
+        traits.size = inst.size
+      }
+    }
     result.push({ type: et.type, x: pos.x, y: pos.y, z: pos.z, traits })
   }
   return result

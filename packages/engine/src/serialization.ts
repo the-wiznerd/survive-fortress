@@ -68,6 +68,17 @@ export function importChunk(
       console.warn('Entity missing entityType, skipping')
       continue
     }
+    const legacyBushSmall = ent.entityType === 'bushSmall'
+    if (legacyBushSmall) {
+      const migrated = {
+        ...(ent as Record<string, unknown>),
+        entityType: 'bush',
+        size: 'small',
+      }
+      spawnEntity(world, 'bush', migrated)
+      continue
+    }
+
     spawnEntity(world, ent.entityType, ent as Record<string, unknown>)
   }
 }
