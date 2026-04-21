@@ -4,9 +4,7 @@
       <div class="stat"><span class="label">Day:</span> {{ day }}.{{ tickOfDay }}</div>
     </div>
 
-    <div v-if="player" class="section">
-      <EntityCard :entity="player" />
-    </div>
+    <EntityCard v-if="player" :entity="player" />
 
     <div v-if="selection" class="section">
       <div v-if="selection.entities.length === 0" class="stat">Empty</div>
