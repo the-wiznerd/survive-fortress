@@ -16,6 +16,7 @@
   import { computed, inject, type Component } from 'vue'
   import type { ViewEntity, VisibleTraitName } from '@repo/server/sdk'
   import { renderTrait } from '../traitRenderers'
+  import { showPositionTraits } from '~client/debug'
 
   const props = defineProps<{
     entity: ViewEntity
@@ -31,6 +32,7 @@
   const traits = computed(() => {
     const result: { name: string; component: Component; props: Record<string, unknown> }[] = []
     for (const name of getTraitNames(props.entity)) {
+      if (name === 'position' && !showPositionTraits.value) continue
       const data = props.entity.traits[name]
       if (!data) continue
       const rendered = renderTrait(name, data)

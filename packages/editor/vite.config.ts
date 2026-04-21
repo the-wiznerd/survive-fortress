@@ -30,8 +30,5 @@ export default defineConfig({
     port: 5175,
     strictPort: true,
     open: false,
-    watch: {
-      ignored: ['**/*.{aseprite,ase,png}'],
-    },
   },
 })

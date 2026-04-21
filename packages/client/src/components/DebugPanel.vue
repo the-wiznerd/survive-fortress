@@ -2,6 +2,9 @@
   <div class="debug-panel section">
     <h2>Debug</h2>
     <label>
+      <input type="checkbox" :checked="showPositionTraits" @change="togglePosition"> Positions
+    </label>
+    <label>
       <input type="checkbox" :checked="moistureOn" @change="toggleMoisture"> Moisture
     </label>
     <div class="debug-actions">
@@ -19,9 +22,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { debugToggleMoisture, debugGetMoistureOverlay, debugForward } from '~client/debug'
+import { debugToggleMoisture, debugGetMoistureOverlay, debugForward, debugTogglePositionTraits, showPositionTraits } from '~client/debug'
 
 const moistureOn = ref(debugGetMoistureOverlay())
+
+function togglePosition() {
+  debugTogglePositionTraits()
+}
 
 function toggleMoisture() {
   debugToggleMoisture()

@@ -5,6 +5,7 @@
  * All debug functions are no-ops when disabled.
  */
 
+import { ref } from 'vue'
 import { dayTicks } from '@repo/state'
 import { getGame } from '~client/game'
 import type { Renderer } from '~client/renderer'
@@ -12,9 +13,14 @@ import type { Renderer } from '~client/renderer'
 export const DEBUG_ENABLED = true
 
 let renderer: Renderer | null = null
+export const showPositionTraits = ref(false)
 
 export function debugInit(r: Renderer) {
   renderer = r
+}
+
+export function debugTogglePositionTraits() {
+  showPositionTraits.value = !showPositionTraits.value
 }
 
 export function debugToggleMoisture() {
