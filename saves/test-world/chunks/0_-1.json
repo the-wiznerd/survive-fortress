@@ -1884,7 +1884,17 @@
         "x": 6,
         "y": -3,
         "z": 1
-      }
+      },
+      "size": "large"
+    },
+    {
+      "entityType": "bush",
+      "position": {
+        "x": 7,
+        "y": -2,
+        "z": 1
+      },
+      "size": "small"
     }
   ]
 }

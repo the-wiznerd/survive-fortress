@@ -126,10 +126,11 @@ export class EditorRenderer {
                     )
                   }
                 } else {
+                  const destY = (hy + 1) * TOP_H - (activeZ - 1) * FRONT_H - sprite.h * CELL_H
                   ctx.drawImage(
                     self.world.spriteSheet,
                     sprite.col * CELL_W, sprite.row * CELL_H, CELL_W, CELL_H * sprite.h,
-                    dx, dy - (sprite.h - 1) * CELL_H, CELL_W, CELL_H * sprite.h,
+                    dx, destY, CELL_W, CELL_H * sprite.h,
                   )
                 }
                 ctx.globalAlpha = 1

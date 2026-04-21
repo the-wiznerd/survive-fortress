@@ -37,7 +37,7 @@
             :class="{ active: type === activeType }"
             @click="activeType = type"
           >
-            {{ type }}
+            {{ PALETTE_LABELS[type] ?? type }}
           </button>
         </div>
       </template>
@@ -87,6 +87,10 @@
   } from '~editor/world'
 
   const PALETTE_TYPES = ['dirt', 'sand', 'stone', 'water', 'player', 'bush', 'bushSmall']
+  const PALETTE_LABELS: Record<string, string> = {
+    bush: 'Bush (Large)',
+    bushSmall: 'Bush (Small)',
+  }
 
   // State
   const saves = ref<string[]>([])
