@@ -9,11 +9,14 @@ import type {
 
 const WS_URL = 'ws://localhost:5176'
 
-type PendingCallback = (response: EditorResponse) => void
+type PendingRequest = {
+  resolve: (response: EditorResponse) => void
+  reject: (error: Error) => void
+}
 
 let ws: WebSocket | null = null
 let seq = 0
-const pending = new Map<number, PendingCallback>()
+const pending = new Map<number, PendingRequest>()
 let connectPromise: Promise<void> | null = null
 
 function connect(): Promise<void> {
@@ -36,14 +39,24 @@ function connect(): Promise<void> {
 
     socket.onmessage = (event) => {
       const res = JSON.parse(event.data) as EditorResponse
-      const cb = pending.get(res.seq)
-      if (cb) {
+      const request = pending.get(res.seq)
+      if (request) {
         pending.delete(res.seq)
-        cb(res)
+        if (res.type === 'error') {
+          request.reject(new Error((res as ErrorResponse).message))
+          return
+        }
+
+        request.resolve(res)
       }
     }
 
     socket.onclose = () => {
+      const error = new Error('WebSocket connection closed')
+      for (const request of pending.values()) {
+        request.reject(error)
+      }
+      pending.clear()
       ws = null
       connectPromise = null
     }
@@ -52,15 +65,23 @@ function connect(): Promise<void> {
   return connectPromise
 }
 
-function send<T extends EditorResponse>(req: Record<string, unknown>): Promise<T> {
-  return new Promise(async (resolve, reject) => {
-    await connect()
-    const id = ++seq
-    pending.set(id, (res) => {
-      if (res.type === 'error') reject(new Error((res as ErrorResponse).message))
-      else resolve(res as T)
+async function send<T extends EditorResponse>(req: Record<string, unknown>): Promise<T> {
+  await connect()
+
+  const socket = ws
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    throw new Error('WebSocket not connected')
+  }
+
+  const id = ++seq
+
+  return new Promise<T>((resolve, reject) => {
+    pending.set(id, {
+      resolve: (res) => resolve(res as T),
+      reject,
     })
-    ws!.send(JSON.stringify({ ...req, seq: id }))
+
+    socket.send(JSON.stringify({ ...req, seq: id }))
   })
 }
 

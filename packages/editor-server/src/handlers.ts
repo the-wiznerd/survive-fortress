@@ -97,5 +97,5 @@ function handleCreateWorld(seq: number, name: string): EditorResponse {
 
 /** Sanitize a directory/file name to prevent path traversal. */
 function sanitizeName(name: string): string {
-  return name.replace(/[^a-zA-Z0-9_\-\.]/g, '_')
+  return name.replace(/[^a-zA-Z0-9_.-]/g, '_')
 }
