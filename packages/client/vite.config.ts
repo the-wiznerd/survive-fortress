@@ -20,6 +20,9 @@ export default defineConfig({
     vue(),
   ],
   publicDir: path.resolve(import.meta.dirname, 'public'),
+  build: {
+    emptyOutDir: false,
+  },
   server: {
     port: 5173,
     strictPort: true,

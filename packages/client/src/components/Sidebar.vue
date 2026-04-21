@@ -65,7 +65,9 @@
     if (!inspectResult.value || !inspectedCell.value) return null
     return {
       ...inspectedCell.value,
-      entities: [...inspectResult.value.entities].sort((a, b) => b.z - a.z),
+      entities: inspectResult.value.entities
+        .filter(e => !e.traits.contained)
+        .sort((a, b) => b.z - a.z),
     }
   })
 </script>
