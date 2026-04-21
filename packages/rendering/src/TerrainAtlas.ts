@@ -150,7 +150,6 @@ export class TerrainAtlas {
       def.unknownTop(tmpCtx, TILE_W, TOP_FACE_H)
       ctx.drawImage(tmp, 0, 0, TILE_W, TOP_FACE_H, col * TILE_W, baseY, TILE_W, TOP_FACE_H)
       const unknownTop = { col, row: typeIdx }
-      col++
 
       this.variantMap.set(name, { topFaces, frontFaces, unknownTop })
     }

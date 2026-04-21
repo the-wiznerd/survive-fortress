@@ -10,13 +10,17 @@ const chunksDir = `saves/${saveName}/chunks`
 const priority: Record<string, number> = { stone: 0, sand: 1, dirt: 2, water: 3 }
 let removed = 0
 
+type EntityPos = { x?: number; y?: number; z?: number }
+type DedupEntity = { entityType?: string; position?: EntityPos } & Record<string, unknown>
+type SaveChunk = { entities: DedupEntity[] } & Record<string, unknown>
+
 for (const file of fs.readdirSync(chunksDir)) {
   if (!file.endsWith('.json')) continue
   const filePath = path.join(chunksDir, file)
-  const chunk = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+  const chunk = JSON.parse(fs.readFileSync(filePath, 'utf-8')) as SaveChunk
 
   // Group entities by position key
-  const groups = new Map<string, any[]>()
+  const groups = new Map<string, DedupEntity[]>()
   for (const ent of chunk.entities) {
     const p = ent.position ?? { x: 0, y: 0, z: 0 }
     const key = `${p.x ?? 0},${p.y ?? 0},${p.z ?? 0}`
@@ -25,17 +29,17 @@ for (const file of fs.readdirSync(chunksDir)) {
     else groups.set(key, [ent])
   }
 
-  const deduped: any[] = []
+  const deduped: DedupEntity[] = []
   for (const [, ents] of groups) {
     if (ents.length === 1) {
       deduped.push(ents[0])
       continue
     }
     // Pick the entity with highest priority (lowest number)
-    ents.sort((a: any, b: any) => (priority[a.entityType] ?? 99) - (priority[b.entityType] ?? 99))
+    ents.sort((a, b) => (priority[a.entityType ?? ''] ?? 99) - (priority[b.entityType ?? ''] ?? 99))
     deduped.push(ents[0])
     removed += ents.length - 1
-    console.log(`  ${file}: kept ${ents[0].entityType}, removed ${ents.slice(1).map((e: any) => e.entityType).join(', ')} at (${ents[0].position?.x ?? 0},${ents[0].position?.y ?? 0},${ents[0].position?.z ?? 0})`)
+    console.log(`  ${file}: kept ${ents[0].entityType ?? 'unknown'}, removed ${ents.slice(1).map(e => e.entityType ?? 'unknown').join(', ')} at (${ents[0].position?.x ?? 0},${ents[0].position?.y ?? 0},${ents[0].position?.z ?? 0})`)
   }
 
   chunk.entities = deduped

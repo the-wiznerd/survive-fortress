@@ -1,11 +1,11 @@
-import type { World, EntityId } from '@repo/state'
+import type { World, EntityId, ComponentName } from '@repo/state'
 import { Trait } from '~engine/traits/Trait.js'
 import { PositionTrait } from '~engine/traits/PositionTrait.js'
 
 export abstract class BaseEntityType {
   abstract type: string
 
-  readonly traits: Trait<any>[] = []
+  readonly traits: Trait<ComponentName>[] = []
   position: PositionTrait
 
   constructor(public world: World, public id: EntityId) {
@@ -13,7 +13,7 @@ export abstract class BaseEntityType {
   }
 
   /** Register a trait — stores it for auto-iteration and returns it for assignment. */
-  protected addTrait<T extends Trait<any>>(trait: T): T {
+  protected addTrait<T extends Trait<ComponentName>>(trait: T): T {
     this.traits.push(trait)
     return trait
   }
@@ -21,7 +21,8 @@ export abstract class BaseEntityType {
   /** Initialize all traits from saved state. */
   init(state: Record<string, unknown>): void {
     for (const t of this.traits) {
-      t.init(state[t.component] as Record<string, unknown> | undefined)
+      const component = t.component
+      t.init(component ? state[component] as Record<string, unknown> | undefined : undefined)
     }
   }
 
@@ -30,7 +31,8 @@ export abstract class BaseEntityType {
     const result: Record<string, unknown> = { entityType: this.type }
     for (const t of this.traits) {
       const saved = t.save()
-      if (saved !== undefined) result[t.component] = saved
+      const component = t.component
+      if (saved !== undefined && component) result[component] = saved
     }
     return result
   }
