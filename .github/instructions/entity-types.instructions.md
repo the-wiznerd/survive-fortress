@@ -207,3 +207,20 @@ Don't extend entity types from each other. If multiple entity types need the sam
 - **Same data**: Use the same trait.
 - **Same cross-entity logic**: Create a system that queries for the relevant component.
 - **Same per-entity logic**: Extract a helper function that entity type ticks can call.
+
+## When to use a class vs. a registered handler object
+
+Two patterns coexist in the engine; pick by asking whether the thing has identity:
+
+- **Class** — when the thing has **identity and per-instance state**: traits
+  (one instance per entity, each with its own fields and `init`/`save`
+  lifecycle) and entity types (factories that compose those traits).
+- **Registered handler object** — when it's a **pure transformation keyed by a
+  discriminator**: action handlers (`packages/engine/src/actions/`) dispatch on
+  `action.type` and hold no state between calls. A class would just be a
+  namespace with a `new` ceremony, force a parallel `type → ctor` registry,
+  and allocate garbage per tick for what is effectively a function call.
+
+For shared behavior between handlers (or between systems), prefer helper
+functions over base classes. Inheritance for stateless behavior is usually
+more friction than reuse. See `actions.instructions.md` for the full rule.
