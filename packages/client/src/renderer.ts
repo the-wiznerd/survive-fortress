@@ -29,12 +29,47 @@ export class Renderer {
     this.cameraY = y - Math.floor(this.viewHeight / 2) - z * FRONT_H / TOP_H
   }
 
-  /** Convert canvas pixel coordinates to world (x, y). */
-  screenToWorld(canvasX: number, canvasY: number): { x: number; y: number } | null {
-    const sx = Math.floor(canvasX / CELL_W)
-    const sy = Math.floor(canvasY / TOP_H)
-    if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) return null
-    return { x: sx + this.cameraX, y: sy + this.cameraY }
+  /** Convert canvas pixel coordinates to the hovered world tile.
+   * When a view is provided, iterates candidate z-levels (highest first)
+   * and returns the first column that has a terrain tile there.
+   * Falls back to flat z=0 projection when no view is given.
+   */
+  screenToWorld(canvasX: number, canvasY: number, view?: GameView): { x: number; y: number } | null {
+    const wx = Math.floor(canvasX / CELL_W) + Math.floor(this.cameraX)
+    if (wx - Math.floor(this.cameraX) < 0 || wx - Math.floor(this.cameraX) >= this.viewWidth) return null
+
+    if (!view) {
+      const sy = Math.floor(canvasY / TOP_H)
+      if (sy < 0 || sy >= this.viewHeight) return null
+      return { x: wx, y: sy + Math.floor(this.cameraY) }
+    }
+
+    const player = view.entities.find(e => String(e.id) === view.playerId)
+    const vision = player?.traits.vision as { horizontalRange: number; verticalRange: number } | undefined
+    const playerZ = player?.z ?? 0
+    const vRange = vision?.verticalRange ?? 0
+
+    // Build a set of terrain positions for fast lookup.
+    const terrainAt = new Set<string>()
+    for (const e of view.entities) {
+      if (this.world.getEntityRenderer(e.type)?.terrain) {
+        terrainAt.add(`${e.x},${e.y},${e.z}`)
+      }
+    }
+
+    const zMax = playerZ + vRange
+    const zMin = playerZ - vRange
+
+    for (let z = zMax; z >= zMin; z--) {
+      const wy = Math.floor((canvasY + z * FRONT_H) / TOP_H) + Math.floor(this.cameraY)
+      if (terrainAt.has(`${wx},${wy},${z}`)) {
+        return { x: wx, y: wy }
+      }
+    }
+
+    // No terrain found — return the flat z=0 projection.
+    const wy = Math.floor(canvasY / TOP_H) + Math.floor(this.cameraY)
+    return { x: wx, y: wy }
   }
 
   showMoistureOverlay = false

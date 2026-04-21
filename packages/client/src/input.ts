@@ -107,5 +107,6 @@ function canvasToWorld(e: MouseEvent, canvas: HTMLCanvasElement, renderer: Rende
   return renderer.screenToWorld(
     (e.clientX - rect.left) * scaleX,
     (e.clientY - rect.top) * scaleY,
+    getView() ?? undefined,
   )
 }
