@@ -20,5 +20,4 @@ export type {
   RoundResolveMessage,
   ServerErrorMessage,
 } from './types.js'
-export { ACTIONS_PER_ROUND } from './types.js'
-export { GameServer } from './GameServer.js'
+export { ACTIONS_PER_ROUND, TICKS_PER_DAY } from './types.js'

@@ -33,6 +33,7 @@
   import { computed, inject } from 'vue'
   import type { Ref } from 'vue'
   import type { GameView, ViewEntity, InspectResult } from '@repo/server/sdk'
+  import { TICKS_PER_DAY } from '@repo/server/sdk'
   import EntityCard from '~client/components/EntityCard.vue'
   import DebugPanel from '~client/components/DebugPanel.vue'
   import SidebarSettings from '~client/components/SidebarSettings.vue'
@@ -50,8 +51,6 @@
 
   const zoomIn = () => setScale(scale.value + 1)
   const zoomOut = () => setScale(scale.value - 1)
-
-  const TICKS_PER_DAY = 100
 
   const day = computed(() => view.value ? Math.floor(view.value.tick / TICKS_PER_DAY) + 1 : 0)
   const tickOfDay = computed(() => view.value ? String(view.value.tick % TICKS_PER_DAY).padStart(2, '0') : '00')

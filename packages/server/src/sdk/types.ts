@@ -1,4 +1,5 @@
 import type { Health, Hunger, Movement, MovementMode, Moisture, GroundCover, Vision } from '@repo/state'
+export { TICKS_PER_DAY } from '@repo/state'
 
 export type { MovementMode } from '@repo/state'
 
