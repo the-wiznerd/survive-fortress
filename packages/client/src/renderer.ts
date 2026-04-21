@@ -184,7 +184,7 @@ export class Renderer {
         const col = arrowCol(action.dx, action.dy)
         ctx.drawImage(spriteSheet,
           col * CELL_W, ARROW_ROW * CELL_H, CELL_W, TOP_H,
-          sx * CELL_W, (sy + 1) * TOP_H - player.z * FRONT_H - 2,
+          sx * CELL_W, (sy + 1) * TOP_H - player.z * FRONT_H,
           CELL_W, TOP_H)
       } else if (action.type === 'harvest') {
         // Find the target entity to determine direction from cursor.
@@ -197,7 +197,7 @@ export class Renderer {
 
         ctx.drawImage(spriteSheet,
           ACTION_SPRITE_COL * CELL_W, ARROW_ROW * CELL_H, CELL_W, TOP_H,
-          sx * CELL_W, (sy + 1) * TOP_H - player.z * FRONT_H - 2,
+          sx * CELL_W, (sy + 1) * TOP_H - player.z * FRONT_H,
           CELL_W, TOP_H)
       }
     }
@@ -206,7 +206,7 @@ export class Renderer {
 
 }
 
-const ARROW_ROW = 15
+const ARROW_ROW = 14
 const HOVER_SPRITE_COL = 0
 const SELECTED_SPRITE_COL = 1
 const ACTION_SPRITE_COL = 6

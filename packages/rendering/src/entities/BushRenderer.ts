@@ -6,7 +6,7 @@ const LARGE_SPRITE_COL = 1
 const LARGE_BERRY_SPRITE_COL = 2
 const SMALL_SPRITE_COL = 3
 const SMALL_BERRY_SPRITE_COL = 4
-const SPRITE_ROW = 13
+const SPRITE_ROW = 12
 const SPRITE_HEIGHT = 2
 
 export class BushRenderer extends EntityRenderer {
