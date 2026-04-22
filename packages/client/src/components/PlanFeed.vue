@@ -6,14 +6,14 @@
     </header>
     <div
       class="slots"
-      :style="{ gridTemplateColumns: `repeat(${apTotal}, minmax(0, 1fr))` }"
+      :style="{ gridTemplateRows: `repeat(${apTotal}, minmax(1.6rem, auto))` }"
     >
       <div
         v-for="(item, i) in items"
         :key="i"
         class="slot"
         :class="[`state-${item.state}`, item.kind]"
-        :style="item.cost > 1 ? { gridColumn: `span ${item.cost}` } : undefined"
+        :style="item.cost > 1 ? { gridRow: `span ${item.cost}` } : undefined"
       >
         <span v-if="item.kind === 'action'" class="label">{{ item.label }}</span>
       </div>
@@ -149,18 +149,18 @@
     display: grid;
     gap: 2px;
     padding: 0.35rem;
-    grid-auto-rows: 2rem;
+    grid-auto-columns: 1fr;
+    min-inline-size: 8rem;
   }
 
   .slot {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0 0.35rem;
+    justify-content: flex-start;
+    padding: 0 0.5rem;
     font-size: 0.75rem;
     overflow: hidden;
     transition: background 200ms ease, color 200ms ease, opacity 200ms ease, border-color 200ms ease;
-    min-inline-size: 1.6rem;
   }
 
   .slot.empty {
