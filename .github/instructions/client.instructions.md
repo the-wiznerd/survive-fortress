@@ -32,6 +32,48 @@ Server SDK (GameView)
   → Sidebar.vue / EntityCard.vue show selected entity details
 ```
 
+## User Interaction & UI Architecture
+
+The client is **pointer-first** (mouse or touch) and **DOM-first** (Vue for everything that isn't the world itself). These are the load-bearing rules for all UI work in this package.
+
+### Pointer-first input
+
+- Every gameplay action must be reachable using **only a mouse** or **only a touch screen**. Keyboard is not required for any action.
+- Use the standard pointer corollaries: tap ↔ click, long-press ↔ hover/right-click. Don't gate functionality behind hover-only affordances; if a hover state reveals info or actions, a tap/long-press must reach the same.
+- Gestures are fine when they work for both mouse and touch (drag, long-press, swipe). Avoid multi-touch-only gestures unless there's a single-pointer equivalent.
+- **Canvas pointer handling stays minimal** — currently just inspect/select. Anything richer (action menus, confirmations, multi-step input) belongs in the DOM.
+- **Interaction model:** select-then-act. Tap/click a target, then act on it via DOM controls (drawer buttons, contextual toolbar, etc.). When the target is unambiguous, skip the explicit select step to reduce friction.
+
+### DOM-first UI
+
+The canvas renders the **world**. Vue/DOM renders **everything else**.
+
+- In the canvas: terrain, entities, world-anchored visual effects (e.g. queued move arrows, future damage numbers tied to a cell). Anything that requires participating in the world's z/y back-to-front sort belongs here.
+- In the DOM: HUD, drawers, modals, toasts, notifications, buttons, menus, inventory grids, tooltips, cursors-of-intent, callouts. If it's a *control* or doesn't need world-space ordering, it's DOM.
+- DOM overlays may be absolutely positioned over the canvas using world↔screen coordinate helpers (we already have `screenToWorld`; add the inverse as needed). This is preferred over rebuilding UI primitives in canvas.
+- **UI state lives in Vue** (refs, composables, small modules like `sidebarStack.ts`) — not in the renderer. The renderer reads game view state; it does not own UI state.
+
+### Accessibility & browser conventions
+
+A11y is **aspirational, not gated**. The target audience is sighted users with a working pointer. That said:
+
+- Use semantic HTML and native controls (`<button>`, `<details>`, `<dialog>`, `<input>`, etc.) rather than rebuilding them on `<div>`. You get focus, keyboard, ARIA roles, and platform conventions for free.
+- Respect user agent settings: size in `rem`/`em` (not `px`) for anything text-related, honor `prefers-reduced-motion` for non-essential animation, use logical properties (`inline-size`, `block-start`, etc.) where reasonable.
+- Don't fight native browser behavior (focus rings, scroll, text selection, context menus on form fields). Suppress only when it actively breaks the experience (e.g. context menu on the canvas itself).
+- Use `role="status"` / `aria-live="polite"` for transient notifications and toasts.
+- Tab order and full keyboard navigation are not requirements; don't go out of your way to break them either.
+
+### Layout target
+
+Design for **desktop first** (mouse + reasonably wide viewport). Responsive/mobile layouts come later, after systems mature. Don't pre-optimize for narrow viewports, but don't bake in fixed pixel layouts that would be painful to make fluid later — prefer flex/grid and relative units by default.
+
+### When in doubt
+
+- "Can I build this with Vue and CSS?" → do that.
+- "Does this need to sort with world entities?" → canvas.
+- "Does this need a hover state to be usable?" → redesign so it doesn't.
+- "Should I add a hotkey / gesture / long-press?" → not yet. Add the simplest conventional control first; layer in shortcuts only when a real need appears.
+
 ## Imports
 
 Use tilde imports for all within-package imports: `import { Renderer } from '~client/rendering/renderer.js'`. Use `@repo/server/sdk` for server SDK imports. Never use relative imports.
