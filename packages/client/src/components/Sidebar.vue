@@ -1,7 +1,9 @@
 <template>
   <aside id="sidebar">
     <Transition :name="transitionName">
-      <component :is="currentComponent" :key="stack.length" class="drawer" />
+      <KeepAlive>
+        <component :is="currentComponent" :key="topId" class="drawer" />
+      </KeepAlive>
     </Transition>
   </aside>
 </template>
@@ -13,6 +15,7 @@
   import { sidebarStack, sidebarTop, sidebarDirection } from '~client/sidebarStack'
 
   const stack = sidebarStack
+  const topId = computed(() => stack.value[stack.value.length - 1]?.id ?? 0)
   const currentComponent = computed(() => {
     const top = sidebarTop.value
     if (!top) return InspectorView
@@ -40,16 +43,14 @@
     overflow-y: auto;
   }
 
-  // Push: new view slides in from the right; old slides out to the left.
+  // Push: new view slides in from the right and covers the previous drawer
+  // (which stays in place underneath, preserving its scroll/expand state).
+  // Pop: top view slides off to the right, revealing the drawer beneath.
   .drawer-push-enter-active,
-  .drawer-push-leave-active,
-  .drawer-pop-enter-active,
   .drawer-pop-leave-active {
     transition: transform 0.2s ease;
+    z-index: 1;
   }
   .drawer-push-enter-from { transform: translateX(100%); }
-  .drawer-push-leave-to   { transform: translateX(-100%); }
-  // Pop: reverse direction.
-  .drawer-pop-enter-from  { transform: translateX(-100%); }
   .drawer-pop-leave-to    { transform: translateX(100%); }
 </style>

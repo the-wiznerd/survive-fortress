@@ -1,5 +1,5 @@
 <template>
-  <details>
+  <details v-if="expandable">
     <summary>
       <span class="label"><slot name="label" /></span>
       <span class="toggle" />
@@ -8,7 +8,29 @@
       <slot />
     </div>
   </details>
+  <div v-else class="empty">
+    <span class="label"><slot name="label" /></span>
+  </div>
 </template>
+
+<script setup lang="ts">
+  import { computed, useSlots, Comment, Text } from 'vue'
+  import type { VNode } from 'vue'
+
+  const slots = useSlots()
+
+  function hasMeaningfulContent(nodes: VNode[] | undefined): boolean {
+    if (!nodes) return false
+    return nodes.some(n => {
+      if (n.type === Comment) return false
+      if (n.type === Text && typeof n.children === 'string' && n.children.trim() === '') return false
+      if (Array.isArray(n.children) && n.children.length === 0) return false
+      return true
+    })
+  }
+
+  const expandable = computed(() => hasMeaningfulContent(slots.default?.()))
+</script>
 
 <style lang="scss" scoped>
   @use '~styles/mixins';
@@ -73,6 +95,16 @@
       display: flex;
       flex-direction: column;
       gap: 1em;
+    }
+  }
+
+  .empty {
+    border-block-start: 1px solid var(--color-darkest-gray);
+    padding: 1rem 0;
+
+    .label {
+      @include mixins.heading;
+      margin-block: 0;
     }
   }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="inspector-view">
-    <div v-if="view">
-      <div class="stat"><span class="label">Day:</span> {{ day }}.{{ tickOfDay }}</div>
+    <div v-if="view" class="game-state">
+      <div class="day"><span class="label">Day:</span> {{ day }}.{{ tickOfDay }}</div>
     </div>
 
     <EntityCard v-if="player" :entity="player" />
@@ -79,6 +79,15 @@
     min-height: 100%;
     box-sizing: border-box;
     background: var(--color-black);
+  }
+
+  .game-state {
+    padding-block-end: 1rem;
+    font-size: 1rem;
+
+    .label {
+      color: var(--color-white);
+    }
   }
 
   .selection {

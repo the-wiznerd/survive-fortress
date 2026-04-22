@@ -6,18 +6,26 @@ export type SidebarView =
   | { kind: 'inspector' }
   | { kind: 'bag' }
 
-const stack = ref<SidebarView[]>([{ kind: 'inspector' }])
+/** Stack entries carry a stable id so Vue can preserve component instance state
+ *  (scroll position, disclosure open/closed, etc.) across pushes/pops. */
+export interface SidebarStackEntry {
+  id: number
+  view: SidebarView
+}
+
+let nextId = 1
+const stack = ref<SidebarStackEntry[]>([{ id: 0, view: { kind: 'inspector' } }])
 /** Direction of the most recent navigation; drives slide animation in `Sidebar.vue`. */
 const direction = ref<'push' | 'pop'>('push')
 
 export const sidebarStack = readonly(stack)
 export const sidebarDirection = readonly(direction)
-export const sidebarTop = computed(() => stack.value[stack.value.length - 1])
+export const sidebarTop = computed(() => stack.value[stack.value.length - 1]?.view)
 export const sidebarDepth = computed(() => stack.value.length)
 
 export function pushSidebarView(view: SidebarView) {
   direction.value = 'push'
-  stack.value.push(view)
+  stack.value.push({ id: nextId++, view })
 }
 
 export function popSidebarView() {
@@ -28,5 +36,6 @@ export function popSidebarView() {
 
 export function resetSidebarStack() {
   direction.value = 'pop'
-  stack.value = [{ kind: 'inspector' }]
+  stack.value = [{ id: 0, view: { kind: 'inspector' } }]
+  nextId = 1
 }
