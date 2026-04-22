@@ -12,6 +12,7 @@ export interface ComponentTypes {
   hunger: Hunger
   movement: Movement
   playerControlled: PlayerControlled
+  actor: Actor
   entityType: EntityType
   moisture: Moisture
   groundCover: GroundCover
@@ -61,6 +62,11 @@ export interface MovementMode {
 
 export interface Movement {
   modes: MovementMode[]
+}
+
+export interface Actor {
+  /** Maximum action points (= ticks) this actor can spend per round. */
+  pointsPerRound: number
 }
 
 export interface PlayerControlled {
@@ -186,6 +192,7 @@ export function createWorld(): World {
       hunger: new Map(),
       movement: new Map(),
       playerControlled: new Map(),
+      actor: new Map(),
       entityType: new Map(),
       moisture: new Map(),
       groundCover: new Map(),

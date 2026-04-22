@@ -5,6 +5,7 @@ import { HungerTrait } from '~engine/traits/HungerTrait.js'
 import { MovementTrait } from '~engine/traits/MovementTrait.js'
 import { VisionTrait } from '~engine/traits/VisionTrait.js'
 import { PlayerControlledTrait } from '~engine/traits/PlayerControlledTrait.js'
+import { ActorTrait } from '~engine/traits/ActorTrait.js'
 import { EquipmentTrait } from '~engine/traits/EquipmentTrait.js'
 import { spawnEntity } from '~engine/registry.js'
 import { equipItem } from '~engine/containment.js'
@@ -25,6 +26,7 @@ export class Player extends BaseEntityType {
     verticalRange: 5
   }))
   playerControlled = this.addTrait(new PlayerControlledTrait(this.world, this.id))
+  actor = this.addTrait(new ActorTrait(this.world, this.id, { pointsPerRound: 8 }))
   equipment = this.addTrait(new EquipmentTrait(this.world, this.id, [...PLAYER_SLOTS]))
 
   /**

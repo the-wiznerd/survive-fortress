@@ -1,7 +1,7 @@
 // WebSocket transport — pure, no Vue or store imports.
 // The store imports `connect()` and treats the returned `Game` as opaque transport.
 
-import type { Game, GameView, ServerMessage, SerializedGameView, TurnMode } from '@repo/server/sdk'
+import type { ActionCosts, ActionType, Game, GameView, ServerMessage, SerializedGameView, TurnMode } from '@repo/server/sdk'
 
 const WS_URL = 'ws://localhost:5174'
 
@@ -16,7 +16,8 @@ export function connect(save: string, turnMode: TurnMode): Promise<Game> {
 
     let resolveCallback: ((frames: GameView[]) => void) | null = null
     let latestView: GameView | null = null
-    let actionsPerRound = 8
+    let actionPointsPerRound = 8
+    let actionCosts: ActionCosts = { move: 1, wait: 1, harvest: 1, pickup: 1, drop: 1, eat: 1 } satisfies Record<ActionType, number>
     let serverTurnMode: TurnMode = turnMode
 
     ws.onopen = () => {
@@ -33,7 +34,8 @@ export function connect(save: string, turnMode: TurnMode): Promise<Game> {
       switch (msg.type) {
         case 'joined':
           latestView = deserializeView(msg.view)
-          actionsPerRound = msg.actionsPerRound
+          actionPointsPerRound = msg.actionPointsPerRound
+          actionCosts = msg.actionCosts
           serverTurnMode = msg.turnMode
           resolve({
             onRoundResolve(cb) { resolveCallback = cb },
@@ -44,7 +46,8 @@ export function connect(save: string, turnMode: TurnMode): Promise<Game> {
             },
             stop() { ws.close() },
             getView() { return latestView! },
-            get actionsPerRound() { return actionsPerRound },
+            get actionPointsPerRound() { return actionPointsPerRound },
+            get actionCosts() { return actionCosts },
             get turnMode() { return serverTurnMode },
             sendRaw(msg) { ws.send(JSON.stringify(msg)) },
           })

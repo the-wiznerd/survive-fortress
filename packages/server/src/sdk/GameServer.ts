@@ -5,12 +5,11 @@ import {
   queryEntities,
 } from '@repo/state'
 import { tick, VisionTrait } from '@repo/engine'
-import { ACTIONS_PER_ROUND } from '~server/sdk/types.js'
-import type { GameView, ViewEntity, PlayerAction, VisibleTraitName, InspectResult, PlayerPlanView } from '~server/sdk/types.js'
+import type { GameView, ViewEntity, PlayerAction, VisibleTraitName, InspectResult, PlayerPlanView, ActionCosts, ActionType } from '~server/sdk/types.js'
 /** Trait names the client is allowed to see when inspecting entities. */
 const VISIBLE_TRAITS: VisibleTraitName[] = [
   'health', 'hunger', 'movement', 'moisture', 'groundCover', 'vision',
-  'carriable', 'contained', 'edible', 'wearable', 'tool',
+  'carriable', 'contained', 'edible', 'wearable', 'tool', 'actor',
 ]
 
 export class GameServer {
@@ -35,7 +34,8 @@ export class GameServer {
     }
 
     const frames: GameView[] = []
-    for (let i = 0; i < ACTIONS_PER_ROUND; i++) {
+    const ticks = this.getActionPointsPerRound()
+    for (let i = 0; i < ticks; i++) {
       tick(this.world)
       const view = this.buildView()
       frames.push(view)
@@ -43,6 +43,31 @@ export class GameServer {
 
     this.currentView = frames[frames.length - 1]!
     return frames
+  }
+
+  /** AP budget for the current player (= ticks per round). */
+  getActionPointsPerRound(): number {
+    const actor = getComponent(this.world, this.playerId, 'actor')
+    return actor?.pointsPerRound ?? 8
+  }
+
+  /** Representative AP cost per action type for client-side plan budgeting.
+   *  Move uses the player's fastest available locomotion mode; everything
+   *  else is currently 1 (matches each action handler's `cost`). */
+  getActionCosts(): ActionCosts {
+    const movement = getComponent(this.world, this.playerId, 'movement')
+    const movePace = movement?.modes.length
+      ? Math.min(...movement.modes.map(m => m.pace))
+      : 1
+    const costs: Record<ActionType, number> = {
+      move: movePace,
+      wait: 1,
+      harvest: 1,
+      pickup: 1,
+      drop: 1,
+      eat: 1,
+    }
+    return costs
   }
 
   /** Get the current view snapshot. */

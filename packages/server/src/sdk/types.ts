@@ -1,4 +1,4 @@
-import type { Health, Hunger, Movement, Moisture, GroundCover, Vision, Carriable, Edible, Wearable, Tool, EntityId } from '@repo/state'
+import type { Health, Hunger, Movement, Moisture, GroundCover, Vision, Carriable, Edible, Wearable, Tool, Actor, EntityId } from '@repo/state'
 export { TICKS_PER_DAY } from '@repo/state'
 
 export type { MovementMode } from '@repo/state'
@@ -23,6 +23,7 @@ export interface TraitViews {
   equipment: { slots: Record<string, EntityId | null> }
   wearable: Wearable
   tool: Tool
+  actor: Actor
 }
 
 /** A trait name the client is allowed to see. */
@@ -74,16 +75,19 @@ export type PlayerAction =
   | { type: 'drop'; targetId: number; dx: number; dy: number }
   | { type: 'eat'; targetId: number }
 
+/** Discriminator for `PlayerAction`. */
+export type ActionType = PlayerAction['type']
+
+/** AP cost per action type. Sent from the server at join; used by the
+ *  client to enforce its plan budget. */
+export type ActionCosts = Record<ActionType, number>
+
 export type TurnMode = 'manual' | 'auto'
 
 /** Inspected entity details for the sidebar. */
 export interface InspectResult {
   entities: ViewEntity[]
 }
-
-// ─── Round Constants ───
-
-export const ACTIONS_PER_ROUND = 8
 
 /** The game interface — same shape whether local or remote. */
 export interface Game {
@@ -102,8 +106,11 @@ export interface Game {
   /** Get the current view (the latest planning-phase view). */
   getView(): GameView
 
-  /** The number of actions (ticks) per round. */
-  actionsPerRound: number
+  /** The player's per-round AP budget (= ticks per round). */
+  actionPointsPerRound: number
+
+  /** AP cost per action type. */
+  actionCosts: ActionCosts
 
   /** Turn mode selected for this session. */
   turnMode: TurnMode
@@ -135,7 +142,8 @@ export type ClientMessage = JoinMessage | SubmitPlanMessage
 export interface JoinedMessage {
   type: 'joined'
   view: SerializedGameView
-  actionsPerRound: number
+  actionPointsPerRound: number
+  actionCosts: ActionCosts
   turnMode: TurnMode
 }
 

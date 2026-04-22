@@ -2,70 +2,36 @@
   <section class="plan-feed" :class="`phase-${gameState.phase}`" aria-label="Plan feed">
     <header class="phase-header">
       <span class="phase-name">{{ phaseLabel }}</span>
+      <span class="ap-counter">{{ apUsed }} / {{ apTotal }}</span>
     </header>
-    <ol class="rows" :class="{ empty: !rows.length }">
-      <TransitionGroup name="row">
-        <li
-          v-for="row in rows"
-          :key="row.id"
-          class="row"
-          :class="{
-            pending: row.state === 'pending',
-            success: row.state === 'success',
-            failed: row.state === 'failed',
-            cancelled: row.state === 'cancelled',
-          }"
-          :style="row.state === 'cancelled' ? { transitionDelay: `${row.cancelDelayMs}ms` } : undefined"
-        >
-          <span class="label">{{ row.label }}</span>
-        </li>
-      </TransitionGroup>
-      <li v-if="!rows.length && gameState.phase === 'planning'" class="hint">Enter actions</li>
-    </ol>
+    <div
+      class="slots"
+      :style="{ gridTemplateColumns: `repeat(${apTotal}, minmax(0, 1fr))` }"
+    >
+      <div
+        v-for="(item, i) in items"
+        :key="i"
+        class="slot"
+        :class="[`state-${item.state}`, item.kind]"
+        :style="item.cost > 1 ? { gridColumn: `span ${item.cost}` } : undefined"
+      >
+        <span v-if="item.kind === 'action'" class="label">{{ item.label }}</span>
+      </div>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-  import { computed, watch } from 'vue'
-  import type { PlayerAction } from '@repo/server/sdk'
+  import { computed } from 'vue'
+  import type { ActionType, PlayerAction } from '@repo/server/sdk'
   import { useGameStore } from '~client/stores/game'
 
   const gameState = useGameStore()
 
-  type RowState = 'pending' | 'success' | 'failed' | 'cancelled'
-
-  interface Row {
-    id: number
-    label: string
-    state: RowState
-    /** Stagger ms applied when transitioning a cancelled row out. */
-    cancelDelayMs: number
-  }
-
-  // Stable per-row IDs so Vue's TransitionGroup can animate insertions/removals.
-  let nextRowId = 1
-  const planningRowIds: number[] = []
-  let submittedRowIds: number[] = []
-  /** IDs of rows that have completed/failed/cancelled and should no longer render. */
-  const exitingRowIds = new Set<number>()
-
-  // Keep planning row IDs aligned with the planning plan length (append new IDs as actions are added).
-  watch(() => gameState.plan.length, (length) => {
-    if (length > planningRowIds.length) {
-      const toAdd = length - planningRowIds.length
-      for (let i = 0; i < toAdd; i++) planningRowIds.push(nextRowId++)
-    } else if (length < planningRowIds.length) {
-      planningRowIds.splice(length)
-    }
-  }, { immediate: true })
-
-  // Allocate fresh IDs for the submitted plan so resolve animations are scoped to those rows.
-  watch(() => gameState.submittedPlan, (next) => {
-    exitingRowIds.clear()
-    submittedRowIds = next.length === 0
-      ? []
-      : Array.from({ length: next.length }, () => nextRowId++)
-  })
+  type SlotState = 'pending' | 'planning' | 'success' | 'failed' | 'cancelled' | 'empty'
+  type Item =
+    | { kind: 'action'; label: string; cost: number; state: SlotState }
+    | { kind: 'empty'; cost: 1; state: 'empty' }
 
   const phaseLabel = computed(() => {
     switch (gameState.phase) {
@@ -74,6 +40,12 @@
       case 'resolving': return 'Resolving'
     }
   })
+
+  const apTotal = computed(() => gameState.actionPointsPerRound)
+
+  function costOf(type: ActionType): number {
+    return gameState.actionCosts[type] ?? 1
+  }
 
   function actionLabel(a: PlayerAction): string {
     switch (a.type) {
@@ -95,78 +67,50 @@
     return parts.length ? `Move ${parts.join('')}` : 'Wait'
   }
 
-  // Build the visible row list based on current phase.
-  const rows = computed<Row[]>(() => {
-    if (gameState.phase === 'planning') {
-      return gameState.plan.map((a, i) => ({
-        id: planningRowIds[i] ?? -i - 1,
-        label: actionLabel(a),
-        state: 'pending' as RowState,
-        cancelDelayMs: 0,
-      }))
-    }
-
-    // submitted | resolving — render submitted plan minus rows that have already exited.
-    const live: Row[] = []
-    const progress = gameState.planProgress
-    for (let i = 0; i < gameState.submittedPlan.length; i++) {
-      const id = submittedRowIds[i] ?? -i - 1
-      if (exitingRowIds.has(id)) continue
-
-      let state: RowState = 'pending'
-      let cancelDelayMs = 0
-      if (gameState.phase === 'resolving') {
-        if (i < progress.index) {
-          state = 'success'
-        } else if (progress.terminated && i === progress.index) {
-          state = 'failed'
-        } else if (progress.terminated && i > progress.index) {
-          state = 'cancelled'
-          cancelDelayMs = (i - progress.index) * 60
-        }
-      }
-      live.push({
-        id,
-        label: actionLabel(gameState.submittedPlan[i]!),
-        state,
-        cancelDelayMs,
-      })
-    }
-    return live
+  /** AP consumed so far this round (sum of pending costs in planning;
+   *  sum of completed-action costs during resolve). */
+  const apUsed = computed(() => {
+    if (gameState.phase === 'planning') return gameState.planCost
+    let used = 0
+    const max = Math.min(gameState.planProgress.index, gameState.submittedPlan.length)
+    for (let i = 0; i < max; i++) used += costOf(gameState.submittedPlan[i]!.type)
+    return used
   })
 
-  // When progress advances during resolving, mark the just-resolved row(s) success and remove them after a brief flash.
-  let lastResolvedIndex = 0
-  watch(
-    () => ({ phase: gameState.phase, index: gameState.planProgress.index, terminated: gameState.planProgress.terminated }),
-    (next, prev) => {
-      if (next.phase !== 'resolving') {
-        lastResolvedIndex = 0
-        return
-      }
-      if (prev?.phase !== 'resolving') lastResolvedIndex = 0
+  /** Slots in left-to-right order. Each action item's `cost` drives `grid-column: span N`. */
+  const items = computed<Item[]>(() => {
+    const list: Item[] = []
+    let used = 0
 
-      while (lastResolvedIndex < next.index) {
-        const i = lastResolvedIndex
-        const id = submittedRowIds[i]
-        if (id != null) setTimeout(() => exitingRowIds.add(id), 250)
-        lastResolvedIndex++
+    if (gameState.phase === 'planning') {
+      for (const a of gameState.plan) {
+        const cost = costOf(a.type)
+        list.push({ kind: 'action', label: actionLabel(a), cost, state: 'planning' })
+        used += cost
       }
-
-      if (next.terminated) {
-        // Schedule the failed row + cancelled tail to exit after their flash/stagger.
-        const failedIndex = next.index
-        const tail = gameState.submittedPlan.length - failedIndex
-        for (let k = 0; k < tail; k++) {
-          const i = failedIndex + k
-          const id = submittedRowIds[i]
-          if (id == null) continue
-          const delay = k === 0 ? 400 : 400 + k * 60
-          setTimeout(() => exitingRowIds.add(id), delay)
+    } else {
+      const progress = gameState.planProgress
+      const isResolving = gameState.phase === 'resolving'
+      for (let i = 0; i < gameState.submittedPlan.length; i++) {
+        const a = gameState.submittedPlan[i]!
+        const cost = costOf(a.type)
+        let state: SlotState = 'pending'
+        if (isResolving) {
+          if (i < progress.index) state = 'success'
+          else if (progress.terminated && i === progress.index) state = 'failed'
+          else if (progress.terminated && i > progress.index) state = 'cancelled'
         }
+        list.push({ kind: 'action', label: actionLabel(a), cost, state })
+        used += cost
       }
-    },
-  )
+    }
+
+    // Pad trailing AP with empty slots up to the budget.
+    for (let i = used; i < apTotal.value; i++) {
+      list.push({ kind: 'empty', cost: 1, state: 'empty' })
+    }
+    return list
+  })
 </script>
 
 <style lang="scss" scoped>
@@ -174,8 +118,6 @@
     position: absolute;
     inset-block-end: 1rem;
     inset-inline-start: 1rem;
-    min-inline-size: 12rem;
-    max-inline-size: 16rem;
     background: var(--color-black);
     border: 1px solid var(--color-darkest-gray);
     display: flex;
@@ -190,74 +132,80 @@
     color: var(--color-black);
     background: var(--color-darkest-gray);
     transition: background 150ms ease;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
   }
 
   .phase-planning .phase-header { background: var(--color-blue); }
   .phase-submitted .phase-header { background: var(--color-yellow); }
   .phase-resolving .phase-header { background: var(--color-green); }
 
-  .rows {
-    list-style: none;
-    margin: 0;
-    padding: 0.25rem 0;
+  .ap-counter {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .slots {
+    display: grid;
+    gap: 2px;
+    padding: 0.35rem;
+    grid-auto-rows: 2rem;
+  }
+
+  .slot {
     display: flex;
-    flex-direction: column;
-
-    &.empty {
-      padding: 0.25rem 0;
-    }
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.35rem;
+    font-size: 0.75rem;
+    overflow: hidden;
+    transition: background 200ms ease, color 200ms ease, opacity 200ms ease, border-color 200ms ease;
+    min-inline-size: 1.6rem;
   }
 
-  .row {
-    padding: 0.3rem 0.6rem;
+  .slot.empty {
+    background: transparent;
+    border: 1px dashed var(--color-darkest-gray);
+  }
+
+  .slot.action {
+    background: var(--color-darkest-gray);
     color: var(--color-lightest-gray);
-    border-block-start: 1px solid transparent;
-    transition: background 150ms ease, color 150ms ease, opacity 200ms ease, transform 200ms ease;
-
-    &.success {
-      background: var(--color-green);
-      color: var(--color-black);
-    }
-    &.failed {
-      background: var(--color-red);
-      color: var(--color-black);
-    }
-    &.cancelled {
-      background: transparent;
-      color: var(--color-red);
-      opacity: 0.6;
-    }
+    border: 1px solid var(--color-dark-gray);
   }
 
-  .hint {
-    padding: 0.3rem 0.6rem;
-    color: var(--color-dark-gray);
-    font-style: italic;
-    list-style: none;
+  .slot.state-pending {
+    background: var(--color-darkest-gray);
+    color: var(--color-light-gray);
   }
 
-  // TransitionGroup animations.
-  .row-enter-from {
-    opacity: 0;
-    transform: translateX(-0.5rem);
+  .slot.state-success {
+    background: var(--color-green);
+    color: var(--color-black);
+    border-color: var(--color-green);
   }
-  .row-enter-active {
-    transition: opacity 150ms ease, transform 150ms ease;
+
+  .slot.state-failed {
+    background: var(--color-red);
+    color: var(--color-black);
+    border-color: var(--color-red);
   }
-  .row-leave-active {
-    transition: opacity 200ms ease, transform 200ms ease;
-    position: absolute; // collapse out of flow so siblings shift smoothly
-    inline-size: calc(100% - 1.2rem);
+
+  .slot.state-cancelled {
+    background: transparent;
+    color: var(--color-red);
+    border: 1px dashed var(--color-red);
+    opacity: 0.65;
   }
-  .row-leave-to {
-    opacity: 0;
-    transform: translateX(-1rem);
+
+  .label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .row,
-    .row-enter-active,
-    .row-leave-active {
+    .slot {
       transition: none;
     }
   }

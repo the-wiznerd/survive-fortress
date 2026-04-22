@@ -7,6 +7,8 @@ export type {
   GameView,
   ViewEntity,
   PlayerAction,
+  ActionType,
+  ActionCosts,
   TurnMode,
   InspectResult,
   TraitViews,
@@ -22,4 +24,4 @@ export type {
   RoundResolveMessage,
   ServerErrorMessage,
 } from './types.js'
-export { ACTIONS_PER_ROUND, TICKS_PER_DAY } from './types.js'
+export { TICKS_PER_DAY } from './types.js'

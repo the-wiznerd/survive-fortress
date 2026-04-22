@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, shallowRef, watch } from 'vue'
-import type { Game, GameView, InspectResult, PlayerAction, TurnMode } from '@repo/server/sdk'
+import { computed, ref, shallowRef, watch } from 'vue'
+import type { ActionCosts, ActionType, Game, GameView, InspectResult, PlayerAction, TurnMode } from '@repo/server/sdk'
 import { connect } from '~client/utils/net/connection'
 import { playFrames, type PlaybackHandle } from '~client/utils/net/playback'
 
@@ -53,12 +53,19 @@ export const useGameStore = defineStore('game', () => {
   const inspectedCell = ref<CellCoord | null>(null)
   /** Cached inspect result for `inspectedCell`. Refreshed on selection change and on phase change. */
   const inspectResult = ref<InspectResult | null>(null)
+  /** Player's per-round AP budget. Set on connect from the `joined` message. */
+  const actionPointsPerRound = ref<number>(8)
+  /** AP cost per action type. Set on connect from the `joined` message. */
+  const actionCosts = ref<ActionCosts>({ move: 1, wait: 1, harvest: 1, pickup: 1, drop: 1, eat: 1 })
+  /** Total AP cost of the currently planned actions. */
+  const planCost = computed(() =>
+    plan.value.reduce((sum, a) => sum + (actionCosts.value[a.type] ?? 1), 0)
+  )
 
   // ─── Non-reactive backing state ───
   // These are not reactive on purpose; they're transport/lifecycle handles, not UI state.
   let game: Game | null = null
   let playback: PlaybackHandle | null = null
-  let maxPlanActions = 8
   let onCameraMove: ((x: number, y: number, z: number) => void) | null = null
 
   // ─── Lifecycle ───
@@ -69,7 +76,8 @@ export const useGameStore = defineStore('game', () => {
     stop()
     onCameraMove = cameraCallback
     game = await connect(SAVE_NAME, turnMode.value)
-    maxPlanActions = game.actionsPerRound
+    actionPointsPerRound.value = game.actionPointsPerRound
+    actionCosts.value = game.actionCosts
 
     const initialView = game.getView()
     view.value = initialView
@@ -126,41 +134,44 @@ export const useGameStore = defineStore('game', () => {
     return game
   }
 
-  /** Read-only snapshot of `actionsPerRound` for components that need it. */
-  function actionsPerRound(): number { return maxPlanActions }
+  /** Whether appending an action of `type` would fit in the AP budget. */
+  function canAfford(type: ActionType): boolean {
+    const cost = actionCosts.value[type] ?? 1
+    return planCost.value + cost <= actionPointsPerRound.value
+  }
 
   // ─── Plan Management ───
 
   function appendMove(dx: number, dy: number) {
     if (phase.value !== 'planning') return
-    if (plan.value.length >= maxPlanActions) return
+    if (!canAfford('move')) return
     plan.value.push({ type: 'move', dx, dy })
   }
 
   function appendHarvest(targetId: number) {
     if (phase.value !== 'planning') return
-    if (plan.value.length >= maxPlanActions) return
+    if (!canAfford('harvest')) return
     if (plan.value.some(a => a.type === 'harvest' && a.targetId === targetId)) return
     plan.value.push({ type: 'harvest', targetId })
   }
 
   function appendPickup(targetId: number) {
     if (phase.value !== 'planning') return
-    if (plan.value.length >= maxPlanActions) return
+    if (!canAfford('pickup')) return
     if (plan.value.some(a => a.type === 'pickup' && a.targetId === targetId)) return
     plan.value.push({ type: 'pickup', targetId })
   }
 
   function appendDrop(targetId: number, dx = 0, dy = 0) {
     if (phase.value !== 'planning') return
-    if (plan.value.length >= maxPlanActions) return
+    if (!canAfford('drop')) return
     if (plan.value.some(a => a.type === 'drop' && a.targetId === targetId)) return
     plan.value.push({ type: 'drop', targetId, dx, dy })
   }
 
   function appendEat(targetId: number) {
     if (phase.value !== 'planning') return
-    if (plan.value.length >= maxPlanActions) return
+    if (!canAfford('eat')) return
     if (plan.value.some(a => a.type === 'eat' && a.targetId === targetId)) return
     plan.value.push({ type: 'eat', targetId })
   }
@@ -173,7 +184,7 @@ export const useGameStore = defineStore('game', () => {
   function submitPlan() {
     if (phase.value !== 'planning') return
     if (!game) return
-    const actions = plan.value.slice(0, maxPlanActions)
+    const actions = plan.value.slice()
     game.submitPlan(actions)
     submittedPlan.value = actions.map(a => ({ ...a }))
     planProgress.value = { index: 0, terminated: false }
@@ -234,6 +245,9 @@ export const useGameStore = defineStore('game', () => {
     scale,
     inspectedCell,
     inspectResult,
+    actionPointsPerRound,
+    actionCosts,
+    planCost,
     // lifecycle
     init,
     stop,
@@ -242,7 +256,7 @@ export const useGameStore = defineStore('game', () => {
     setScale,
     setInspectedCell,
     getGame,
-    actionsPerRound,
+    canAfford,
     // plan actions
     appendMove,
     appendHarvest,

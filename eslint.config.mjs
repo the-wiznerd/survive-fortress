@@ -66,6 +66,9 @@ export default [
     },
     rules: {
       'vue/script-indent': ['error', 2, { baseIndent: 1, switchCase: 1 }],
+      // TypeScript exhaustive switches return on every reachable branch, but
+      // this rule can't see that. Disable in favor of TS's own checks.
+      'vue/return-in-computed-property': 'off',
     },
   },
   {

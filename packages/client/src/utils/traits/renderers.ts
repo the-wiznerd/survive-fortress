@@ -76,6 +76,10 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
       return { slots: d.slots }
     }
   },
+  actor: {
+    component: StatText,
+    props: d => ({ label: 'AP / Round', value: String(d.pointsPerRound) })
+  },
 }
 
 /** Look up and apply a trait renderer. The renderer ↔ data correlation is

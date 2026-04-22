@@ -3,7 +3,7 @@
 
 import type { GameView } from '@repo/server/sdk'
 
-const PLAYBACK_TICK_MS = 250
+const PLAYBACK_TICK_MS = 400
 
 export interface PlaybackHandle {
   /** Cancel any in-flight playback. Safe to call multiple times. */

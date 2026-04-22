@@ -4,7 +4,6 @@ import { WebSocketServer } from 'ws'
 import { type WorldManifest, type ChunkData } from '@repo/state'
 import { bootstrap, importWorld } from '@repo/engine'
 import { GameServer } from '~server/sdk/GameServer.js'
-import { ACTIONS_PER_ROUND } from '~server/sdk/types.js'
 import type { ClientMessage, ServerMessage, SerializedGameView, GameView, TurnMode, PlayerAction } from '~server/sdk/types.js'
 
 const PORT = 5174
@@ -90,7 +89,8 @@ wss.on('connection', (ws) => {
           send({
             type: 'joined',
             view: serializeView(server.getView()),
-            actionsPerRound: ACTIONS_PER_ROUND,
+            actionPointsPerRound: server.getActionPointsPerRound(),
+            actionCosts: server.getActionCosts(),
             turnMode,
           })
 
@@ -120,12 +120,13 @@ wss.on('connection', (ws) => {
           clearAutoPlanningTimer()
           const allFrames: GameView[] = []
           // Run N empty rounds to advance simulation by approximately `ticks` ticks.
-          const rounds = Math.ceil(ticks / ACTIONS_PER_ROUND)
+          const roundSize = server.getActionPointsPerRound()
+          const rounds = Math.ceil(ticks / roundSize)
           for (let i = 0; i < rounds; i++) {
             allFrames.push(...server.resolveRound([]))
           }
           // Send only the final frame set as a round-resolve so the client stays in sync.
-          const lastRoundFrames = allFrames.slice(-ACTIONS_PER_ROUND)
+          const lastRoundFrames = allFrames.slice(-roundSize)
           send({
             type: 'round-resolve',
             frames: lastRoundFrames.map(serializeView),
