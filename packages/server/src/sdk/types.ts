@@ -39,6 +39,18 @@ export interface GameView {
   entities: ViewEntity[]
   /** Set of "x,y,z" keys the player can see — used by renderer for entity filtering. */
   visiblePositions: Set<string>
+  /** Player's plan execution state for this frame. */
+  playerPlan: PlayerPlanView
+}
+
+/** Per-frame snapshot of the player's plan progress. */
+export interface PlayerPlanView {
+  /** The plan currently loaded on the player. Empty array during planning before any submission. */
+  actions: PlayerAction[]
+  /** Index of the next action to consume. >= actions.length means the plan is exhausted or terminated. */
+  index: number
+  /** True if the plan was aborted by an invalid action this round. */
+  terminated: boolean
 }
 
 /** A single entity as seen by the client. */

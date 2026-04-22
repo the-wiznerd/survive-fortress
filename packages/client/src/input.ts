@@ -1,5 +1,5 @@
 import type { Renderer } from '~client/renderer'
-import { appendMove, appendHarvest, clearPlan, submitPlan, getPlanCursor, getView, type RoundPhase } from '~client/game'
+import { appendMove, appendHarvest, clearPlan, submitPlan, getPlanCursor, gameState, view } from '~client/game'
 
 // ─── Inspector State ───
 
@@ -10,12 +10,6 @@ export function getInspectedCell() { return inspectedCell }
 export function getHoveredCell() { return hoveredCell }
 
 // ─── Binding ───
-
-let currentPhase: RoundPhase = 'planning'
-
-export function setInputPhase(phase: RoundPhase) {
-  currentPhase = phase
-}
 
 export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelect: () => void, onReload: () => void): () => void {
   const onClick = (e: MouseEvent) => {
@@ -45,7 +39,7 @@ export function bindInput(canvas: HTMLCanvasElement, renderer: Renderer, onSelec
     }
 
     // Plan-building only works in planning phase.
-    if (currentPhase !== 'planning') return
+    if (gameState.phase !== 'planning') return
 
     let dx = 0
     let dy = 0
@@ -79,14 +73,14 @@ function handleDirectional(dx: number, dy: number) {
   const cursor = getPlanCursor()
   if (!cursor) { appendMove(dx, dy); return }
 
-  const view = getView()
-  if (!view) { appendMove(dx, dy); return }
+  const v = view.value
+  if (!v) { appendMove(dx, dy); return }
 
   const tx = cursor.x + dx
   const ty = cursor.y + dy
 
   // Check if there's a harvestable entity at the target cell.
-  const target = view.entities.find(e =>
+  const target = v.entities.find(e =>
     e.x === tx && e.y === ty &&
     (e.traits.harvestable as { available: boolean } | undefined)?.available === true
   )
@@ -107,6 +101,6 @@ function canvasToWorld(e: MouseEvent, canvas: HTMLCanvasElement, renderer: Rende
   return renderer.screenToWorld(
     (e.clientX - rect.left) * scaleX,
     (e.clientY - rect.top) * scaleY,
-    getView() ?? undefined,
+    view.value ?? undefined,
   )
 }

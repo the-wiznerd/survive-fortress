@@ -25,6 +25,7 @@
   overflow: hidden;
   border: 8px solid transparent;
   box-sizing: border-box;
+  position: relative;
 
   &.phase-planning {
     border-color: var(--color-blue);

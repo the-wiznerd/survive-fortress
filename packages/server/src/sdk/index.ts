@@ -1,6 +1,7 @@
 // Server SDK — client-facing surface.
 // Import this from @repo/server/sdk in client code.
 
+export type { EntityId } from '@repo/state'
 export type {
   Game,
   GameView,
@@ -11,6 +12,7 @@ export type {
   TraitViews,
   VisibleTraitName,
   MovementMode,
+  PlayerPlanView,
   ClientMessage,
   ServerMessage,
   SerializedGameView,

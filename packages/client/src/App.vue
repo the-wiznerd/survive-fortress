@@ -1,28 +1,29 @@
 <template>
   <div id="game-container" :class="`phase-${phase}`">
     <canvas ref="canvasRef"></canvas>
+    <PlanFeed />
   </div>
   <Sidebar />
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, provide, toRef } from 'vue'
-  import type { GameView, ViewEntity, InspectResult, VisibleTraitName } from '@repo/server/sdk'
+  import { ref, computed, onMounted, onUnmounted, provide, toRef, watch } from 'vue'
+  import type { ViewEntity, InspectResult, VisibleTraitName } from '@repo/server/sdk'
   import { ENTITY_TRAIT_NAMES } from '~client/entityTraits'
   import { settings } from '~client/settings'
   import { Renderer } from '~client/renderer'
-  import { bindInput, getHoveredCell, getInspectedCell, setInputPhase } from '~client/input'
-  import { init, getView, getGame, onPhaseChange, stopGame, type RoundPhase } from '~client/game'
+  import { bindInput, getHoveredCell, getInspectedCell } from '~client/input'
+  import { init, getGame, stopGame, gameState, view } from '~client/game'
   import { debugInit } from '~client/debug'
   import Sidebar from '~client/components/Sidebar.vue'
+  import PlanFeed from '~client/components/PlanFeed.vue'
 
   const canvasRef = ref<HTMLCanvasElement | null>(null)
 
   // Reactive state for the sidebar.
-  const view = ref<GameView | null>(null)
   const inspectedCell = ref<{ x: number; y: number } | null>(null)
   const inspectResult = ref<InspectResult | null>(null)
-  const phase = ref<RoundPhase>('planning')
+  const phase = computed(() => gameState.phase)
   const scale = toRef(settings, 'scale')
 
   let renderer: Renderer
@@ -58,11 +59,7 @@
       if (view.value) renderer.render(view.value, getHoveredCell(), getInspectedCell())
     }
 
-    onPhaseChange((nextPhase) => {
-      phase.value = nextPhase
-      setInputPhase(nextPhase)
-      refreshUI()
-    })
+    watch(phase, () => { refreshUI() })
 
     unbindInput = bindInput(canvas, renderer, refreshUI, () => { startGame() })
     rafId = requestAnimationFrame(animationLoop)
@@ -81,9 +78,8 @@
   }
 
   function refreshUI() {
-    const v = getView()
+    const v = view.value
     if (!v) return
-    view.value = v
     const game = getGame()
     const cell = getInspectedCell()
     inspectedCell.value = cell
@@ -91,7 +87,7 @@
   }
 
   function animationLoop() {
-    const v = getView()
+    const v = view.value
     if (v) renderer.render(v, getHoveredCell(), getInspectedCell())
     rafId = requestAnimationFrame(animationLoop)
   }

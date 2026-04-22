@@ -6,7 +6,7 @@ import {
 } from '@repo/state'
 import { tick, VisionTrait } from '@repo/engine'
 import { ACTIONS_PER_ROUND } from '~server/sdk/types.js'
-import type { GameView, ViewEntity, PlayerAction, VisibleTraitName, InspectResult } from '~server/sdk/types.js'
+import type { GameView, ViewEntity, PlayerAction, VisibleTraitName, InspectResult, PlayerPlanView } from '~server/sdk/types.js'
 /** Trait names the client is allowed to see when inspecting entities. */
 const VISIBLE_TRAITS: VisibleTraitName[] = [
   'health', 'hunger', 'movement', 'moisture', 'groundCover', 'vision',
@@ -30,6 +30,8 @@ export class GameServer {
     if (pc) {
       pc.plan = actions.map(a => ({ ...a }))
       pc.planIndex = 0
+      pc.actionTicksElapsed = 0
+      pc.planTerminated = false
     }
 
     const frames: GameView[] = []
@@ -144,6 +146,17 @@ export class GameServer {
       playerId: String(this.playerId),
       entities,
       visiblePositions: visiblePositions ?? new Set(),
+      playerPlan: this.buildPlayerPlanView(),
+    }
+  }
+
+  private buildPlayerPlanView(): PlayerPlanView {
+    const pc = getComponent(this.world, this.playerId, 'playerControlled')
+    if (!pc) return { actions: [], index: 0, terminated: false }
+    return {
+      actions: pc.plan.map(a => ({ ...a })) as PlayerAction[],
+      index: pc.planIndex,
+      terminated: pc.planTerminated,
     }
   }
 }

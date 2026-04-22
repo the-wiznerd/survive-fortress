@@ -70,6 +70,8 @@ export interface PlayerControlled {
   planIndex: number
   /** Ticks already spent on the current action (plan[planIndex]). Resets when an action completes or a plan terminates. */
   actionTicksElapsed: number
+  /** True if the plan was aborted by an invalid action (vs naturally exhausted). Reset when a new plan is loaded. */
+  planTerminated: boolean
 }
 
 export interface EntityType {

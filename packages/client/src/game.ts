@@ -1,26 +1,42 @@
+import { reactive, shallowRef } from 'vue'
 import type { Game, GameView, ServerMessage, SerializedGameView, PlayerAction, TurnMode } from '@repo/server/sdk'
 import { Renderer } from '~client/renderer'
 
-// ─── Round Phase ───
+// ─── Types ───
 
 export type RoundPhase = 'planning' | 'submitted' | 'resolving'
 
-let phase: RoundPhase = 'planning'
-let phaseCallback: ((phase: RoundPhase) => void) | null = null
-
-export function getPhase(): RoundPhase { return phase }
-export function onPhaseChange(cb: (phase: RoundPhase) => void) { phaseCallback = cb }
-
-function setPhase(p: RoundPhase) {
-  phase = p
-  phaseCallback?.(p)
+export interface PlanProgress {
+  /** Number of actions completed successfully so far. */
+  index: number
+  /** True if the plan was terminated by an invalid action this round. */
+  terminated: boolean
 }
 
-// ─── Game State ───
+// ─── Reactive State ───
+//
+// Components import `gameState` and read fields directly — Vue tracks dependencies
+// via the reactive proxy, so no manual subscribe/unsubscribe is needed.
+// `view` is kept as a separate shallowRef because GameView is a large per-frame
+// snapshot that is replaced wholesale; deep reactivity would be wasted work.
+
+export const gameState = reactive({
+  phase: 'planning' as RoundPhase,
+  /** The plan currently being assembled by the player. */
+  plan: [] as PlayerAction[],
+  /** The plan most recently submitted to the server. Frozen during submitted/resolving,
+   *  cleared when a new planning phase begins. */
+  submittedPlan: [] as PlayerAction[],
+  /** Per-frame plan progress emitted during playback. */
+  planProgress: { index: 0, terminated: false } as PlanProgress,
+})
+
+export const view = shallowRef<GameView | null>(null)
+
+// ─── Game Connection ───
 
 let game: Game
 let gameInitialized = false
-let currentView: GameView
 let resolveTimerId: ReturnType<typeof setTimeout> | null = null
 let maxPlanActions = 8
 
@@ -31,7 +47,6 @@ const DEFAULT_SAVE = 'test-world'
 const SAVE_NAME = new URLSearchParams(window.location.search).get('save') ?? DEFAULT_SAVE
 
 export function getGame(): Game { return game }
-export function getView(): GameView { return currentView }
 
 export function stopGame() {
   if (resolveTimerId) {
@@ -49,79 +64,68 @@ function deserializeView(sv: SerializedGameView): GameView {
 
 // ─── Plan Management ───
 
-let plan: PlayerAction[] = []
-let planChangeCallback: ((plan: readonly PlayerAction[]) => void) | null = null
-
-export function getPlan(): readonly PlayerAction[] { return plan }
-export function onPlanChange(cb: (plan: readonly PlayerAction[]) => void) { planChangeCallback = cb }
-
 /** Returns the world position the player will be at after all planned moves. */
 export function getPlanCursor(): { x: number; y: number } | null {
-  if (!currentView) return null
-  const player = currentView.entities.find(e => String(e.id) === currentView.playerId)
+  const v = view.value
+  if (!v) return null
+  const player = v.entities.find(e => String(e.id) === v.playerId)
   if (!player) return null
   let x = player.x
   let y = player.y
-  for (const action of plan) {
+  for (const action of gameState.plan) {
     if (action.type === 'move') { x += action.dx; y += action.dy }
   }
   return { x, y }
 }
 
 export function appendMove(dx: number, dy: number) {
-  if (phase !== 'planning') return
-  if (plan.length >= maxPlanActions) return
-  plan.push({ type: 'move', dx, dy })
-  planChangeCallback?.(plan)
+  if (gameState.phase !== 'planning') return
+  if (gameState.plan.length >= maxPlanActions) return
+  gameState.plan.push({ type: 'move', dx, dy })
 }
 
 export function appendHarvest(targetId: number) {
-  if (phase !== 'planning') return
-  if (plan.length >= maxPlanActions) return
-  // No-op if already queued a harvest on this target.
-  if (plan.some(a => a.type === 'harvest' && a.targetId === targetId)) return
-  plan.push({ type: 'harvest', targetId })
-  planChangeCallback?.(plan)
+  if (gameState.phase !== 'planning') return
+  if (gameState.plan.length >= maxPlanActions) return
+  if (gameState.plan.some(a => a.type === 'harvest' && a.targetId === targetId)) return
+  gameState.plan.push({ type: 'harvest', targetId })
 }
 
 export function appendPickup(targetId: number) {
-  if (phase !== 'planning') return
-  if (plan.length >= maxPlanActions) return
-  if (plan.some(a => a.type === 'pickup' && a.targetId === targetId)) return
-  plan.push({ type: 'pickup', targetId })
-  planChangeCallback?.(plan)
+  if (gameState.phase !== 'planning') return
+  if (gameState.plan.length >= maxPlanActions) return
+  if (gameState.plan.some(a => a.type === 'pickup' && a.targetId === targetId)) return
+  gameState.plan.push({ type: 'pickup', targetId })
 }
 
 export function appendDrop(targetId: number, dx = 0, dy = 0) {
-  if (phase !== 'planning') return
-  if (plan.length >= maxPlanActions) return
-  if (plan.some(a => a.type === 'drop' && a.targetId === targetId)) return
-  plan.push({ type: 'drop', targetId, dx, dy })
-  planChangeCallback?.(plan)
+  if (gameState.phase !== 'planning') return
+  if (gameState.plan.length >= maxPlanActions) return
+  if (gameState.plan.some(a => a.type === 'drop' && a.targetId === targetId)) return
+  gameState.plan.push({ type: 'drop', targetId, dx, dy })
 }
 
 export function appendEat(targetId: number) {
-  if (phase !== 'planning') return
-  if (plan.length >= maxPlanActions) return
-  if (plan.some(a => a.type === 'eat' && a.targetId === targetId)) return
-  plan.push({ type: 'eat', targetId })
-  planChangeCallback?.(plan)
+  if (gameState.phase !== 'planning') return
+  if (gameState.plan.length >= maxPlanActions) return
+  if (gameState.plan.some(a => a.type === 'eat' && a.targetId === targetId)) return
+  gameState.plan.push({ type: 'eat', targetId })
 }
 
 export function clearPlan() {
-  if (phase !== 'planning') return
-  plan = []
-  planChangeCallback?.(plan)
+  if (gameState.phase !== 'planning') return
+  gameState.plan = []
 }
 
 export function submitPlan() {
-  if (phase !== 'planning') return
+  if (gameState.phase !== 'planning') return
   if (!gameInitialized) return
-  const actions = plan.slice(0, maxPlanActions)
+  const actions = gameState.plan.slice(0, maxPlanActions)
   game.submitPlan(actions)
-  plan = []
-  planChangeCallback?.(plan)
-  setPhase('submitted')
+  gameState.submittedPlan = actions.map(a => ({ ...a }))
+  gameState.planProgress = { index: 0, terminated: false }
+  gameState.plan = []
+  gameState.phase = 'submitted'
 }
 
 // ─── Connection ───
@@ -155,8 +159,8 @@ function connectGame(save: string, turnMode: TurnMode): Promise<Game> {
             onRoundResolve(cb) { resolveCallback = cb },
             submitPlan(actions) { ws.send(JSON.stringify({ type: 'submit-plan', actions })) },
             inspect(x, y) {
-              const view = latestView!
-              return { entities: view.entities.filter(e => e.x === x && e.y === y) }
+              const v = latestView!
+              return { entities: v.entities.filter(e => e.x === x && e.y === y) }
             },
             stop() { ws.close() },
             getView() { return latestView! },
@@ -196,7 +200,7 @@ function startPlayback(frames: GameView[], renderer: Renderer, onDone: () => voi
     return
   }
 
-  setPhase('resolving')
+  gameState.phase = 'resolving'
   let frameIndex = 0
 
   function step() {
@@ -207,8 +211,12 @@ function startPlayback(frames: GameView[], renderer: Renderer, onDone: () => voi
       return
     }
 
-    currentView = frame
-    const player = currentView.entities.find(e => String(e.id) === currentView.playerId)
+    view.value = frame
+    gameState.planProgress = {
+      index: frame.playerPlan.index,
+      terminated: frame.playerPlan.terminated,
+    }
+    const player = frame.entities.find(e => String(e.id) === frame.playerId)
     if (player) renderer.setCamera(player.x, player.y, player.z)
 
     frameIndex++
@@ -231,21 +239,24 @@ export async function init(renderer: Renderer, onUpdate: () => void, turnMode: T
   gameInitialized = true
   maxPlanActions = game.actionsPerRound
 
-  currentView = game.getView()
+  const initialView = game.getView()
+  view.value = initialView
 
   // Center camera on player.
-  const player = currentView.entities.find(e => String(e.id) === currentView.playerId)
+  const player = initialView.entities.find(e => String(e.id) === initialView.playerId)
   if (player) {
     renderer.setCamera(player.x, player.y, player.z)
   }
 
   game.onRoundResolve((frames) => {
     startPlayback(frames, renderer, () => {
-      setPhase('planning')
+      gameState.submittedPlan = []
+      gameState.planProgress = { index: 0, terminated: false }
+      gameState.phase = 'planning'
       onUpdate()
     })
   })
 
-  setPhase('planning')
+  gameState.phase = 'planning'
   onUpdate()
 }

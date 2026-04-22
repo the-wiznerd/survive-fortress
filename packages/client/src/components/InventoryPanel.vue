@@ -36,14 +36,13 @@
   import { computed, inject, ref } from 'vue'
   import type { Ref } from 'vue'
   import type { GameView, ViewEntity } from '@repo/server/sdk'
-  import { appendDrop, appendEat, getPhase, onPhaseChange, type RoundPhase } from '~client/game'
+  import { appendDrop, appendEat, gameState } from '~client/game'
   import EntityCard from '~client/components/EntityCard.vue'
 
   const view = inject<Ref<GameView | null>>('view')!
   const expandedId = ref<number | null>(null)
 
-  const phase = ref<RoundPhase>(getPhase())
-  onPhaseChange((p) => { phase.value = p })
+  const phase = computed(() => gameState.phase)
 
   const player = computed<ViewEntity | null>(() => {
     const v = view.value

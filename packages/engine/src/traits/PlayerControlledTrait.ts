@@ -6,8 +6,9 @@ export class PlayerControlledTrait extends Trait<'playerControlled'> {
   declare plan: Action[]
   declare planIndex: number
   declare actionTicksElapsed: number
+  declare planTerminated: boolean
 
   defaults(): PlayerControlled {
-    return { plan: [], planIndex: 0, actionTicksElapsed: 0 }
+    return { plan: [], planIndex: 0, actionTicksElapsed: 0, planTerminated: false }
   }
 }

@@ -45,7 +45,8 @@ export function actionSystem(world: World) {
   }
 }
 
-function terminatePlan(pc: { plan: unknown[]; planIndex: number; actionTicksElapsed: number }): void {
+function terminatePlan(pc: { plan: unknown[]; planIndex: number; actionTicksElapsed: number; planTerminated: boolean }): void {
   pc.planIndex = pc.plan.length
   pc.actionTicksElapsed = 0
+  pc.planTerminated = true
 }
