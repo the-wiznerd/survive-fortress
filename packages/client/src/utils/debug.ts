@@ -7,7 +7,7 @@
 
 import { ref } from 'vue'
 import { dayTicks } from '@repo/state'
-import { getGame } from '~client/game'
+import { useGameStore } from '~client/stores/game'
 import type { Renderer } from '~client/renderer'
 
 export const DEBUG_ENABLED = true
@@ -33,7 +33,6 @@ export function debugGetMoistureOverlay(): boolean {
 }
 
 export function debugForward(days: number) {
-  const game = getGame()
-  if (!game) return
+  const game = useGameStore().getGame()
   game.sendRaw({ type: 'debug-forward', ticks: dayTicks(days) })
 }

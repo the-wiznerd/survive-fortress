@@ -19,8 +19,8 @@
 <script setup lang="ts">
   import { computed, inject, type Component } from 'vue'
   import type { ViewEntity, VisibleTraitName } from '@repo/server/sdk'
-  import { renderTrait } from '../traitRenderers'
-  import { showPositionTraits } from '~client/debug'
+  import { renderTrait } from '~client/utils/traits/renderers'
+  import { showPositionTraits } from '~client/utils/debug'
   import Disclosure from './Disclosure.vue'
 
   const props = withDefaults(defineProps<{

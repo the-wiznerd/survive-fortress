@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { debugToggleMoisture, debugGetMoistureOverlay, debugForward, debugTogglePositionTraits, showPositionTraits } from '~client/debug'
+  import { debugToggleMoisture, debugGetMoistureOverlay, debugForward, debugTogglePositionTraits, showPositionTraits } from '~client/utils/debug'
   import Disclosure from './Disclosure.vue'
 
   const moistureOn = ref(debugGetMoistureOverlay())

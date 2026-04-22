@@ -36,8 +36,10 @@
   import { computed, inject, ref } from 'vue'
   import type { Ref } from 'vue'
   import type { GameView, ViewEntity } from '@repo/server/sdk'
-  import { appendDrop, appendEat, gameState } from '~client/game'
+  import { useGameStore } from '~client/stores/game'
   import EntityCard from '~client/components/EntityCard.vue'
+
+  const gameState = useGameStore()
 
   const view = inject<Ref<GameView | null>>('view')!
   const expandedId = ref<number | null>(null)
@@ -92,11 +94,11 @@
   }
 
   function eat(item: ViewEntity) {
-    appendEat(item.id)
+    gameState.appendEat(item.id)
   }
 
   function drop(item: ViewEntity) {
-    appendDrop(item.id, 0, 0)
+    gameState.appendDrop(item.id, 0, 0)
   }
 </script>
 

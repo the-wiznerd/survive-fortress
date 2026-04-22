@@ -22,7 +22,7 @@
   import { inject } from 'vue'
   import type { Ref } from 'vue'
   import type { GameView, EntityId } from '@repo/server/sdk'
-  import { pushSidebarView } from '~client/sidebarStack'
+  import { pushSidebarView } from '~client/utils/sidebarStack'
 
   defineProps<{
     slots: Record<string, EntityId | null>

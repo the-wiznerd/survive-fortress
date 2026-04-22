@@ -28,7 +28,9 @@
 <script setup lang="ts">
   import { computed, watch } from 'vue'
   import type { PlayerAction } from '@repo/server/sdk'
-  import { gameState } from '~client/game'
+  import { useGameStore } from '~client/stores/game'
+
+  const gameState = useGameStore()
 
   type RowState = 'pending' | 'success' | 'failed' | 'cancelled'
 

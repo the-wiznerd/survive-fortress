@@ -39,7 +39,7 @@
   import EntityCard from '~client/components/EntityCard.vue'
   import DebugPanel from '~client/components/DebugPanel.vue'
   import SidebarSettings from '~client/components/SidebarSettings.vue'
-  import { DEBUG_ENABLED } from '~client/debug'
+  import { DEBUG_ENABLED } from '~client/utils/debug'
 
   const debugEnabled = DEBUG_ENABLED
 

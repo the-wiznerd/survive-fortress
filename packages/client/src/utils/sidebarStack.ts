@@ -1,18 +1,5 @@
 import { ref, readonly, computed } from 'vue'
 
-/** Discriminated union of all view kinds that can appear in the sidebar stack.
- *  Add new variants here as new drawer types are introduced. */
-export type SidebarView =
-  | { kind: 'inspector' }
-  | { kind: 'bag' }
-
-/** Stack entries carry a stable id so Vue can preserve component instance state
- *  (scroll position, disclosure open/closed, etc.) across pushes/pops. */
-export interface SidebarStackEntry {
-  id: number
-  view: SidebarView
-}
-
 let nextId = 1
 const stack = ref<SidebarStackEntry[]>([{ id: 0, view: { kind: 'inspector' } }])
 /** Direction of the most recent navigation; drives slide animation in `Sidebar.vue`. */

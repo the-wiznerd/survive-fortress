@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
   import InventoryPanel from '~client/components/InventoryPanel.vue'
-  import { popSidebarView } from '~client/sidebarStack'
+  import { popSidebarView } from '~client/utils/sidebarStack'
 </script>
 
 <style lang="scss" scoped>

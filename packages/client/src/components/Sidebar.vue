@@ -12,7 +12,7 @@
   import { computed } from 'vue'
   import InspectorView from '~client/components/InspectorView.vue'
   import BagView from '~client/components/BagView.vue'
-  import { sidebarStack, sidebarTop, sidebarDirection } from '~client/sidebarStack'
+  import { sidebarStack, sidebarTop, sidebarDirection } from '~client/utils/sidebarStack'
 
   const stack = sidebarStack
   const topId = computed(() => stack.value[stack.value.length - 1]?.id ?? 0)

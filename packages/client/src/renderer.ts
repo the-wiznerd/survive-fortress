@@ -1,6 +1,6 @@
 import type { GameView } from '@repo/server/sdk'
 import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, zKey, type RenderEntity, type EntityRenderer } from '@repo/rendering'
-import { gameState } from '~client/game'
+import { useGameStore } from '~client/stores/game'
 
 export class Renderer {
   private world: WorldRenderer
@@ -163,7 +163,7 @@ export class Renderer {
   }
 
   private drawMoveArrows(ctx: CanvasRenderingContext2D, view: GameView) {
-    const plan = gameState.plan
+    const plan = useGameStore().plan
     if (plan.length === 0) return
 
     const player = view.entities.find(e => String(e.id) === view.playerId)
