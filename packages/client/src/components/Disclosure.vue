@@ -1,23 +1,39 @@
 <template>
-  <details v-if="expandable">
+  <details v-if="collapsible" :open="startOpen" class="disclosure">
     <summary>
-      <span class="label"><slot name="label" /></span>
-      <span class="toggle" />
+      <span class="label"><slot name="label">{{  label }}</slot></span>
+      <span class="toggle"></span>
     </summary>
     <div class="content">
       <slot />
     </div>
   </details>
-  <div v-else class="empty">
-    <span class="label"><slot name="label" /></span>
-  </div>
+  <section v-else class="disclosure">
+    <header>
+      <h3 class="label"><slot name="label">{{  label }}</slot></h3>
+    </header>
+    <div v-if="!isEmpty" class="content">
+      <slot />
+    </div>
+  </section>
 </template>
 
 <script setup lang="ts">
   import { computed, useSlots, Comment, Text } from 'vue'
   import type { VNode } from 'vue'
 
+  withDefaults(defineProps<{
+    label?: string
+    collapsible?: boolean
+    startOpen?: boolean
+  }>(), {
+    collapsible: true,
+    startOpen: false
+  })
+
   const slots = useSlots()
+
+  const isEmpty = computed(() => !hasMeaningfulContent(slots.default?.()))
 
   function hasMeaningfulContent(nodes: VNode[] | undefined): boolean {
     if (!nodes) return false
@@ -28,32 +44,33 @@
       return true
     })
   }
-
-  const expandable = computed(() => hasMeaningfulContent(slots.default?.()))
 </script>
 
 <style lang="scss" scoped>
   @use '~styles/mixins';
 
-  details {
+  .disclosure {
     border-block-start: 1px solid var(--color-darkest-gray);
 
+    header,
     summary {
-      cursor: pointer;
-      display: flex;
       justify-content: space-between;
       align-items: center;
-      list-style: none;
       padding: 1rem 0;
-
-      &::marker,
-      &::-webkit-details-marker {
-        display: none;
-      }
 
       .label {
         @include mixins.heading;
         margin-block: 0;
+      }
+    }
+
+    summary {
+      cursor: pointer;
+      display: flex;
+
+      &::marker,
+      &::-webkit-details-marker {
+        display: none;
       }
 
       .toggle {
@@ -98,13 +115,14 @@
     }
   }
 
-  .empty {
-    border-block-start: 1px solid var(--color-darkest-gray);
-    padding: 1rem 0;
+  details::details-content {
+    display: block;
+    overflow: clip;
+    transition: height 0.25s ease, content-visibility 0.25s ease allow-discrete;
+    height: 0;
+  }
 
-    .label {
-      @include mixins.heading;
-      margin-block: 0;
-    }
+  details[open]::details-content {
+    height: auto;
   }
 </style>

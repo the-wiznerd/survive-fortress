@@ -1,8 +1,10 @@
 <template>
-  <Disclosure class="entity-card">
-    <template #label>
-      {{ label }}
-    </template>
+  <Disclosure 
+    class="entity-card" 
+    :collapsible="collapsible && traits.length > 0" 
+    :start-open="startOpen"
+    :label="label"
+  >
     <div v-if="traits.length" class="traits">
       <component
         v-for="t in traits"
@@ -21,9 +23,15 @@
   import { showPositionTraits } from '~client/debug'
   import Disclosure from './Disclosure.vue'
 
-  const props = defineProps<{
+  const props = withDefaults(defineProps<{
     entity: ViewEntity
-  }>()
+    label?: string
+    collapsible?: boolean
+    startOpen?: boolean
+  }>(), {
+    collapsible: true,
+    startOpen: false
+  })
 
   const getTraitNames = inject<(entity: ViewEntity) => VisibleTraitName[]>('getTraitNames')!
 

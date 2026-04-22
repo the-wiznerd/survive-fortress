@@ -4,7 +4,11 @@
       <div class="day"><span class="label">Day:</span> {{ day }}.{{ tickOfDay }}</div>
     </div>
 
-    <EntityCard v-if="player" :entity="player" />
+    <EntityCard
+      v-if="player"
+      :entity="player"
+      :collapsible="false"
+    />
 
     <div v-if="selection" class="selection">
       <div v-if="selection.entities.length === 0" class="stat">Empty</div>
@@ -72,7 +76,7 @@
 
 <style lang="scss" scoped>
   .inspector-view {
-    padding: 2rem 1.5rem 1rem;
+    padding: 1.5rem 1.5rem 0.5rem;
     line-height: 1.5;
     display: flex;
     flex-direction: column;
@@ -84,6 +88,7 @@
   .game-state {
     padding-block-end: 1rem;
     font-size: 1rem;
+    font-weight: bold;
 
     .label {
       color: var(--color-white);

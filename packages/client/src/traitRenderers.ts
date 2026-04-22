@@ -1,7 +1,6 @@
 import type { Component } from 'vue'
 import type { TraitViews, VisibleTraitName } from '@repo/server/sdk'
 import StatText from '~client/components/traits/StatText.vue'
-import MovementBar from '~client/components/traits/MovementBar.vue'
 import ActionBadge from '~client/components/traits/ActionBadge.vue'
 import EquipmentSlots from '~client/components/traits/EquipmentSlots.vue'
 
@@ -31,12 +30,12 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
       value: `${d.current}/${d.max}`
     })
   },
-  movement: {
-    component: MovementBar,
-    props: d => ({
-      modes: d.modes
-    })
-  },
+  // movement: {
+  //   component: MovementBar,
+  //   props: d => ({
+  //     modes: d.modes
+  //   })
+  // },
   moisture: {
     component: StatText,
     props: d => ({
