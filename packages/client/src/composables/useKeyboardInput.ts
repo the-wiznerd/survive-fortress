@@ -2,8 +2,8 @@ import { onMounted, onBeforeUnmount } from 'vue'
 import { useGameStore } from '~client/stores/game'
 
 /** Bind global keyboard input. WASD builds the plan (move or harvest if a target is adjacent),
- *  Backspace clears, Space submits, R triggers `onReload`. */
-export function useKeyboardInput(onReload: () => void) {
+ *  Backspace clears, Space submits, R reconnects to the server. */
+export function useKeyboardInput() {
   const game = useGameStore()
 
   function handleDirectional(dx: number, dy: number) {
@@ -28,7 +28,7 @@ export function useKeyboardInput(onReload: () => void) {
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.repeat) return
 
-    if (e.key === 'r' || e.key === 'R') { onReload(); return }
+    if (e.key === 'r' || e.key === 'R') { game.reload(); return }
 
     if (game.phase !== 'planning') return
 

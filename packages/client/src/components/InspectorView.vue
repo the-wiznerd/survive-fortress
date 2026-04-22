@@ -40,16 +40,19 @@
   import DebugPanel from '~client/components/DebugPanel.vue'
   import SidebarSettings from '~client/components/SidebarSettings.vue'
   import { DEBUG_ENABLED } from '~client/utils/debug'
+  import { useGameStore } from '~client/stores/game'
 
   const debugEnabled = DEBUG_ENABLED
+
+  const gameStore = useGameStore()
 
   const view = inject<Ref<GameView | null>>('view')!
   const inspectedCell = inject<Ref<{ x: number; y: number } | null>>('inspectedCell')!
   const inspectResult = inject<Ref<InspectResult | null>>('inspectResult')!
-  const scale = inject<Ref<number>>('scale')!
-  const setScale = inject<(s: number) => void>('setScale')!
-  const turnMode = inject<Ref<'manual' | 'auto'>>('turnMode')!
-  const setTurnMode = inject<(mode: 'manual' | 'auto') => Promise<void>>('setTurnMode')!
+  const scale = computed(() => gameStore.scale)
+  const setScale = (n: number) => gameStore.setScale(n)
+  const turnMode = computed(() => gameStore.turnMode)
+  const setTurnMode = (mode: 'manual' | 'auto') => gameStore.setTurnMode(mode)
 
   const zoomIn = () => setScale(scale.value + 1)
   const zoomOut = () => setScale(scale.value - 1)

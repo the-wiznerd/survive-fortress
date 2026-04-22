@@ -1,11 +1,31 @@
 import { defineStore } from 'pinia'
-import { ref, shallowRef } from 'vue'
+import { ref, shallowRef, watch } from 'vue'
 import type { Game, GameView, PlayerAction, TurnMode } from '@repo/server/sdk'
 import { connect } from '~client/utils/net/connection'
 import { playFrames, type PlaybackHandle } from '~client/utils/net/playback'
 
 const DEFAULT_SAVE = 'test-world'
 const SAVE_NAME = new URLSearchParams(window.location.search).get('save') ?? DEFAULT_SAVE
+
+const TURN_MODE_STORAGE_KEY = 'survive-fortress-turn-mode'
+const SCALE_STORAGE_KEY = 'survive-fortress-scale'
+
+function loadTurnMode(): TurnMode {
+  try {
+    const raw = localStorage.getItem(TURN_MODE_STORAGE_KEY)
+    if (raw === 'manual' || raw === 'auto') return raw
+  } catch { /* ignore */ }
+  return 'auto'
+}
+
+function loadScale(): number {
+  try {
+    const raw = localStorage.getItem(SCALE_STORAGE_KEY)
+    const n = raw ? parseInt(raw, 10) : NaN
+    if (Number.isFinite(n) && n >= 1) return n
+  } catch { /* ignore */ }
+  return 3
+}
 
 /** The single application store: round phase, plan management, and the current view.
  *  Uses Pinia's setup-style for natural ref/shallowRef composition.
@@ -23,6 +43,12 @@ export const useGameStore = defineStore('game', () => {
   /** Per-frame plan progress emitted during playback. */
   const planProgress = ref<PlanProgress>({ index: 0, terminated: false })
   const view = shallowRef<GameView | null>(null)
+  /** How rounds advance: `manual` requires explicit submit, `auto` ticks freely. Persisted. */
+  const turnMode = ref<TurnMode>(loadTurnMode())
+  watch(turnMode, (mode) => { localStorage.setItem(TURN_MODE_STORAGE_KEY, mode) })
+  /** Renderer pixel scale multiplier. Persisted. */
+  const scale = ref<number>(loadScale())
+  watch(scale, (n) => { localStorage.setItem(SCALE_STORAGE_KEY, String(n)) })
 
   // ─── Non-reactive backing state ───
   // These are not reactive on purpose; they're transport/lifecycle handles, not UI state.
@@ -35,10 +61,10 @@ export const useGameStore = defineStore('game', () => {
 
   /** Connect to the server and prepare for the first round.
    *  `cameraCallback` is invoked whenever the camera should follow the player. */
-  async function init(turnMode: TurnMode, cameraCallback: (x: number, y: number, z: number) => void) {
+  async function init(cameraCallback: (x: number, y: number, z: number) => void) {
     stop()
     onCameraMove = cameraCallback
-    game = await connect(SAVE_NAME, turnMode)
+    game = await connect(SAVE_NAME, turnMode.value)
     maxPlanActions = game.actionsPerRound
 
     const initialView = game.getView()
@@ -59,6 +85,23 @@ export const useGameStore = defineStore('game', () => {
       game.stop()
       game = null
     }
+  }
+
+  /** Switch turn mode and reconnect. Requires `init()` to have been called previously
+   *  so we have a camera callback to reuse. */
+  async function setTurnMode(mode: TurnMode) {
+    if (mode === turnMode.value) return
+    turnMode.value = mode
+    if (onCameraMove) await init(onCameraMove)
+  }
+
+  /** Reconnect to the server using the existing camera callback. No-op until `init()`. */
+  async function reload() {
+    if (onCameraMove) await init(onCameraMove)
+  }
+
+  function setScale(n: number) {
+    scale.value = Math.max(1, Math.floor(n))
   }
 
   function getGame(): Game {
@@ -170,9 +213,14 @@ export const useGameStore = defineStore('game', () => {
     submittedPlan,
     planProgress,
     view,
+    turnMode,
+    scale,
     // lifecycle
     init,
     stop,
+    reload,
+    setTurnMode,
+    setScale,
     getGame,
     actionsPerRound,
     // plan actions
