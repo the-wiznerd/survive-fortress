@@ -63,10 +63,11 @@
 
   const selection = computed(() => {
     if (!inspectResult.value || !inspectedCell.value) return null
+    const playerId = view.value?.playerId
     return {
       ...inspectedCell.value,
       entities: inspectResult.value.entities
-        .filter(e => !e.traits.contained)
+        .filter(e => !e.traits.contained && String(e.id) !== playerId)
         .sort((a, b) => b.z - a.z),
     }
   })
