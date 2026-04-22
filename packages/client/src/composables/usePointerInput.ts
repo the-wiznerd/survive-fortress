@@ -2,19 +2,13 @@ import { ref, onMounted, onBeforeUnmount, type Ref, type ShallowRef } from 'vue'
 import { useGameStore } from '~client/stores/game'
 import type { Renderer } from '~client/renderer'
 
-export interface PointerInputState {
-  inspectedCell: Ref<CellCoord | null>
-  hoveredCell: Ref<CellCoord | null>
-}
-
-/** Wire pointer input on a canvas to inspector state. The returned refs drive UI. */
+/** Wire pointer input on a canvas: clicks update the store's inspected cell,
+ *  hover updates the returned `hoveredCell` ref (a render-only concern). */
 export function usePointerInput(
   canvas: Ref<HTMLCanvasElement | null>,
   renderer: ShallowRef<Renderer | null>,
-  onSelect: () => void,
-): PointerInputState {
+): { hoveredCell: Ref<CellCoord | null> } {
   const game = useGameStore()
-  const inspectedCell = ref<CellCoord | null>(null)
   const hoveredCell = ref<CellCoord | null>(null)
 
   function canvasToWorld(e: MouseEvent): CellCoord | null {
@@ -30,10 +24,7 @@ export function usePointerInput(
     )
   }
 
-  const onClick = (e: MouseEvent) => {
-    inspectedCell.value = canvasToWorld(e)
-    onSelect()
-  }
+  const onClick = (e: MouseEvent) => { game.setInspectedCell(canvasToWorld(e)) }
   const onMouseMove = (e: MouseEvent) => { hoveredCell.value = canvasToWorld(e) }
   const onMouseLeave = () => { hoveredCell.value = null }
 
@@ -53,5 +44,5 @@ export function usePointerInput(
     c.removeEventListener('mouseleave', onMouseLeave)
   })
 
-  return { inspectedCell, hoveredCell }
+  return { hoveredCell }
 }

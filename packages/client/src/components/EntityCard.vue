@@ -17,9 +17,10 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, inject, type Component } from 'vue'
-  import type { ViewEntity, VisibleTraitName } from '@repo/server/sdk'
+  import { computed, type Component } from 'vue'
+  import type { ViewEntity } from '@repo/server/sdk'
   import { renderTrait } from '~client/utils/traits/renderers'
+  import { ENTITY_TRAIT_NAMES } from '~client/utils/traits/entities'
   import { showPositionTraits } from '~client/utils/debug'
   import Disclosure from './Disclosure.vue'
 
@@ -33,8 +34,6 @@
     startOpen: false
   })
 
-  const getTraitNames = inject<(entity: ViewEntity) => VisibleTraitName[]>('getTraitNames')!
-
   const label = computed(() => {
     const e = props.entity
     return e.name ? `${e.name} (${e.type})` : e.type
@@ -42,7 +41,7 @@
 
   const traits = computed(() => {
     const result: { name: string; component: Component; props: Record<string, unknown> }[] = []
-    for (const name of getTraitNames(props.entity)) {
+    for (const name of ENTITY_TRAIT_NAMES[props.entity.type] ?? []) {
       if (name === 'position' && !showPositionTraits.value) continue
       const data = props.entity.traits[name]
       if (!data) continue

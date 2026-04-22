@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, shallowRef, watch } from 'vue'
-import type { Game, GameView, PlayerAction, TurnMode } from '@repo/server/sdk'
+import type { Game, GameView, InspectResult, PlayerAction, TurnMode } from '@repo/server/sdk'
 import { connect } from '~client/utils/net/connection'
 import { playFrames, type PlaybackHandle } from '~client/utils/net/playback'
 
@@ -49,6 +49,10 @@ export const useGameStore = defineStore('game', () => {
   /** Renderer pixel scale multiplier. Persisted. */
   const scale = ref<number>(loadScale())
   watch(scale, (n) => { localStorage.setItem(SCALE_STORAGE_KEY, String(n)) })
+  /** The world cell currently selected for inspection (clicked on the canvas). */
+  const inspectedCell = ref<CellCoord | null>(null)
+  /** Cached inspect result for `inspectedCell`. Refreshed on selection change and on phase change. */
+  const inspectResult = ref<InspectResult | null>(null)
 
   // ─── Non-reactive backing state ───
   // These are not reactive on purpose; they're transport/lifecycle handles, not UI state.
@@ -103,6 +107,19 @@ export const useGameStore = defineStore('game', () => {
   function setScale(n: number) {
     scale.value = Math.max(1, Math.floor(n))
   }
+
+  function setInspectedCell(cell: CellCoord | null) {
+    inspectedCell.value = cell
+    refreshInspector()
+  }
+
+  function refreshInspector() {
+    const cell = inspectedCell.value
+    inspectResult.value = cell && game ? game.inspect(cell.x, cell.y) : null
+  }
+
+  // Re-inspect whenever the round phase changes (so harvested/moved entities update).
+  watch(phase, refreshInspector)
 
   function getGame(): Game {
     if (!game) throw new Error('Game not initialized')
@@ -215,12 +232,15 @@ export const useGameStore = defineStore('game', () => {
     view,
     turnMode,
     scale,
+    inspectedCell,
+    inspectResult,
     // lifecycle
     init,
     stop,
     reload,
     setTurnMode,
     setScale,
+    setInspectedCell,
     getGame,
     actionsPerRound,
     // plan actions

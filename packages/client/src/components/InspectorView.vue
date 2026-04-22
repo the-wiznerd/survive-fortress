@@ -32,10 +32,10 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, inject } from 'vue'
-  import type { Ref } from 'vue'
-  import type { GameView, ViewEntity, InspectResult } from '@repo/server/sdk'
+  import { computed } from 'vue'
+  import type { ViewEntity } from '@repo/server/sdk'
   import { TICKS_PER_DAY } from '@repo/server/sdk'
+  import { storeToRefs } from 'pinia'
   import EntityCard from '~client/components/EntityCard.vue'
   import DebugPanel from '~client/components/DebugPanel.vue'
   import SidebarSettings from '~client/components/SidebarSettings.vue'
@@ -45,13 +45,8 @@
   const debugEnabled = DEBUG_ENABLED
 
   const gameStore = useGameStore()
-
-  const view = inject<Ref<GameView | null>>('view')!
-  const inspectedCell = inject<Ref<{ x: number; y: number } | null>>('inspectedCell')!
-  const inspectResult = inject<Ref<InspectResult | null>>('inspectResult')!
-  const scale = computed(() => gameStore.scale)
+  const { view, inspectedCell, inspectResult, scale, turnMode } = storeToRefs(gameStore)
   const setScale = (n: number) => gameStore.setScale(n)
-  const turnMode = computed(() => gameStore.turnMode)
   const setTurnMode = (mode: 'manual' | 'auto') => gameStore.setTurnMode(mode)
 
   const zoomIn = () => setScale(scale.value + 1)

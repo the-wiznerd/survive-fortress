@@ -19,16 +19,16 @@
 </template>
 
 <script setup lang="ts">
-  import { inject } from 'vue'
-  import type { Ref } from 'vue'
-  import type { GameView, EntityId } from '@repo/server/sdk'
+  import { storeToRefs } from 'pinia'
+  import type { EntityId } from '@repo/server/sdk'
+  import { useGameStore } from '~client/stores/game'
   import { pushSidebarView } from '~client/utils/sidebarStack'
 
   defineProps<{
     slots: Record<string, EntityId | null>
   }>()
 
-  const view = inject<Ref<GameView | null>>('view')!
+  const { view } = storeToRefs(useGameStore())
 
   function findEntity(id: EntityId) {
     return view.value?.entities.find(e => e.id === id) ?? null

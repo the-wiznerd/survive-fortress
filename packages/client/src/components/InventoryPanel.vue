@@ -33,15 +33,15 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, inject, ref } from 'vue'
-  import type { Ref } from 'vue'
-  import type { GameView, ViewEntity } from '@repo/server/sdk'
+  import { computed, ref } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import type { ViewEntity } from '@repo/server/sdk'
   import { useGameStore } from '~client/stores/game'
   import EntityCard from '~client/components/EntityCard.vue'
 
   const gameState = useGameStore()
+  const { view } = storeToRefs(gameState)
 
-  const view = inject<Ref<GameView | null>>('view')!
   const expandedId = ref<number | null>(null)
 
   const phase = computed(() => gameState.phase)
