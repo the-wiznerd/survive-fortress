@@ -1,89 +1,55 @@
 <template>
   <aside id="sidebar">
-    <div v-if="view">
-      <div class="stat"><span class="label">Day:</span> {{ day }}.{{ tickOfDay }}</div>
-    </div>
-
-    <EntityCard v-if="player" :entity="player" />
-
-    <InventoryPanel />
-
-    <div v-if="selection" class="selection">
-      <div v-if="selection.entities.length === 0" class="stat">Empty</div>
-      <EntityCard
-        v-for="e in selection.entities"
-        :key="e.id"
-        :entity="e"
-      />
-    </div>
-
-    <SidebarSettings
-      :scale="scale"
-      :turn-mode="turnMode"
-      @zoom-in="zoomIn"
-      @zoom-out="zoomOut"
-      @turn-mode-change="setTurnMode"
-    />
-
-    <DebugPanel v-if="debugEnabled" />
+    <Transition :name="transitionName">
+      <component :is="currentComponent" :key="stack.length" class="drawer" />
+    </Transition>
   </aside>
 </template>
 
 <script setup lang="ts">
-  import { computed, inject } from 'vue'
-  import type { Ref } from 'vue'
-  import type { GameView, ViewEntity, InspectResult } from '@repo/server/sdk'
-  import { TICKS_PER_DAY } from '@repo/server/sdk'
-  import EntityCard from '~client/components/EntityCard.vue'
-  import DebugPanel from '~client/components/DebugPanel.vue'
-  import SidebarSettings from '~client/components/SidebarSettings.vue'
-  import InventoryPanel from '~client/components/InventoryPanel.vue'
-  import { DEBUG_ENABLED } from '~client/debug'
+  import { computed } from 'vue'
+  import InspectorView from '~client/components/InspectorView.vue'
+  import BagView from '~client/components/BagView.vue'
+  import { sidebarStack, sidebarTop, sidebarDirection } from '~client/sidebarStack'
 
-  const debugEnabled = DEBUG_ENABLED
-
-  const view = inject<Ref<GameView | null>>('view')!
-  const inspectedCell = inject<Ref<{ x: number; y: number } | null>>('inspectedCell')!
-  const inspectResult = inject<Ref<InspectResult | null>>('inspectResult')!
-  const scale = inject<Ref<number>>('scale')!
-  const setScale = inject<(s: number) => void>('setScale')!
-  const turnMode = inject<Ref<'manual' | 'auto'>>('turnMode')!
-  const setTurnMode = inject<(mode: 'manual' | 'auto') => Promise<void>>('setTurnMode')!
-
-  const zoomIn = () => setScale(scale.value + 1)
-  const zoomOut = () => setScale(scale.value - 1)
-
-  const day = computed(() => view.value ? Math.floor(view.value.tick / TICKS_PER_DAY) + 1 : 0)
-  const tickOfDay = computed(() => view.value ? String(view.value.tick % TICKS_PER_DAY).padStart(2, '0') : '00')
-
-  const player = computed<ViewEntity | null>(() => {
-    if (!view.value) return null
-    return view.value.entities.find(e => String(e.id) === view.value!.playerId) ?? null
-  })
-
-  const selection = computed(() => {
-    if (!inspectResult.value || !inspectedCell.value) return null
-    const playerId = view.value?.playerId
-    return {
-      ...inspectedCell.value,
-      entities: inspectResult.value.entities
-        .filter(e => !e.traits.contained && String(e.id) !== playerId)
-        .sort((a, b) => b.z - a.z),
+  const stack = sidebarStack
+  const currentComponent = computed(() => {
+    const top = sidebarTop.value
+    if (!top) return InspectorView
+    switch (top.kind) {
+      case 'inspector': return InspectorView
+      case 'bag': return BagView
     }
   })
+
+  const transitionName = computed(() =>
+    sidebarDirection.value === 'push' ? 'drawer-push' : 'drawer-pop'
+  )
 </script>
 
 <style lang="scss" scoped>
   #sidebar {
     width: 300px;
-    padding: 2rem 1.5rem 1rem;
-    overflow-y: auto;
-    line-height: 1.5;
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    overflow: hidden;
   }
 
-  .selection {
-    padding-top: 2rem;
+  .drawer {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
   }
+
+  // Push: new view slides in from the right; old slides out to the left.
+  .drawer-push-enter-active,
+  .drawer-push-leave-active,
+  .drawer-pop-enter-active,
+  .drawer-pop-leave-active {
+    transition: transform 0.2s ease;
+  }
+  .drawer-push-enter-from { transform: translateX(100%); }
+  .drawer-push-leave-to   { transform: translateX(-100%); }
+  // Pop: reverse direction.
+  .drawer-pop-enter-from  { transform: translateX(-100%); }
+  .drawer-pop-leave-to    { transform: translateX(100%); }
 </style>

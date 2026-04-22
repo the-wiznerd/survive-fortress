@@ -3,6 +3,7 @@ import type { TraitViews, VisibleTraitName } from '@repo/server/sdk'
 import StatText from '~client/components/traits/StatText.vue'
 import MovementBar from '~client/components/traits/MovementBar.vue'
 import ActionBadge from '~client/components/traits/ActionBadge.vue'
+import EquipmentSlots from '~client/components/traits/EquipmentSlots.vue'
 
 type TraitRendererMap = {
   [K in VisibleTraitName]?: {
@@ -70,14 +71,10 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
     props: d => ({ label: 'Wears', value: d.slot })
   },
   equipment: {
-    component: StatText,
+    component: EquipmentSlots,
     props: d => {
-      const entries = Object.entries(d.slots)
-      if (entries.length === 0) return null
-      const summary = entries
-        .map(([slot, id]) => `${slot}: ${id === null ? '∅' : '#' + id}`)
-        .join(', ')
-      return { label: 'Equipment', value: summary }
+      if (Object.keys(d.slots).length === 0) return null
+      return { slots: d.slots }
     }
   },
 }
