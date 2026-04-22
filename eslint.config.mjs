@@ -68,4 +68,18 @@ export default [
       'vue/script-indent': ['error', 2, { baseIndent: 1, switchCase: 1 }],
     },
   },
+  {
+    // Client ambient types declared in packages/client/src/types/*.d.ts.
+    // ESLint can't see `declare global` types, so we list them as globals here.
+    files: ['packages/client/**/*.{ts,vue}'],
+    languageOptions: {
+      globals: {
+        RoundPhase: 'readonly',
+        PlanProgress: 'readonly',
+        SidebarView: 'readonly',
+        SidebarStackEntry: 'readonly',
+        CellCoord: 'readonly',
+      },
+    },
+  },
 ]

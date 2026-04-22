@@ -32,13 +32,13 @@
     return ENTITY_TRAIT_NAMES[entity.type] ?? []
   })
 
+  // Re-fetch inspector data whenever the phase changes (so harvested entities update).
+  watch(phase, refreshInspector)
+
   onUnmounted(() => { game.stop() })
 
   function refreshInspector() {
     const cell = inspectedCell.value
     inspectResult.value = cell ? game.getGame().inspect(cell.x, cell.y) : null
   }
-
-  // Re-fetch inspector data whenever the phase changes (so harvested entities update).
-  watch(phase, refreshInspector)
 </script>
