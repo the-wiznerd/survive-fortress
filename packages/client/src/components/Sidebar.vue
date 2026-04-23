@@ -122,7 +122,7 @@
 
   .drawer-push-enter-active,
   .drawer-pop-leave-active {
-    transition: transform 0.2s ease;
+    transition: transform 0.1s ease;
     z-index: 1;
   }
 

@@ -192,12 +192,12 @@
     padding: 0 pixel-sim-space(5);
     min-height: pixel-sim-space(12);
     
-     .label {
+    > .label {
       @include ts-heading-secondary;
       color: var(--color-white);
     }
 
-    .actions {
+    > .actions {
       display: flex;
       align-items: center;
       gap: pixel-sim-space(1);
@@ -240,10 +240,6 @@
     transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
     color: var(--color-lightest-gray);
 
-    .status {
-      min-width: pixel-sim-space(6);
-    }
-
     &.-pending {
       color: var(--color-light-gray);
     }
@@ -254,6 +250,10 @@
 
     &.-failed {
       color: var(--color-light-red);
+    }
+
+    > .status {
+      min-width: pixel-sim-space(6);
     }
   }
 
