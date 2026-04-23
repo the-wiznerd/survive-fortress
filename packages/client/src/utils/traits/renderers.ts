@@ -64,8 +64,22 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
     props: d => ({ label: 'Bag', value: `${d.usedCapacity}/${d.capacity}` })
   },
   edible: {
+    component: ActionButton,
+    props: (d, entity) => ({
+      label: `Eat (+${d.nutrition})`,
+      action: { type: 'eat', targetId: entity.id },
+    }),
+  },
+  contained: {
+    component: ActionButton,
+    props: (_d, entity) => ({
+      label: 'Drop',
+      action: { type: 'drop', targetId: entity.id, dx: 0, dy: 0 },
+    }),
+  },
+  stackable: {
     component: StatText,
-    props: d => ({ label: 'Nutrition', value: String(d.nutrition) })
+    props: d => d.count > 1 ? { label: 'Count', value: String(d.count) } : null,
   },
   wearable: {
     component: StatText,

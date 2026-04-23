@@ -8,30 +8,8 @@
       </div>
       <div v-if="items.length === 0" class="empty">Empty</div>
       <ul v-else class="items">
-        <li
-          v-for="item in items"
-          :key="item.id"
-          class="item"
-        >
-          <div class="item-row" :class="{ selected: expandedId === item.id }">
-            <button class="item-label" @click="toggle(item)">
-              {{ itemLabel(item) }}
-            </button>
-            <div class="item-actions">
-              <button
-                v-if="item.traits.edible"
-                class="action"
-                :disabled="phase !== 'planning'"
-                @click="eat(item)"
-              >eat</button>
-              <button
-                class="action"
-                :disabled="phase !== 'planning'"
-                @click="drop(item)"
-              >drop</button>
-            </div>
-          </div>
-          <EntityCard v-if="expandedId === item.id" :entity="item" class="expanded" />
+        <li v-for="item in items" :key="item.id" class="item">
+          <EntityCard :entity="item" :label="itemLabel(item)" />
         </li>
       </ul>
     </template>
@@ -39,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed } from 'vue'
   import { storeToRefs } from 'pinia'
   import type { EntityId, ViewEntity } from '@repo/server/sdk'
   import EntityCard from '~client/components/EntityCard.vue'
@@ -53,9 +31,6 @@
 
   const gameStore = useGameStore()
   const { view } = storeToRefs(gameStore)
-
-  const expandedId = ref<EntityId | null>(null)
-  const phase = computed(() => gameStore.phase)
 
   const container = computed<ViewEntity | null>(() => {
     const v = view.value
@@ -89,18 +64,6 @@
     return count > 1 ? `${base} \u00d7 ${count}` : base
   }
 
-  function toggle(item: ViewEntity) {
-    expandedId.value = expandedId.value === item.id ? null : item.id
-  }
-
-  function eat(item: ViewEntity) {
-    gameStore.appendEat(item.id)
-  }
-
-  function drop(item: ViewEntity) {
-    gameStore.appendDrop(item.id, 0, 0)
-  }
-
   function onClose() {
     popSidebarView()
   }
@@ -122,64 +85,5 @@
     display: flex;
     flex-direction: column;
     gap: pixel-sim-space(1);
-  }
-
-  .item {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .item-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: pixel-sim-space(2);
-
-    &.selected .item-label {
-      color: var(--color-light-gray);
-    }
-  }
-
-  .item-label {
-    background: none;
-    border: none;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-    padding: 0;
-    text-align: left;
-    flex: 1;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  .item-actions {
-    display: flex;
-    gap: pixel-sim-space(1);
-  }
-
-  .action {
-    background: var(--color-darkest-gray);
-    color: inherit;
-    border: 1px solid var(--color-dark-gray);
-    font: inherit;
-    padding: pixel-sim-space(1) pixel-sim-space(2);
-    cursor: pointer;
-
-    &:hover:not(:disabled) {
-      background: var(--color-dark-gray);
-    }
-
-    &:disabled {
-      opacity: 0.4;
-      cursor: default;
-    }
-  }
-
-  .expanded {
-    margin-top: pixel-sim-space(1);
-    margin-left: pixel-sim-space(4);
   }
 </style>

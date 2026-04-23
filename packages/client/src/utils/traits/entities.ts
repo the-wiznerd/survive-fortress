@@ -8,6 +8,6 @@ export const ENTITY_TRAIT_NAMES: Record<string, VisibleTraitName[]> = {
   water: ['moisture', 'position'],
   player: ['health', 'hunger', 'movement', 'actor', 'equipment', 'position'],
   bush: ['harvestable', 'position'],
-  berry: ['carriable', 'edible', 'position'],
-  bag: ['carriable', 'wearable', 'container', 'position'],
+  berry: ['stackable', 'carriable', 'edible', 'contained', 'position'],
+  bag: ['carriable', 'wearable', 'container', 'contained', 'position'],
 }
