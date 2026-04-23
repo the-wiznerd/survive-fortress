@@ -30,12 +30,14 @@ export class ContainerTrait extends Trait<'container'> {
     return { capacity: 0, contents: [], ...this.initial }
   }
 
-  /** Total Carriable.size of currently-held contents. */
+  /** Total effective Carriable size of currently-held contents (accounts for stacks). */
   get usedCapacity(): number {
     let total = 0
     for (const id of this.contents) {
       const c = getComponent(this.world, id, 'carriable')
-      if (c) total += c.size
+      if (!c) continue
+      const stack = getComponent(this.world, id, 'stackable')
+      total += c.size * (stack?.count ?? 1)
     }
     return total
   }

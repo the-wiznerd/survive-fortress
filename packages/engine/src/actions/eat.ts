@@ -26,6 +26,12 @@ registerAction<EatAction>({
     const edible = getComponent(world, action.targetId, 'edible')!
     const hunger = getComponent(world, actorId, 'hunger')!
     hunger.current = Math.min(hunger.max, hunger.current + edible.nutrition)
+    // Stacked items decrement the stack; only destroy when the last unit is consumed.
+    const stack = getComponent(world, action.targetId, 'stackable')
+    if (stack && stack.count > 1) {
+      stack.count -= 1
+      return
+    }
     destroyEntity(world, action.targetId)
   },
 })

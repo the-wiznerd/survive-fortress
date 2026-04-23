@@ -118,7 +118,7 @@ describe('containment', () => {
 })
 
 describe('bush harvest produces berries', () => {
-  it('places yielded berries into the harvester container', () => {
+  it('places yielded berries into the harvester container as a single stack', () => {
     const world = createWorld()
     const player = spawnPlayer(world, 5, 5)
     const bag = bagId(world, player.id)
@@ -132,10 +132,11 @@ describe('bush harvest produces berries', () => {
 
     expect(harvestable.amount).toBe(0)
     const contents = getContainerContents(world, bag)
-    expect(contents.length).toBe(yielded)
-    for (const id of contents) {
-      expect(getComponent(world, id, 'entityType')!.type).toBe('berry')
-    }
+    // Berries are stackable — yield merges into a single stack.
+    expect(contents.length).toBe(1)
+    const stack = contents[0]!
+    expect(getComponent(world, stack, 'entityType')!.type).toBe('berry')
+    expect(getComponent(world, stack, 'stackable')!.count).toBe(yielded)
   })
 
   it('overflow berries drop on the harvester tile', () => {
@@ -152,8 +153,12 @@ describe('bush harvest produces berries', () => {
     const harvestable = getComponent(world, bush.id, 'harvestable')! as HarvestableTrait
     harvestable.onHarvest(player.id)
 
-    expect(getContainerContents(world, bag).length).toBe(8)
-    // Two berries should have dropped on the player's tile.
+    // Bag holds one full stack of 8 berries (6 pre-filled + 2 from yield merged in).
+    const contents = getContainerContents(world, bag)
+    expect(contents.length).toBe(1)
+    expect(getComponent(world, contents[0]!, 'stackable')!.count).toBe(8)
+    // Two berries should have dropped on the player's tile (as separate entities;
+    // free-standing entities aren't auto-merged).
     const onTile = getEntitiesAt(world, 5, 5, 0)
     const dropped = onTile.filter(id =>
       getComponent(world, id, 'entityType')?.type === 'berry'

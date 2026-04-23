@@ -11,5 +11,5 @@ export class Bag extends BaseEntityType {
   type = 'bag'
   carriable = this.addTrait(new CarriableTrait(this.world, this.id, { size: 4 }))
   wearable = this.addTrait(new WearableTrait(this.world, this.id, { slot: 'back' }))
-  container = this.addTrait(new ContainerTrait(this.world, this.id, { capacity: 8 }))
+  container = this.addTrait(new ContainerTrait(this.world, this.id, { capacity: 30 }))
 }

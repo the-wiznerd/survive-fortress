@@ -29,6 +29,7 @@ export interface ComponentTypes {
   equipment: Equipment
   wearable: Wearable
   tool: Tool
+  stackable: Stackable
 }
 
 export type ComponentName = keyof ComponentTypes
@@ -129,6 +130,19 @@ export interface Carriable {
   size: number
 }
 
+/**
+ * Allows multiple identical entities to share one entity instance with a count.
+ * Effective storage size in a container is `Carriable.size * count`.
+ * Stacks merge when transferred into a container that already holds a stack of
+ * the same entity type with room (count + incoming ≤ maxStack).
+ */
+export interface Stackable {
+  /** Number of units represented by this entity. Must be ≥ 1. */
+  count: number
+  /** Maximum count this stack can hold. 1 = effectively un-stackable. */
+  maxStack: number
+}
+
 export interface Container {
   /** Maximum total Carriable.size of contents. */
   capacity: number
@@ -222,6 +236,7 @@ export function createWorld(): World {
       equipment: new Map(),
       wearable: new Map(),
       tool: new Map(),
+      stackable: new Map(),
     },
     spatialIndex: new Map(),
   }

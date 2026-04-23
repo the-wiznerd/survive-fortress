@@ -1,4 +1,4 @@
-import type { Health, Hunger, Movement, Moisture, GroundCover, Vision, Carriable, Edible, Wearable, Tool, Actor, EntityId, Direction } from '@repo/state'
+import type { Health, Hunger, Movement, Moisture, GroundCover, Vision, Carriable, Edible, Wearable, Tool, Actor, Stackable, EntityId, Direction } from '@repo/state'
 export { TICKS_PER_DAY } from '@repo/state'
 
 export type { MovementMode, Direction } from '@repo/state'
@@ -24,6 +24,7 @@ export interface TraitViews {
   wearable: Wearable
   tool: Tool
   actor: Actor
+  stackable: Stackable
 }
 
 /** A trait name the client is allowed to see. */

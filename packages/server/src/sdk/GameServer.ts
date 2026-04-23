@@ -9,7 +9,7 @@ import type { GameView, ViewEntity, PlayerAction, VisibleTraitName, InspectResul
 /** Trait names the client is allowed to see when inspecting entities. */
 const VISIBLE_TRAITS: VisibleTraitName[] = [
   'health', 'hunger', 'movement', 'moisture', 'groundCover', 'vision',
-  'carriable', 'contained', 'edible', 'wearable', 'tool', 'actor',
+  'carriable', 'contained', 'edible', 'wearable', 'tool', 'actor', 'stackable',
 ]
 
 export class GameServer {
@@ -112,7 +112,9 @@ export class GameServer {
       let usedCapacity = 0
       for (const childId of container.contents) {
         const c = getComponent(this.world, childId, 'carriable')
-        if (c) usedCapacity += c.size
+        if (!c) continue
+        const stack = getComponent(this.world, childId, 'stackable')
+        usedCapacity += c.size * (stack?.count ?? 1)
       }
       traits.container = {
         capacity: container.capacity,

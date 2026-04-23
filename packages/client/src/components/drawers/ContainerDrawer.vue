@@ -84,7 +84,9 @@
   })
 
   function itemLabel(item: ViewEntity): string {
-    return item.name ? `${item.name} (${item.type})` : item.type
+    const base = item.name ? `${item.name} (${item.type})` : item.type
+    const count = item.traits.stackable?.count ?? 1
+    return count > 1 ? `${base} \u00d7 ${count}` : base
   }
 
   function toggle(item: ViewEntity) {

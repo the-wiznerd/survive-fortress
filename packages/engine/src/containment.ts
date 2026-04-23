@@ -64,8 +64,39 @@ export function isHeldByActor(world: World, itemId: EntityId, actorId: EntityId)
 }
 
 /**
+ * Effective Carriable size for capacity accounting: `Carriable.size * Stackable.count`
+ * (or just `Carriable.size` when not stackable). Items without a Carriable trait
+ * fall back to size 1.
+ */
+export function effectiveCarriableSize(world: World, entityId: EntityId): number {
+  const carriable = getComponent(world, entityId, 'carriable')
+  const size = carriable?.size ?? 1
+  const stackable = getComponent(world, entityId, 'stackable')
+  const count = stackable?.count ?? 1
+  return size * count
+}
+
+/**
+ * Total Carriable size currently held by a container, accounting for stacked
+ * items. Mirrors `ContainerTrait.usedCapacity`.
+ */
+export function getContainerUsedCapacity(world: World, containerId: EntityId): number {
+  const container = getComponent(world, containerId, 'container')
+  if (!container) return 0
+  let total = 0
+  for (const id of container.contents) {
+    total += effectiveCarriableSize(world, id)
+  }
+  return total
+}
+
+/**
  * Move an entity into a container. Removes it from any current parent or
  * world position. The carried entity's spatial index entry follows the carrier.
+ *
+ * If the source has a Stackable trait, attempts to merge into an existing
+ * stack of the same entity type with room (count + source.count ≤ maxStack)
+ * before adding as a new entry. A successful merge destroys the source entity.
  *
  * Returns true on success, false if the destination cannot accept the item
  * (missing Container, capacity exceeded).
@@ -78,21 +109,46 @@ export function transferToContainer(
   const container = getComponent(world, containerId, 'container')
   if (!container) return false
 
-  const carriable = getComponent(world, itemId, 'carriable')
-  const size = carriable?.size ?? 1
-
-  // Capacity check accounts for currently-held items only — re-parenting to the
-  // same container is a no-op below.
   const currentParent = getContainerOf(world, itemId)
-  if (currentParent !== containerId) {
-    let used = 0
-    for (const id of container.contents) {
-      const c = getComponent(world, id, 'carriable')
-      if (c) used += c.size
+  if (currentParent === containerId) return true // Already here.
+
+  // Try to merge into an existing same-typed stack first.
+  const sourceStackable = getComponent(world, itemId, 'stackable')
+  if (sourceStackable) {
+    const sourceType = getComponent(world, itemId, 'entityType')?.type
+    const sourceCarriable = getComponent(world, itemId, 'carriable')
+    const unitSize = sourceCarriable?.size ?? 1
+    if (sourceType !== undefined) {
+      for (const existingId of container.contents) {
+        if (existingId === itemId) continue
+        const existingType = getComponent(world, existingId, 'entityType')?.type
+        if (existingType !== sourceType) continue
+        const existingStack = getComponent(world, existingId, 'stackable')
+        if (!existingStack) continue
+        const room = existingStack.maxStack - existingStack.count
+        if (room <= 0) continue
+        const mergeCount = Math.min(room, sourceStackable.count)
+        // Capacity check for the merged units only.
+        if (getContainerUsedCapacity(world, containerId) + mergeCount * unitSize > container.capacity) {
+          continue
+        }
+        existingStack.count += mergeCount
+        sourceStackable.count -= mergeCount
+        if (sourceStackable.count <= 0) {
+          destroyEntity(world, itemId)
+          return true
+        }
+        // Partial merge — fall through to add the remainder as a new entry.
+        break
+      }
     }
-    if (used + size > container.capacity) return false
-  } else {
-    return true // Already here.
+  }
+
+  // Capacity check accounts for currently-held items only (the source is not
+  // yet in this container; if it was, we returned early above).
+  const remainingIncomingSize = effectiveCarriableSize(world, itemId)
+  if (getContainerUsedCapacity(world, containerId) + remainingIncomingSize > container.capacity) {
+    return false
   }
 
   // Capture the item's current effective coordinates so any descendants can be

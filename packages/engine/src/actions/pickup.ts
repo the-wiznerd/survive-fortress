@@ -1,6 +1,6 @@
 import { getComponent, type Action, type World, type EntityId } from '@repo/state'
 import { registerAction } from '~engine/actions/registry.js'
-import { transferToContainer, getActorContainer } from '~engine/containment.js'
+import { transferToContainer, getActorContainer, getContainerUsedCapacity, effectiveCarriableSize } from '~engine/containment.js'
 
 type PickupAction = Extract<Action, { type: 'pickup' }>
 
@@ -23,12 +23,10 @@ registerAction<PickupAction>({
     const containerId = getActorContainer(world, actorId)
     if (containerId === undefined) return false
     const container = getComponent(world, containerId, 'container')!
-    let used = 0
-    for (const id of container.contents) {
-      const c = getComponent(world, id, 'carriable')
-      if (c) used += c.size
-    }
-    if (used + carriable.size > container.capacity) return false
+    // The transfer may merge into an existing stack, but worst case adds the
+    // full effective size as a new entry. Validate against that ceiling.
+    const incomingSize = effectiveCarriableSize(world, action.targetId)
+    if (getContainerUsedCapacity(world, containerId) + incomingSize > container.capacity) return false
     return isAdjacent(world, actorId, action.targetId)
   },
   execute: (world, actorId, action) => {
