@@ -2,7 +2,7 @@
   <div class="drawer">
     <header>
       <h2><slot name="title">{{ title}}</slot></h2>
-      <button class="back" @click="$emit('close')">&lt; Back</button>
+      <button class="back" @click="$emit('close')">x</button>
     </header>
     <slot />
   </div>
@@ -21,7 +21,7 @@
 <style lang="scss" scoped>
 
   .drawer {
-    padding: pixel-sim-space(8) pixel-sim-space(6) pixel-sim-space(6);
+    padding: pixel-sim-space(6) pixel-sim-space(6) pixel-sim-space(6);
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -42,7 +42,6 @@
   }
 
   .back {
-    @include button-back-button;
-    margin-block: pixel-sim-space(-3);
+    @include button-tiny;
   }
 </style>

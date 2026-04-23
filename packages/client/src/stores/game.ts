@@ -41,6 +41,9 @@ export const useGameStore = defineStore('game', () => {
   /** The plan most recently submitted to the server. Frozen during submitted/resolving,
    *  cleared when a new planning phase begins. */
   const submittedPlan = ref<PlayerAction[]>([])
+  /** Names of action targets at the moment of submission, so the PlanFeed can
+   *  still show "Eat Berry" after the entity has been destroyed mid-resolution. */
+  const submittedTargetLabels = ref<Map<number, string>>(new Map())
   /** Per-frame plan progress emitted during playback. */
   const planProgress = ref<PlanProgress>({ index: 0, terminated: false, elapsedTicks: 0 })
   const view = shallowRef<GameView | null>(null)
@@ -234,7 +237,13 @@ export const useGameStore = defineStore('game', () => {
     if (phase.value !== 'planning') return
     const action: PlayerAction = { type: 'eat', targetId }
     if (!canAfford(action)) return
-    if (plan.value.some(a => a.type === 'eat' && a.targetId === targetId)) return
+    // Stacks (e.g. berries) can be eaten multiple times per turn, up to count.
+    const target = view.value?.entities.find(e => e.id === targetId)
+    const stackCount = target?.traits.stackable?.count ?? 1
+    const alreadyQueued = plan.value.filter(
+      a => a.type === 'eat' && a.targetId === targetId,
+    ).length
+    if (alreadyQueued >= stackCount) return
     plan.value.push(action)
   }
 
@@ -265,6 +274,18 @@ export const useGameStore = defineStore('game', () => {
     const actions = plan.value.slice()
     game.submitPlan(actions)
     submittedPlan.value = actions.map(a => ({ ...a }))
+    // Snapshot target labels for actions that reference an entity, so the
+    // PlanFeed remains readable even after targets are destroyed.
+    const labels = new Map<number, string>()
+    const v = view.value
+    if (v) {
+      for (const a of actions) {
+        if (!('targetId' in a)) continue
+        const e = v.entities.find(x => x.id === a.targetId)
+        if (e) labels.set(a.targetId, e.name ?? e.type)
+      }
+    }
+    submittedTargetLabels.value = labels
     planProgress.value = { index: 0, terminated: false, elapsedTicks: 0 }
     plan.value = []
     phase.value = 'submitted'
@@ -290,6 +311,7 @@ export const useGameStore = defineStore('game', () => {
       onDone() {
         playback = null
         submittedPlan.value = []
+        submittedTargetLabels.value = new Map()
         planProgress.value = { index: 0, terminated: false, elapsedTicks: 0 }
         phase.value = 'planning'
       },
@@ -306,6 +328,7 @@ export const useGameStore = defineStore('game', () => {
     phase,
     plan,
     submittedPlan,
+    submittedTargetLabels,
     planProgress,
     view,
     turnMode,

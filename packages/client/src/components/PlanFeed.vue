@@ -152,8 +152,10 @@
 
   function targetLabel(id: number): string {
     const e = gameState.view?.entities.find(e => e.id === id)
-    if (!e) return `#${id}`
-    return e.name ?? e.type
+    if (e) return e.name ?? e.type
+    const cached = gameState.submittedTargetLabels.get(id)
+    if (cached) return cached
+    return `#${id}`
   }
 
   function moveLabel(direction: 'n' | 's' | 'e' | 'w'): string {

@@ -51,12 +51,14 @@
     }
   }
 
-  /** Whether an equivalent action is already in the plan (mirrors store guards). */
+  /** Whether an equivalent action is already in the plan (mirrors store guards).
+   *  `eat` is intentionally absent: stacked items can be eaten multiple times
+   *  per turn, so the eat button stays clickable until the stack is exhausted
+   *  or AP runs out. Removal happens via the PlanFeed slot. */
   function isQueued(plan: readonly PlayerAction[], a: PlayerAction): boolean {
     switch (a.type) {
       case 'harvest':
       case 'pickup':
-      case 'eat':
       case 'drop':
         return plan.some(p => p.type === a.type && 'targetId' in p && p.targetId === a.targetId)
       default:
