@@ -161,10 +161,6 @@
 <style lang="scss" scoped>
 
   .plan-feed {
-    @include pixel-sim-border;
-
-    --border-color: var(--color-dark-blue);
-
     color: var(--color-black);
     display: flex;
     flex-direction: column;
@@ -184,19 +180,11 @@
     }
   }
 
-  header,
-  footer {
-    padding: 0 pixel-sim-space(2);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: pixel-sim-space(13);
-  }
-
   header {
     @include ts-heading-secondary;
-    padding: 0 pixel-sim-space(2);
-    margin-block: 0;
+    display: flex;
+    align-items: center;
+    padding: pixel-sim-space(4) pixel-sim-space(5);
     color: var(--color-white);
   }
 
@@ -205,7 +193,6 @@
     grid-auto-columns: 1fr;
     grid-template-rows: repeat(var(--ap-total), minmax(pixel-sim-space(6), auto));
     min-inline-size: pixel-sim-space(40);
-    margin: 0 4px;
     background-color: var(--color-darkest-blue);
     padding-block: pixel-sim-space(1);
   }
@@ -214,7 +201,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 pixel-sim-space(2);
+    padding: 0 pixel-sim-space(5);
     overflow: hidden;
     transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
     color: var(--color-lightest-gray);
@@ -243,8 +230,13 @@
   }
 
   footer {
+    padding: 0 pixel-sim-space(5);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     display: flex;
     justify-content: space-between;
+    min-height: pixel-sim-space(14);
   }
 
   button {
@@ -253,6 +245,7 @@
     --border-color: var(--color-lightest-blue);
     background-color: transparent;
     color: var(--color-lightest-blue);
+    margin: var(--border-width);
 
     &:hover,
     &:focus-visible {

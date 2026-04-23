@@ -92,8 +92,7 @@
 
   .sidebar-header {
     flex: 0 0 auto;
-    padding: pixel-sim-space(5);
-    border-block-end: var(--border-width) solid var(--color-darkest-gray);
+    padding-block-start: pixel-sim-space(5);
     display: flex;
     flex-direction: column;
     gap: pixel-sim-space(4);
@@ -101,6 +100,8 @@
 
   .day {
     @include ts-heading-secondary;
+
+    padding-inline: pixel-sim-space(5);
 
     .value {
       color: var(--color-white);
@@ -120,14 +121,17 @@
     scrollbar-gutter: stable;
   }
 
-  // Push: new view slides in from the right and covers the previous drawer
-  // (which stays in place underneath, preserving its scroll/expand state).
-  // Pop: top view slides off to the right, revealing the drawer beneath.
   .drawer-push-enter-active,
   .drawer-pop-leave-active {
     transition: transform 0.2s ease;
     z-index: 1;
   }
-  .drawer-push-enter-from { transform: translateX(100%); }
-  .drawer-pop-leave-to    { transform: translateX(100%); }
+
+  .drawer-push-enter-from { 
+    transform: translateX(100%);
+  }
+
+  .drawer-pop-leave-to    {
+    transform: translateX(100%);
+  }
 </style>
