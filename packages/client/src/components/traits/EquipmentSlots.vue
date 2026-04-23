@@ -8,7 +8,7 @@
           <button
             v-if="itemId !== null && isBag(itemId)"
             class="link"
-            @click="openBag"
+            @click="openContainer(itemId)"
           >{{ itemLabel(itemId) }}</button>
           <span v-else-if="itemId !== null">{{ itemLabel(itemId) }}</span>
           <span v-else class="empty">NONE</span>
@@ -44,8 +44,8 @@
     return !!findEntity(id)?.traits.container
   }
 
-  function openBag() {
-    pushSidebarView({ kind: 'bag' })
+  function openContainer(id: EntityId) {
+    pushSidebarView({ kind: 'container', containerId: id })
   }
 </script>
 

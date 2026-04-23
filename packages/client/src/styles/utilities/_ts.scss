@@ -11,16 +11,12 @@
   @include heading-base;
 
   color: var(--color-white);
-  letter-spacing: -1px;
-  margin-block-end: ps.space(4);
 }
 
-/* Section heading inside a panel: accent color, bold. */
 @mixin heading-secondary {
   @include heading-base;
 
   color: var(--color-lightest-yellow);
-  margin-block-end: ps.space(4);
 }
 
 /* Inline label/key for a key-value pair. */

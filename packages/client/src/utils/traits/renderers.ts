@@ -80,7 +80,7 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
   },
   actor: {
     component: StatText,
-    props: d => ({ label: 'AP / Round', value: String(d.pointsPerRound) })
+    props: d => ({ label: 'AP/Round', value: String(d.pointsPerRound) })
   },
 }
 

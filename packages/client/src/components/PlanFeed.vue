@@ -195,7 +195,7 @@
   .slots {
     display: grid;
     grid-auto-columns: 1fr;
-    grid-template-rows: repeat(var(--ap-total), minmax(pixel-sim-space(10), auto));
+    grid-template-rows: repeat(var(--ap-total), minmax(pixel-sim-space(8), auto));
     min-inline-size: pixel-sim-space(40);
     margin: 0 4px;
     background-color: var(--color-darkest-blue);
@@ -205,9 +205,9 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 pixel-sim-space(3);
+    padding: 0 pixel-sim-space(2);
     overflow: hidden;
-    transition: background 200ms ease, color 200ms ease, opacity 200ms ease, border-color 200ms ease;
+    transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
     border-width: var(--border-width) 0;
     border-style: dashed;
     border-color: transparent;
@@ -265,9 +265,6 @@
     --border-color: var(--color-lightest-blue);
     background-color: transparent;
     color: var(--color-lightest-blue);
-    display: inline-flex;
-    align-items: center;
-    gap: pixel-sim-space(2);
 
     &:hover,
     &:focus-visible {

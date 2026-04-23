@@ -21,7 +21,7 @@
 <style lang="scss" scoped>
 
   .drawer {
-    padding: pixel-sim-space(4) pixel-sim-space(6);
+    padding: pixel-sim-space(8) pixel-sim-space(6) pixel-sim-space(6);
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -34,7 +34,7 @@
     align-items: center;
     justify-content: space-between;
     gap: pixel-sim-space(3);
-    margin-block-end: pixel-sim-space(4);
+    margin-block-end: pixel-sim-space(8);
 
     h2 {
       @include ts-heading-primary;

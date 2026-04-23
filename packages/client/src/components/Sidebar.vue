@@ -1,13 +1,20 @@
 <template>
   <aside id="sidebar">
     <header class="sidebar-header">
-      <div class="day"><span class="label">Day:</span> {{ day }}.{{ tickOfDay }}</div>
+      <div class="day">
+        <span class="label">Day:</span> <span class="value">{{ day }}.{{ tickOfDay }}</span>
+      </div>
       <PlanFeed />
     </header>
     <div class="drawer-area">
       <Transition :name="transitionName">
         <KeepAlive>
-          <component :is="currentComponent" :key="topId" class="drawer" />
+          <component
+            :is="currentComponent"
+            :key="topId"
+            v-bind="currentProps"
+            class="drawer"
+          />
         </KeepAlive>
       </Transition>
     </div>
@@ -20,7 +27,7 @@
   import { TICKS_PER_DAY } from '@repo/server/sdk'
   import PlayerView from '~client/components/PlayerView.vue'
   import InspectorView from '~client/components/InspectorView.vue'
-  import BagView from '~client/components/BagView.vue'
+  import ContainerView from '~client/components/ContainerView.vue'
   import PlanFeed from '~client/components/PlanFeed.vue'
   import {
     sidebarStack,
@@ -39,7 +46,16 @@
     switch (top.kind) {
       case 'player': return PlayerView
       case 'inspector': return InspectorView
-      case 'bag': return BagView
+      case 'container': return ContainerView
+    }
+  })
+
+  const currentProps = computed<Record<string, unknown>>(() => {
+    const top = sidebarTop.value
+    if (!top) return {}
+    switch (top.kind) {
+      case 'container': return { containerId: top.containerId }
+      default: return {}
     }
   })
 
@@ -84,9 +100,9 @@
   }
 
   .day {
-    font-weight: bold;
+    @include ts-heading-secondary;
 
-    .label {
+    .value {
       color: var(--color-white);
     }
   }

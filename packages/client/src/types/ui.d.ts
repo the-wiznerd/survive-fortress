@@ -1,4 +1,5 @@
 // Ambient client-wide UI types — no import needed at use sites.
+import type { EntityId } from '@repo/server/sdk'
 
 declare global {
   /** Discriminated union of all view kinds that can appear in the sidebar stack.
@@ -6,7 +7,7 @@ declare global {
   type SidebarView =
     | { kind: 'player' }
     | { kind: 'inspector' }
-    | { kind: 'bag' }
+    | { kind: 'container'; containerId: EntityId }
 
   /** Stack entries carry a stable id so Vue can preserve component instance state
    *  (scroll position, disclosure open/closed, etc.) across pushes/pops. */
