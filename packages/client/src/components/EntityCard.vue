@@ -57,6 +57,6 @@
   .traits {
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: pixel-sim-space(4);
   }
 </style>

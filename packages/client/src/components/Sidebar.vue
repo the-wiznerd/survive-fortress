@@ -76,11 +76,11 @@
 
   .sidebar-header {
     flex: 0 0 auto;
-    padding: 1rem 1.5rem 1.5rem;
+    padding: pixel-sim-space(4) pixel-sim-space(6) pixel-sim-space(6);
     border-block-end: 1px solid var(--color-darkest-gray);
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: pixel-sim-space(3);
   }
 
   .day {

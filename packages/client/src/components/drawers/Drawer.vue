@@ -4,7 +4,6 @@
       <h2><slot name="title">{{ title}}</slot></h2>
       <button class="back" @click="$emit('close')">&lt; Back</button>
     </header>
-
     <slot />
   </div>
 </template>
@@ -22,7 +21,7 @@
 <style lang="scss" scoped>
 
   .drawer {
-    padding: 1rem 1.5rem;
+    padding: pixel-sim-space(4) pixel-sim-space(6);
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -34,8 +33,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    margin-block-end: 1rem;
+    gap: pixel-sim-space(3);
+    margin-block-end: pixel-sim-space(4);
 
     h2 {
       @include ts-heading-primary;
@@ -44,15 +43,6 @@
 
   .back {
     @include button-back-button;
-    margin-block: -0.75rem;
-  }
-
-  .position {
-    color: var(--color-gray);
-    font-size: 0.875rem;
-  }
-
-  .empty {
-    opacity: 0.6;
+    margin-block: pixel-sim-space(-3);
   }
 </style>

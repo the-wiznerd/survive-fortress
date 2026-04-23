@@ -182,12 +182,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 2.75rem;
+    min-height: pixel-sim-space(11);
   }
 
   header {
     @include ts-heading-secondary;
-    padding: 0 0.5rem;
+    padding: 0 pixel-sim-space(2);
     margin-block: 0;
     color: var(--color-white);
   }
@@ -195,8 +195,8 @@
   .slots {
     display: grid;
     grid-auto-columns: 1fr;
-    grid-template-rows: repeat(var(--ap-total), minmax(2.25rem, auto));
-    min-inline-size: 10rem;
+    grid-template-rows: repeat(var(--ap-total), minmax(pixel-sim-space(9), auto));
+    min-inline-size: pixel-sim-space(40);
     margin: 0 4px;
     background-color: var(--color-darkest-blue);
   }
@@ -205,7 +205,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 0.75rem;
+    padding: 0 pixel-sim-space(3);
     overflow: hidden;
     transition: background 200ms ease, color 200ms ease, opacity 200ms ease, border-color 200ms ease;
     border-width: var(--border-width) 0;
@@ -267,7 +267,7 @@
     color: var(--color-lightest-blue);
     display: inline-flex;
     align-items: center;
-    gap: 0.4em;
+    gap: pixel-sim-space(2);
 
     &:hover,
     &:focus-visible {

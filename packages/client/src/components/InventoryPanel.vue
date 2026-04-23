@@ -119,7 +119,7 @@
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 0.25em;
+      gap: pixel-sim-space(1);
     }
 
     .item {
@@ -131,7 +131,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.5em;
+      gap: pixel-sim-space(2);
 
       &.selected .item-label {
         color: var(--color-light-gray);
@@ -155,7 +155,7 @@
 
     .item-actions {
       display: flex;
-      gap: 0.25em;
+      gap: pixel-sim-space(1);
     }
 
     .action {
@@ -163,7 +163,7 @@
       color: inherit;
       border: 1px solid var(--color-dark-gray);
       font: inherit;
-      padding: 0.1em 0.4em;
+      padding: pixel-sim-space(1) pixel-sim-space(2);
       cursor: pointer;
 
       &:hover:not(:disabled) {
@@ -177,8 +177,8 @@
     }
 
     .expanded {
-      margin-top: 0.25em;
-      margin-left: 1em;
+      margin-top: pixel-sim-space(1);
+      margin-left: pixel-sim-space(4);
     }
   }
 </style>

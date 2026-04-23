@@ -24,7 +24,6 @@
     display: inline-block;
     width: 16px;
     height: 16px;
-    vertical-align: -0.2em;
     fill: currentColor;
     flex-shrink: 0;
     overflow: visible;

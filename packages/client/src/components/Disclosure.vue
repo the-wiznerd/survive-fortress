@@ -55,7 +55,7 @@
     summary {
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 0;
+      padding: pixel-sim-space(4) 0;
 
       .label {
         @include ts-heading-secondary;
@@ -76,8 +76,8 @@
         background: var(--color-darkest-gray);
         color: var(--color-lightest-gray);
         font-family: var(--font-mono);
-        height: 1.25rem;
-        width: 1.25rem;
+        height: pixel-sim-space(5);
+        width: pixel-sim-space(5);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -105,10 +105,10 @@
     }
 
     .content {
-      padding-block: 0 1rem;
+      padding-block: 0 pixel-sim-space(4);
       display: flex;
       flex-direction: column;
-      gap: 1em;
+      gap: pixel-sim-space(4);
     }
   }
 

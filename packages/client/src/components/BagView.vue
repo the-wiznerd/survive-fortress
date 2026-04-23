@@ -14,7 +14,7 @@
 
 <style lang="scss" scoped>
   .bag-view {
-    padding: 2rem 1.5rem 1rem;
+    padding: pixel-sim-space(8) pixel-sim-space(6) pixel-sim-space(4);
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -25,7 +25,7 @@
   .drawer-header {
     display: flex;
     align-items: center;
-    margin-block-end: 1rem;
+    margin-block-end: pixel-sim-space(4);
   }
 
   .back {
@@ -33,7 +33,7 @@
     color: inherit;
     border: 1px solid var(--color-dark-gray);
     font: inherit;
-    padding: 0.2em 0.6em;
+    padding: pixel-sim-space(1) pixel-sim-space(2);
     cursor: pointer;
 
     &:hover {

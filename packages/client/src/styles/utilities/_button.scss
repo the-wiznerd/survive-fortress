@@ -7,8 +7,8 @@
 
   cursor: pointer;
   text-transform: uppercase;
-  min-height: 2rem;
-  padding: 0 0.75rem;
+  min-height: ps.space(8);
+  padding: 0 ps.space(3);
   border: 0 none;
   background-color: var(--color-darkest-gray);
   color: var(--color-lightest-gray);

@@ -1,3 +1,5 @@
+@use 'pixel-sim' as ps;
+
 /* Typographic styles.
  * The UI is locked to a single 16px font size (and 16px icons) to keep the
  * pixel font and pixel-art icons crisp. Hierarchy is established through
@@ -8,15 +10,15 @@
 @mixin heading-primary {
   color: var(--color-white);
   font-weight: bold;
-  letter-spacing: -0.08em;
-  margin-block-end: 1em;
+  letter-spacing: -1px;
+  margin-block-end: ps.space(4);
 }
 
 /* Section heading inside a panel: accent color, bold. */
 @mixin heading-secondary {
   color: var(--color-lightest-yellow);
   font-weight: bold;
-  margin-block-end: 1em;
+  margin-block-end: ps.space(4);
 }
 
 /* Inline label/key for a key-value pair. */

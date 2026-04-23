@@ -71,8 +71,8 @@
   .action-button {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.45rem 0.6rem;
+    gap: pixel-sim-space(2);
+    padding: pixel-sim-space(2) pixel-sim-space(3);
     border: 0 none;
     border-radius: 3px;
     font-family: inherit;
@@ -94,9 +94,8 @@
   .cost {
     display: inline-flex;
     align-items: center;
-    gap: 0.25em;
+    gap: pixel-sim-space(1);
     opacity: 0.7;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
 </style>

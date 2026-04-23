@@ -1,19 +1,5 @@
 @use 'sass:math';
 
-/* Pixel-art simulation primitives.
- * These helpers establish the "pixel grid" aesthetic: integer pixel borders
- * via box-shadow (so they don't take part in layout), and a 4px building
- * block for all spacing.
- */
-
-/* 4px layout grid. Use space($n) to express N grid units.
- *
- *   padding: space(2) space(4);   // 8px 16px
- *   gap: space(3);                // 12px
- *
- * Reserve raw em/rem for typographic micro-adjustments (letter-spacing,
- * vertical-align, text-underline-offset).
- */
 @function space($n) {
   @return $n * 4px;
 }

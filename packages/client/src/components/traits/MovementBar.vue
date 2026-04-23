@@ -18,3 +18,23 @@
     modes: MovementMode[]
   }>()
 </script>
+
+<style lang="scss" scoped>
+  .segments {
+    display: inline-flex;
+    gap: pixel-sim-space(1);
+  }
+
+  .segment {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: var(--border-width) solid var(--color-gray);
+    position: relative;
+
+    &.filled {
+      background: var(--color-lightest-gray);
+      border-color: var(--color-lightest-gray);
+    }
+  }
+</style>

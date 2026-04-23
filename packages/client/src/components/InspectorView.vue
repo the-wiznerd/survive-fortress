@@ -36,7 +36,7 @@
 <style lang="scss" scoped>
 
   .inspector-view {
-    padding: 0.5rem 1.5rem;
+    padding: pixel-sim-space(2) pixel-sim-space(6);
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -47,8 +47,8 @@
   .drawer-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-block-end: 1rem;
+    gap: pixel-sim-space(3);
+    margin-block-end: pixel-sim-space(4);
   }
 
   .back {

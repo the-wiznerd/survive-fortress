@@ -54,7 +54,7 @@
   .equipment {
     >.label {
       @include ts-label;
-      margin: 0 0 0.25em;
+      margin: 0 0 pixel-sim-space(1);
       font-size: inherit;
       font-weight: normal;
     }
@@ -63,10 +63,10 @@
   .slots {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: pixel-sim-space(2);
     margin: 0;
     list-style: none;
-    padding: 0.5rem 0 0 0.5rem;
+    padding: pixel-sim-space(2) 0 0 pixel-sim-space(2);
   }
 
   .slot {
@@ -90,7 +90,8 @@
       padding: 0;
       cursor: pointer;
       text-transform: uppercase;
-      text-underline-offset: 0.15em;
+      text-underline-offset: 2px;
+      text-decoration-thickness: var(--border-width);
       color: var(--color-light-blue);
 
       &:hover {

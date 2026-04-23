@@ -99,7 +99,7 @@
       color: var(--color-lightest-gray);
       font-family: var(--font-mono);
       border: 0 none;
-      padding: 0.15rem 0.5rem;
+      padding: pixel-sim-space(1) pixel-sim-space(2);
       cursor: pointer;
       position: relative;
       inset-block-start: -1px;
@@ -119,7 +119,7 @@
       color: var(--color-lightest-gray);
       font-family: var(--font-mono);
       border: 0 none;
-      padding: 0.2rem 0.35rem;
+      padding: pixel-sim-space(1) pixel-sim-space(2);
       text-transform: uppercase;
     }
 
@@ -138,7 +138,7 @@
     .debug-actions {
       .buttons {
         display: inline-flex;
-        gap: 0.25rem;
+        gap: pixel-sim-space(1);
       }
     }
   }
