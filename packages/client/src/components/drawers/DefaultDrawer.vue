@@ -1,5 +1,5 @@
 <template>
-  <div class="player-view">
+  <div class="default-drawer">
     <EntityCard
       v-if="player"
       :entity="player"
@@ -40,7 +40,7 @@
 </script>
 
 <style lang="scss" scoped>
-  .player-view {
+  .default-drawer {
     padding: pixel-sim-space(3) pixel-sim-space(6) pixel-sim-space(2);
     display: flex;
     flex-direction: column;
