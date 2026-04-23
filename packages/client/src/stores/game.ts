@@ -157,6 +157,49 @@ export const useGameStore = defineStore('game', () => {
     plan.value.push(action)
   }
 
+  /** Returns the world position the player will be at after all currently-planned moves. */
+  function planCursor(): CellCoord | null {
+    const v = view.value
+    if (!v) return null
+    const player = v.entities.find(e => String(e.id) === v.playerId)
+    if (!player) return null
+    let x = player.x
+    let y = player.y
+    for (const action of plan.value) {
+      if (action.type === 'move') { x += action.dx; y += action.dy }
+    }
+    return { x, y }
+  }
+
+  /** Append a path of single-tile cardinal moves from the current plan cursor
+   *  to (tx, ty). Each step is one of N/S/E/W only — diagonals are emitted as
+   *  two separate moves. The walk interleaves x- and y-steps so the path
+   *  stays close to the straight line between start and target. Truncates
+   *  silently when the AP budget is reached. No collision checks — the engine
+   *  validates each step at execution time. */
+  function appendPathTo(tx: number, ty: number) {
+    if (phase.value !== 'planning') return
+    const start = planCursor()
+    if (!start) return
+    let remX = Math.abs(tx - start.x)
+    let remY = Math.abs(ty - start.y)
+    const sx = Math.sign(tx - start.x)
+    const sy = Math.sign(ty - start.y)
+    // Interleave x and y steps so the path stays close to a straight line.
+    // At each step, pick whichever axis has more remaining distance (favors x
+    // on ties). Each emitted action moves exactly one tile cardinally.
+    while (remX > 0 || remY > 0) {
+      const stepX = remX >= remY && remX > 0
+      const action: PlayerAction = stepX
+        ? { type: 'move', dx: sx, dy: 0 }
+        : { type: 'move', dx: 0, dy: sy }
+      if (!canAfford(action)) return
+      plan.value.push(action)
+      if (stepX) remX--
+      else remY--
+    }
+  }
+
   function appendHarvest(targetId: number) {
     if (phase.value !== 'planning') return
     const action: PlayerAction = { type: 'harvest', targetId }
@@ -203,20 +246,6 @@ export const useGameStore = defineStore('game', () => {
     planProgress.value = { index: 0, terminated: false, elapsedTicks: 0 }
     plan.value = []
     phase.value = 'submitted'
-  }
-
-  /** Returns the world position the player will be at after all planned moves. */
-  function planCursor(): CellCoord | null {
-    const v = view.value
-    if (!v) return null
-    const player = v.entities.find(e => String(e.id) === v.playerId)
-    if (!player) return null
-    let x = player.x
-    let y = player.y
-    for (const action of plan.value) {
-      if (action.type === 'move') { x += action.dx; y += action.dy }
-    }
-    return { x, y }
   }
 
   // ─── Playback ───
@@ -276,6 +305,7 @@ export const useGameStore = defineStore('game', () => {
     canAfford,
     // plan actions
     appendMove,
+    appendPathTo,
     appendHarvest,
     appendPickup,
     appendDrop,
