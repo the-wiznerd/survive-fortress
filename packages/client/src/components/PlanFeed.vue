@@ -50,7 +50,7 @@
   import { computed } from 'vue'
   import type { PlayerAction } from '@repo/server/sdk'
   import { useGameStore } from '~client/stores/game'
-  import Icon from '~client/components/Icon.vue'
+  import Icon from '~client/components/icons/Icon.vue'
 
   const gameState = useGameStore()
 

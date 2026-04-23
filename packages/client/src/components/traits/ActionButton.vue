@@ -13,7 +13,7 @@
 <script setup lang="ts">
   import { computed } from 'vue'
   import type { PlayerAction } from '@repo/server/sdk'
-  import Icon from '~client/components/Icon.vue'
+  import Icon from '~client/components/icons/Icon.vue'
   import { useGameStore } from '~client/stores/game'
 
   const props = defineProps<{
