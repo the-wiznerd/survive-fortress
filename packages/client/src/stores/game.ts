@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
-import type { ActionCosts, Direction, Game, GameView, InspectResult, PlayerAction, TurnMode } from '@repo/server/sdk'
+import type { ActionCosts, Direction, Game, GameView, InspectResult, PlayerAction, TurnMode, ViewEntity } from '@repo/server/sdk'
 import { DIRECTION_DELTAS } from '@repo/server/sdk'
 import { connect } from '~client/utils/net/connection'
 import { playFrames, type PlaybackHandle } from '~client/utils/net/playback'
+import { useToasts } from '~client/composables/useToasts'
+import { useFlash } from '~client/composables/useFlash'
+import { pushSidebarView, sidebarTop } from '~client/utils/sidebarStack'
 
 const DEFAULT_SAVE = 'test-world'
 const SAVE_NAME = new URLSearchParams(window.location.search).get('save') ?? DEFAULT_SAVE
@@ -80,6 +83,12 @@ export const useGameStore = defineStore('game', () => {
   let game: Game | null = null
   let playback: PlaybackHandle | null = null
   let onCameraMove: ((x: number, y: number, z: number) => void) | null = null
+
+  // ─── UI feedback composables ───
+  // Instantiated in the store's setup so their internal timers are owned by
+  // the Pinia effect scope and cleaned up on HMR/store-dispose.
+  const { push: pushToast } = useToasts()
+  const { flash: flashEntity } = useFlash()
 
   // ─── Lifecycle ───
 
@@ -293,12 +302,79 @@ export const useGameStore = defineStore('game', () => {
 
   // ─── Playback ───
 
+  /** Find the player's primary container (equipped bag-like entity). */
+  function findPlayerBag(v: GameView): ViewEntity | null {
+    const player = v.entities.find(e => String(e.id) === v.playerId)
+    const slots = player?.traits.equipment?.slots
+    if (!slots) return null
+    for (const id of Object.values(slots)) {
+      if (id == null) continue
+      const e = v.entities.find(x => x.id === id)
+      if (e?.traits.container) return e
+    }
+    return null
+  }
+
+  /** Snapshot of (entityType → total stacked count) for the items in a bag. */
+  function snapshotBagByType(v: GameView, bag: ViewEntity): Map<string, number> {
+    const out = new Map<string, number>()
+    const ids = bag.traits.container?.contents ?? []
+    for (const id of ids) {
+      const item = v.entities.find(x => x.id === id)
+      if (!item) continue
+      const count = item.traits.stackable?.count ?? 1
+      out.set(item.type, (out.get(item.type) ?? 0) + count)
+    }
+    return out
+  }
+
+  /** Pluralize a type label for toast text. Naive English suffixing. */
+  function pluralize(type: string, n: number): string {
+    if (n === 1) return type
+    return type.endsWith('s') ? type : `${type}s`
+  }
+
+  /** Compare bags between frames and announce any net additions. */
+  function announceBagAdditions(prev: GameView | null, next: GameView, autoOpen: { value: boolean }) {
+    const bag = findPlayerBag(next)
+    if (!bag) return
+    const beforeBag = prev ? findPlayerBag(prev) : null
+    const before = beforeBag ? snapshotBagByType(prev!, beforeBag) : new Map<string, number>()
+    const after = snapshotBagByType(next, bag)
+
+    let anyAdded = false
+    for (const [type, count] of after) {
+      const delta = count - (before.get(type) ?? 0)
+      if (delta <= 0) continue
+      anyAdded = true
+      pushToast(`+${delta} ${pluralize(type, delta)}`, 'pickup')
+      // Flash whichever stack of this type is currently in the bag.
+      const stackId = (bag.traits.container?.contents ?? []).find(id => {
+        const e = next.entities.find(x => x.id === id)
+        return e?.type === type
+      })
+      if (stackId !== undefined) flashEntity(stackId)
+    }
+
+    if (anyAdded && autoOpen.value) {
+      autoOpen.value = false
+      const top = sidebarTop.value
+      const alreadyOpen = top?.kind === 'container' && top.containerId === bag.id
+      if (!alreadyOpen) pushSidebarView({ kind: 'container', containerId: bag.id })
+    }
+  }
+
   function startPlayback(frames: GameView[]) {
     playback?.cancel()
     phase.value = 'resolving'
     let elapsedTicks = 0
+    let prevFrame: GameView | null = view.value
+    // Latched: only auto-open the bag once per round, on the first delivery.
+    const autoOpen = { value: true }
     playback = playFrames(frames, {
       onFrame(frame) {
+        announceBagAdditions(prevFrame, frame, autoOpen)
+        prevFrame = frame
         view.value = frame
         elapsedTicks++
         planProgress.value = {

@@ -1,6 +1,7 @@
 <template>
   <div id="game-container" :class="`-${phase}`">
     <GameCanvas />
+    <ToastOverlay />
   </div>
   <Sidebar />
 </template>
@@ -11,6 +12,7 @@
   import { useGameStore } from '~client/stores/game'
   import GameCanvas from '~client/components/GameCanvas.vue'
   import Sidebar from '~client/components/Sidebar.vue'
+  import ToastOverlay from '~client/components/ToastOverlay.vue'
 
   const game = useGameStore()
   const { phase } = storeToRefs(game)
