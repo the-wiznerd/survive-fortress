@@ -1,12 +1,10 @@
 <template>
-  <section class="plan-feed" :class="`-${gameState.phase}`" aria-label="Plan feed">
+  <section class="plan-feed" :class="`-${gameState.phase}`" aria-label="Plan feed"
+  :style="{ '--ap-total': apTotal }">
     <header class="phase-header">
       <span class="phase-name">{{ phaseLabel }}</span>
     </header>
-    <div
-      class="slots"
-      :style="{ gridTemplateRows: `repeat(${apTotal}, minmax(2.5rem, auto))` }"
-    >
+    <div class="slots">
       <div
         v-for="(item, i) in items"
         :key="i"
@@ -154,6 +152,7 @@
   .slots {
     display: grid;
     grid-auto-columns: 1fr;
+    grid-template-rows: repeat(var(--ap-total), minmax(2.25rem, auto));
     min-inline-size: 10rem;
     margin: 0 4px 4px;
     background-color: var(--color-black);
