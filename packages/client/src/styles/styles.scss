@@ -9,7 +9,7 @@
   font-family: var(--font-mono);
   display: flex;
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: var(--font-size-base);
   height: 100svh;
   width: 100svw;
   overflow: hidden;

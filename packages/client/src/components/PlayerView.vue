@@ -41,8 +41,7 @@
 
 <style lang="scss" scoped>
   .player-view {
-    padding: 0.5rem 1.5rem;
-    line-height: 1.5;
+    padding: 0.25rem 1.5rem  0.5rem;
     display: flex;
     flex-direction: column;
     min-height: 100%;

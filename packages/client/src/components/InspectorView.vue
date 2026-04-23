@@ -38,7 +38,6 @@
 
   .inspector-view {
     padding: 0.5rem 1.5rem;
-    line-height: 1.5;
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -59,7 +58,7 @@
 
   .position {
     color: var(--color-gray);
-    font-size: 0.875rem;
+    font-size: var(--font-size-lg);
   }
 
   .empty {

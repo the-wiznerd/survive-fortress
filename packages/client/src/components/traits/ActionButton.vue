@@ -6,13 +6,14 @@
     @click="onClick"
   >
     <span class="label">{{ label }}</span>
-    <span class="cost">{{ cost }} AP</span>
+    <span class="cost">{{ cost }}<Icon name="ap" label="action points" /></span>
   </button>
 </template>
 
 <script setup lang="ts">
   import { computed } from 'vue'
   import type { PlayerAction } from '@repo/server/sdk'
+  import Icon from '~client/components/Icon.vue'
   import { useGameStore } from '~client/stores/game'
 
   const props = defineProps<{
@@ -75,8 +76,7 @@
     border: 0 none;
     border-radius: 3px;
     font-family: inherit;
-    font-size: 0.75rem;
-    line-height: 1;
+    font-size: var(--font-size-base);
     background-color: var(--color-white);
     color: var(--color-black);
     cursor: pointer;
@@ -93,7 +93,10 @@
   }
 
   .cost {
-    font-size: 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    font-size: var(--font-size-sm);
     opacity: 0.7;
     text-transform: uppercase;
     letter-spacing: 0.05em;

@@ -24,7 +24,6 @@
 
   .drawer {
     padding: 1rem 1.5rem;
-    line-height: 1.5;
     display: flex;
     flex-direction: column;
     min-height: 100%;

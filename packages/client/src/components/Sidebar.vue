@@ -71,7 +71,7 @@
     display: flex;
     flex-direction: column;
     background: var(--color-black);
-    border-left: 1px solid var(--color-darkest-gray);
+    border-left: var(--border-width) solid var(--color-darkest-gray);
   }
 
   .sidebar-header {
@@ -84,7 +84,7 @@
   }
 
   .day {
-    font-size: 1rem;
+    font-size: var(--font-size-xl);
     font-weight: bold;
 
     .label {

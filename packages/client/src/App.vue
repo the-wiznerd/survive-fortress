@@ -26,20 +26,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    // border: 8px solid transparent;
     box-sizing: border-box;
     position: relative;
-
-    &.-planning {
-      border-color: var(--color-blue);
-    }
-
-    &.-submitted {
-      border-color: var(--color-yellow);
-    }
-
-    &.-resolving {
-      border-color: var(--color-green);
-    }
   }
 </style>

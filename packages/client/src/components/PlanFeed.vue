@@ -22,6 +22,7 @@
         class="submit"
         @click="onSubmit"
       >
+        <Icon name="check" />
         Submit
       </button>
       <button
@@ -40,6 +41,7 @@
 <script setup lang="ts">
   import { computed } from 'vue'
   import type { PlayerAction } from '@repo/server/sdk'
+  import Icon from '~client/components/Icon.vue'
   import { useGameStore } from '~client/stores/game'
 
   const gameState = useGameStore()
@@ -152,21 +154,26 @@
   @use '~styles/mixins';
 
   .plan-feed {
+    @include mixins.pixel-border;
+
+    --border-color: var(--color-dark-blue);
+
     color: var(--color-black);
     display: flex;
     flex-direction: column;
     transition: background-color 0.2s ease;
+    background-color: var(--border-color);
 
     &.-planning { 
-      background-color: var(--color-dark-blue);
+      --border-color: var(--color-dark-blue);
     }
 
     &.-submitted { 
-      background-color: var(--color-dark-yellow);
+      --border-color: var(--color-dark-yellow);
     }
 
     &.-resolving { 
-      background-color: var(--color-dark-green);
+      --border-color: var(--color-dark-green);
     }
   }
 
@@ -192,7 +199,7 @@
     grid-template-rows: repeat(var(--ap-total), minmax(2.25rem, auto));
     min-inline-size: 10rem;
     margin: 0 4px;
-    background-color: var(--color-black);
+    background-color: var(--color-darkest-blue);
   }
 
   .slot {
@@ -200,14 +207,14 @@
     align-items: center;
     justify-content: flex-start;
     padding: 0 0.75rem;
-    font-size: 0.75rem;
+    font-size: var(--font-size-base);
     overflow: hidden;
     transition: background 200ms ease, color 200ms ease, opacity 200ms ease, border-color 200ms ease;
-    border-width: 1px 0;
+    border-width: var(--border-width) 0;
     border-style: dashed;
     border-color: transparent;
     color: var(--color-lightest-gray);
-    margin-block-end: -1px;
+    margin-block-end: calc(var(--border-width) * -1);
 
     &:first-child {
       border-block-start-width: 0;
@@ -220,11 +227,11 @@
 
     &.empty {
       border-style: dashed;
-      border-color: var(--color-darkest-gray);
+      border-color: var(--color-dark-blue);
     }
 
     &.action {
-      border-color: var(--color-darkest-gray);
+      border-color: var(--color-dark-blue);
     }
 
     &.-pending {
@@ -256,15 +263,19 @@
 
   button {
     @include mixins.button;
-    
+
     --border-color: var(--color-lightest-blue);
     background-color: transparent;
     color: var(--color-lightest-blue);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
 
     &:hover,
     &:focus-visible {
       background-color: var(--color-light-blue);
       color: var(--color-black);
+      --border-color: var(--color-light-blue);
     }
   }
 </style>

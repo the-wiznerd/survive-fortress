@@ -1,17 +1,21 @@
 @mixin pixel-border {
-  box-shadow: 0px var(--border-width) var(--border-color), 0px calc(-1 * var(--border-width)) var(--border-color), var(--border-width) 0px var(--border-color), calc(-1 * var(--border-width)) 0px var(--border-color);
+  box-shadow:
+    0px var(--border-width) var(--border-color),
+    0px calc(-1 * var(--border-width)) var(--border-color),
+    var(--border-width) 0px var(--border-color),
+    calc(-1 * var(--border-width)) 0px var(--border-color);
 }
 
 @mixin heading {
   color: var(--color-lightest-yellow);
   margin-block-end: 1em;
-  font-size: 0.8rem;
+  font-size: var(--font-size-lg);
   font-weight: bold;
 }
 
 @mixin heading-lg {
   color: var(--color-white);
-  font-size: 0.9rem;
+  font-size: var(--font-size-xl);
   font-weight: bold;
   letter-spacing: -0.08em;
 }
@@ -23,12 +27,11 @@
 @mixin button {
   @include pixel-border;
 
-  --border-width: 2px;
-  --border-color: var(--color-dark-gray);
+  --border-color: var(--color-darkest-gray);
 
   cursor: pointer;
   text-transform: uppercase;
-  min-height: 1.85rem;
+  min-height: 2rem;
   padding: 0 0.75rem;
   border: 0 none;
   background-color: var(--color-darkest-gray);
@@ -37,7 +40,7 @@
 
   &:hover,
   &:focus-visible {
-    --border-color: var(--color-light-gray);
+    --border-color: var(--color-gray);
     background-color: var(--color-dark-gray);
     color: var(--color-white);
   }

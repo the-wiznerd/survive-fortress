@@ -21,7 +21,7 @@
   display: inline-block;
   width: 0.75em;
   height: 0.98em;
-  border: 2px solid var(--color-gray);
+  border: var(--border-width) solid var(--color-gray);
   position: relative;
   top: -1px;
 

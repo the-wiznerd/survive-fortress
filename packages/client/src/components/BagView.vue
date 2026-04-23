@@ -15,7 +15,6 @@
 <style lang="scss" scoped>
   .bag-view {
     padding: 2rem 1.5rem 1rem;
-    line-height: 1.5;
     display: flex;
     flex-direction: column;
     min-height: 100%;

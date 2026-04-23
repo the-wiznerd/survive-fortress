@@ -50,7 +50,7 @@
   @use '~styles/mixins';
 
   .disclosure {
-    border-block-start: 1px solid var(--color-darkest-gray);
+    border-block-start: var(--border-width) solid var(--color-darkest-gray);
 
     header,
     summary {
@@ -77,7 +77,7 @@
         background: var(--color-darkest-gray);
         color: var(--color-lightest-gray);
         font-family: var(--font-mono);
-        font-size: 0.75rem;
+        font-size: var(--font-size-base);
         height: 1.25rem;
         width: 1.25rem;
         display: flex;
@@ -87,7 +87,6 @@
         user-select: none;        
         position: relative;
         inset-block-start: -1px;
-        line-height: 1;
 
         &::after {
           content: '+';        

@@ -26,8 +26,7 @@
   /* 4. Core body setup: Full height and smoother text */
   body {
     min-block-size: 100dvb;
-    /* Modern dynamic viewport unit */
-    line-height: 1.5;
+    line-height: 1;
     -webkit-font-smoothing: antialiased;
   }
 
