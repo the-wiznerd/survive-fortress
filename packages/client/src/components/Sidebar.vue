@@ -25,7 +25,7 @@
   import { computed, watch } from 'vue'
   import { storeToRefs } from 'pinia'
   import { TICKS_PER_DAY } from '@repo/server/sdk'
-  import PlayerView from '~client/components/PlayerView.vue'
+  import DefaultDrawer from '~client/components/drawers/DefaultDrawer.vue'
   import InspectorDrawer from '~client/components/drawers/InspectorDrawer.vue'
   import ContainerDrawer from '~client/components/drawers/ContainerDrawer.vue'
   import PlanFeed from '~client/components/PlanFeed.vue'
@@ -42,9 +42,9 @@
   const topId = computed(() => stack.value[stack.value.length - 1]?.id ?? 0)
   const currentComponent = computed(() => {
     const top = sidebarTop.value
-    if (!top) return PlayerView
+    if (!top) return DefaultDrawer
     switch (top.kind) {
-      case 'player': return PlayerView
+      case 'player': return DefaultDrawer
       case 'inspector': return InspectorDrawer
       case 'container': return ContainerDrawer
     }

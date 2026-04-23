@@ -7,7 +7,7 @@
       class="player"
     />
 
-    <SidebarSettings
+    <Settings
       :scale="scale"
       :turn-mode="turnMode"
       @zoom-in="zoomIn"
@@ -22,7 +22,7 @@
   import type { ViewEntity } from '@repo/server/sdk'
   import { storeToRefs } from 'pinia'
   import EntityCard from '~client/components/EntityCard.vue'
-  import SidebarSettings from '~client/components/SidebarSettings.vue'
+  import Settings from '~client/components/Settings.vue'
   import { useGameStore } from '~client/stores/game'
 
   const gameStore = useGameStore()
