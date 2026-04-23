@@ -143,11 +143,17 @@
     switch (a.type) {
       case 'move': return moveLabel(a.direction)
       case 'wait': return 'Wait'
-      case 'harvest': return 'Harvest'
-      case 'pickup': return 'Pick up'
-      case 'drop': return 'Drop'
-      case 'eat': return 'Eat'
+      case 'harvest': return `Harvest ${targetLabel(a.targetId)}`
+      case 'pickup': return `Pick up ${targetLabel(a.targetId)}`
+      case 'drop': return `Drop ${targetLabel(a.targetId)}`
+      case 'eat': return `Eat ${targetLabel(a.targetId)}`
     }
+  }
+
+  function targetLabel(id: number): string {
+    const e = gameState.view?.entities.find(e => e.id === id)
+    if (!e) return `#${id}`
+    return e.name ?? e.type
   }
 
   function moveLabel(direction: 'n' | 's' | 'e' | 'w'): string {
