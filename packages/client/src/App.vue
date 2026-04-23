@@ -1,7 +1,6 @@
 <template>
-  <div id="game-container" :class="`phase-${phase}`">
+  <div id="game-container" :class="`-${phase}`">
     <GameCanvas />
-    <PlanFeed />
   </div>
   <Sidebar />
 </template>
@@ -13,7 +12,6 @@
   import { useKeyboardInput } from '~client/composables/useKeyboardInput'
   import GameCanvas from '~client/components/GameCanvas.vue'
   import Sidebar from '~client/components/Sidebar.vue'
-  import PlanFeed from '~client/components/PlanFeed.vue'
 
   const game = useGameStore()
   const { phase } = storeToRefs(game)
@@ -22,3 +20,29 @@
 
   onUnmounted(() => { game.stop() })
 </script>
+
+<style lang="scss" scoped>
+  #game-container {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    // border: 8px solid transparent;
+    box-sizing: border-box;
+    position: relative;
+
+    &.-planning {
+      border-color: var(--color-blue);
+    }
+
+    &.-submitted {
+      border-color: var(--color-yellow);
+    }
+
+    &.-resolving {
+      border-color: var(--color-green);
+    }
+  }
+</style>

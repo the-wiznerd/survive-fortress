@@ -41,8 +41,12 @@ export function playFrames(frames: GameView[], { onFrame, onDone }: PlaybackCall
     if (frameIndex < frames.length) {
       timerId = setTimeout(step, PLAYBACK_TICK_MS)
     } else {
-      timerId = null
-      onDone()
+      // Hold the final frame on screen for one tick so the last action's
+      // success/failure state is actually visible before `onDone` resets it.
+      timerId = setTimeout(() => {
+        timerId = null
+        onDone()
+      }, PLAYBACK_TICK_MS)
     }
   }
 

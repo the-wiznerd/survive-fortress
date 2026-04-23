@@ -15,7 +15,7 @@ import { getActionHandler } from '~engine/actions/registry.js'
 export function actionSystem(world: World) {
   for (const id of queryEntities(world, 'playerControlled')) {
     const pc = getComponent(world, id, 'playerControlled')!
-    if (pc.planIndex >= pc.plan.length) continue
+    if (pc.planTerminated || pc.planIndex >= pc.plan.length) continue
 
     const action = pc.plan[pc.planIndex]!
     const handler = getActionHandler(action.type)
@@ -45,8 +45,9 @@ export function actionSystem(world: World) {
   }
 }
 
+/** Mark the plan terminated. `planIndex` is left pointing at the failing action
+ *  so views/UI can identify which one didn't resolve. */
 function terminatePlan(pc: { plan: unknown[]; planIndex: number; actionTicksElapsed: number; planTerminated: boolean }): void {
-  pc.planIndex = pc.plan.length
   pc.actionTicksElapsed = 0
   pc.planTerminated = true
 }

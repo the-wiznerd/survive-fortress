@@ -1,8 +1,7 @@
 <template>
-  <section class="plan-feed" :class="`phase-${gameState.phase}`" aria-label="Plan feed">
+  <section class="plan-feed" :class="`-${gameState.phase}`" aria-label="Plan feed">
     <header class="phase-header">
       <span class="phase-name">{{ phaseLabel }}</span>
-      <span class="ap-counter">{{ apUsed }} / {{ apTotal }}</span>
     </header>
     <div
       class="slots"
@@ -12,7 +11,7 @@
         v-for="(item, i) in items"
         :key="i"
         class="slot"
-        :class="[`state-${item.state}`, item.kind]"
+        :class="[`-${item.state}`, item.kind]"
         :style="item.cost > 1 ? { gridRow: `span ${item.cost}` } : undefined"
       >
         <span v-if="item.kind === 'action'" class="label">{{ item.label }}</span>
@@ -28,7 +27,7 @@
 
   const gameState = useGameStore()
 
-  type SlotState = 'pending' | 'planning' | 'success' | 'failed' | 'cancelled' | 'empty'
+  type SlotState = 'pending' | 'planning' | 'success' | 'failed' | 'empty'
   type Item =
     | { kind: 'action'; label: string; cost: number; state: SlotState }
     | { kind: 'empty'; cost: 1; state: 'empty' }
@@ -42,6 +41,64 @@
   })
 
   const apTotal = computed(() => gameState.actionPointsPerRound)
+
+  const items = computed<Item[]>(() => {
+    const list: Item[] = []
+    let used = 0
+
+    if (gameState.phase === 'planning') {
+      for (const a of gameState.plan) {
+        const cost = costOf(a.type)
+        list.push({ kind: 'action', label: actionLabel(a), cost, state: 'planning' })
+        used += cost
+      }
+      // Pad trailing AP with empty slots up to the budget.
+      for (let i = used; i < apTotal.value; i++) {
+        list.push({ kind: 'empty', cost: 1, state: 'empty' })
+      }
+      return list
+    }
+
+    // submitted | resolving — render the submitted plan, then fill any unused
+    // AP with synthesized wait actions (the simulation idles those ticks).
+    const progress = gameState.planProgress
+    const isResolving = gameState.phase === 'resolving'
+    const waitCost = costOf('wait')
+
+    // Build a flat slot stream: the submitted actions, then waits to fill the
+    // budget. Track each slot's planned-action index (waits get -1) so we can
+    // tell, on termination, which planned actions never ran.
+    const slots: { label: string; cost: number; plannedIdx: number }[] = []
+    for (let i = 0; i < gameState.submittedPlan.length; i++) {
+      const a = gameState.submittedPlan[i]!
+      slots.push({ label: actionLabel(a), cost: costOf(a.type), plannedIdx: i })
+      used += costOf(a.type)
+    }
+    for (let s = used; s < apTotal.value; s += waitCost) {
+      slots.push({ label: 'Wait', cost: waitCost, plannedIdx: -1 })
+    }
+
+    // The engine keeps ticking after a plan terminates — it just stops
+    // executing this entity's remaining planned actions. Wait fillers resolve
+    // normally as elapsedTicks advances. Planned actions at or after
+    // progress.index reveal as failed only once their own tick frame elapses,
+    // so the feed unfolds in lockstep with playback rather than collapsing
+    // the whole tail to failed the moment the first one breaks.
+    let tick = 0
+    for (const slot of slots) {
+      let state: SlotState = 'pending'
+      if (isResolving && progress.elapsedTicks >= tick + slot.cost) {
+        const isUnreachedPlannedAction =
+          slot.plannedIdx >= 0
+          && progress.terminated
+          && slot.plannedIdx >= progress.index
+        state = isUnreachedPlannedAction ? 'failed' : 'success'
+      }
+      list.push({ kind: 'action', label: slot.label, cost: slot.cost, state })
+      tick += slot.cost
+    }
+    return list
+  })
 
   function costOf(type: ActionType): number {
     return gameState.actionCosts[type] ?? 1
@@ -60,142 +117,96 @@
 
   function moveLabel(dx: number, dy: number): string {
     const parts: string[] = []
-    if (dy < 0) parts.push('N')
-    if (dy > 0) parts.push('S')
-    if (dx > 0) parts.push('E')
-    if (dx < 0) parts.push('W')
+    if (dy < 0) parts.push('North')
+    if (dy > 0) parts.push('South')
+    if (dx > 0) parts.push('East')
+    if (dx < 0) parts.push('West')
     return parts.length ? `Move ${parts.join('')}` : 'Wait'
   }
-
-  /** AP consumed so far this round (sum of pending costs in planning;
-   *  sum of completed-action costs during resolve). */
-  const apUsed = computed(() => {
-    if (gameState.phase === 'planning') return gameState.planCost
-    let used = 0
-    const max = Math.min(gameState.planProgress.index, gameState.submittedPlan.length)
-    for (let i = 0; i < max; i++) used += costOf(gameState.submittedPlan[i]!.type)
-    return used
-  })
-
-  /** Slots in left-to-right order. Each action item's `cost` drives `grid-column: span N`. */
-  const items = computed<Item[]>(() => {
-    const list: Item[] = []
-    let used = 0
-
-    if (gameState.phase === 'planning') {
-      for (const a of gameState.plan) {
-        const cost = costOf(a.type)
-        list.push({ kind: 'action', label: actionLabel(a), cost, state: 'planning' })
-        used += cost
-      }
-    } else {
-      const progress = gameState.planProgress
-      const isResolving = gameState.phase === 'resolving'
-      for (let i = 0; i < gameState.submittedPlan.length; i++) {
-        const a = gameState.submittedPlan[i]!
-        const cost = costOf(a.type)
-        let state: SlotState = 'pending'
-        if (isResolving) {
-          if (i < progress.index) state = 'success'
-          else if (progress.terminated && i === progress.index) state = 'failed'
-          else if (progress.terminated && i > progress.index) state = 'cancelled'
-        }
-        list.push({ kind: 'action', label: actionLabel(a), cost, state })
-        used += cost
-      }
-    }
-
-    // Pad trailing AP with empty slots up to the budget.
-    for (let i = used; i < apTotal.value; i++) {
-      list.push({ kind: 'empty', cost: 1, state: 'empty' })
-    }
-    return list
-  })
 </script>
 
 <style lang="scss" scoped>
+  @use '~styles/mixins';
+
   .plan-feed {
-    position: absolute;
-    inset-block-end: 1rem;
-    inset-inline-start: 1rem;
-    background: var(--color-black);
-    border: 1px solid var(--color-darkest-gray);
+    color: var(--color-black);
     display: flex;
     flex-direction: column;
-    pointer-events: auto;
-    user-select: none;
+    transition: background-color 0.2s ease;
+
+    &.-planning { 
+      background-color: var(--color-dark-blue);
+    }
+
+    &.-submitted { 
+      background-color: var(--color-dark-yellow);
+    }
+
+    &.-resolving { 
+      background-color: var(--color-dark-green);
+    }
   }
 
   .phase-header {
-    padding: 0.4rem 0.6rem;
-    font-weight: bold;
-    color: var(--color-black);
-    background: var(--color-darkest-gray);
-    transition: background 150ms ease;
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-
-  .phase-planning .phase-header { background: var(--color-blue); }
-  .phase-submitted .phase-header { background: var(--color-yellow); }
-  .phase-resolving .phase-header { background: var(--color-green); }
-
-  .ap-counter {
-    font-variant-numeric: tabular-nums;
+    @include mixins.heading;
+    padding: 0.5rem 0.5rem;
+    margin-block: 0;
+    color: var(--color-white);
   }
 
   .slots {
     display: grid;
-    gap: 2px;
-    padding: 0.35rem;
     grid-auto-columns: 1fr;
-    min-inline-size: 8rem;
+    min-inline-size: 10rem;
+    margin: 0 4px 4px;
+    background-color: var(--color-black);
   }
 
   .slot {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 0.5rem;
+    min-height: 2.25rem;
+    padding: 0 0.75rem;
     font-size: 0.75rem;
     overflow: hidden;
     transition: background 200ms ease, color 200ms ease, opacity 200ms ease, border-color 200ms ease;
-  }
-
-  .slot.empty {
-    background: transparent;
-    border: 1px dashed var(--color-darkest-gray);
-  }
-
-  .slot.action {
-    background: var(--color-darkest-gray);
+    border-width: 1px 0;
+    border-style: solid;
+    border-color: transparent;
     color: var(--color-lightest-gray);
-    border: 1px solid var(--color-dark-gray);
-  }
+    margin-bottom: -1px;
 
-  .slot.state-pending {
-    background: var(--color-darkest-gray);
-    color: var(--color-light-gray);
-  }
+    &:first-child {
+      border-block-start-width: 0;
+    }
 
-  .slot.state-success {
-    background: var(--color-green);
-    color: var(--color-black);
-    border-color: var(--color-green);
-  }
+    &:last-child {
+      border-block-end-width: 0;
+    }
 
-  .slot.state-failed {
-    background: var(--color-red);
-    color: var(--color-black);
-    border-color: var(--color-red);
-  }
+    &.empty {
+      border-style: dashed;
+      border-color: var(--color-darkest-gray);
+    }
 
-  .slot.state-cancelled {
-    background: transparent;
-    color: var(--color-red);
-    border: 1px dashed var(--color-red);
-    opacity: 0.65;
+    &.action {
+      border-color: var(--color-darkest-gray);
+    }
+
+    &.-pending {
+      color: var(--color-light-gray);
+    }
+
+    &.-success {
+      color: var(--color-light-green);
+      border-color: var(--color-green);
+    }
+
+    &.-failed {
+      color: var(--color-light-red);
+      border-color: var(--color-red);
+    }
   }
 
   .label {

@@ -41,7 +41,7 @@ export const useGameStore = defineStore('game', () => {
    *  cleared when a new planning phase begins. */
   const submittedPlan = ref<PlayerAction[]>([])
   /** Per-frame plan progress emitted during playback. */
-  const planProgress = ref<PlanProgress>({ index: 0, terminated: false })
+  const planProgress = ref<PlanProgress>({ index: 0, terminated: false, elapsedTicks: 0 })
   const view = shallowRef<GameView | null>(null)
   /** How rounds advance: `manual` requires explicit submit, `auto` ticks freely. Persisted. */
   const turnMode = ref<TurnMode>(loadTurnMode())
@@ -187,7 +187,7 @@ export const useGameStore = defineStore('game', () => {
     const actions = plan.value.slice()
     game.submitPlan(actions)
     submittedPlan.value = actions.map(a => ({ ...a }))
-    planProgress.value = { index: 0, terminated: false }
+    planProgress.value = { index: 0, terminated: false, elapsedTicks: 0 }
     plan.value = []
     phase.value = 'submitted'
   }
@@ -211,19 +211,22 @@ export const useGameStore = defineStore('game', () => {
   function startPlayback(frames: GameView[]) {
     playback?.cancel()
     phase.value = 'resolving'
+    let elapsedTicks = 0
     playback = playFrames(frames, {
       onFrame(frame) {
         view.value = frame
+        elapsedTicks++
         planProgress.value = {
           index: frame.playerPlan.index,
           terminated: frame.playerPlan.terminated,
+          elapsedTicks,
         }
         centerOnPlayer(frame)
       },
       onDone() {
         playback = null
         submittedPlan.value = []
-        planProgress.value = { index: 0, terminated: false }
+        planProgress.value = { index: 0, terminated: false, elapsedTicks: 0 }
         phase.value = 'planning'
       },
     })

@@ -1,9 +1,5 @@
 <template>
   <div class="inspector-view">
-    <div v-if="view" class="game-state">
-      <div class="day"><span class="label">Day:</span> {{ day }}.{{ tickOfDay }}</div>
-    </div>
-
     <EntityCard
       v-if="player"
       :entity="player"
@@ -34,7 +30,6 @@
 <script setup lang="ts">
   import { computed } from 'vue'
   import type { ViewEntity } from '@repo/server/sdk'
-  import { TICKS_PER_DAY } from '@repo/server/sdk'
   import { storeToRefs } from 'pinia'
   import EntityCard from '~client/components/EntityCard.vue'
   import DebugPanel from '~client/components/DebugPanel.vue'
@@ -51,9 +46,6 @@
 
   const zoomIn = () => setScale(scale.value + 1)
   const zoomOut = () => setScale(scale.value - 1)
-
-  const day = computed(() => view.value ? Math.floor(view.value.tick / TICKS_PER_DAY) + 1 : 0)
-  const tickOfDay = computed(() => view.value ? String(view.value.tick % TICKS_PER_DAY).padStart(2, '0') : '00')
 
   const player = computed<ViewEntity | null>(() => {
     if (!view.value) return null
@@ -81,16 +73,6 @@
     min-height: 100%;
     box-sizing: border-box;
     background: var(--color-black);
-  }
-
-  .game-state {
-    padding-block-end: 1rem;
-    font-size: 1rem;
-    font-weight: bold;
-
-    .label {
-      color: var(--color-white);
-    }
   }
 
   .selection {

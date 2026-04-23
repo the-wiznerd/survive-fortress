@@ -43,3 +43,11 @@
     if (r && v) r.render(v, hoveredCell.value, inspectedCell.value)
   })
 </script>
+
+<style lang="scss" scoped>
+  canvas {
+    image-rendering: pixelated;
+    flex-shrink: 0;
+    max-inline-size: none;
+  }
+</style>

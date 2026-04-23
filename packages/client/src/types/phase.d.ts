@@ -13,6 +13,8 @@ declare global {
     index: number
     /** True if the plan was terminated by an invalid action this round. */
     terminated: boolean
+    /** Number of simulation ticks (= AP) elapsed in the current round. */
+    elapsedTicks: number
   }
 }
 

@@ -2,7 +2,6 @@
 @use 'fonts';
 @use 'variables';
 @use 'utilities';
-@use 'mixins';
 
 #app {
   background: var(--color-black);
@@ -14,34 +13,4 @@
   height: 100svh;
   width: 100svw;
   overflow: hidden;
-}
-
-#game-container {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border: 8px solid transparent;
-  box-sizing: border-box;
-  position: relative;
-
-  &.phase-planning {
-    border-color: var(--color-blue);
-  }
-
-  &.phase-submitted {
-    border-color: var(--color-yellow);
-  }
-
-  &.phase-resolving {
-    border-color: var(--color-green);
-  }
-}
-
-canvas {
-  image-rendering: pixelated;
-  flex-shrink: 0;
-  max-inline-size: none;
 }
