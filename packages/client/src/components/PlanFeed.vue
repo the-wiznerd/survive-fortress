@@ -1,6 +1,6 @@
 <template>
   <section class="plan-feed" :class="`-${gameState.phase}`" aria-label="Plan feed"
-  :style="{ '--ap-total': apTotal }">
+  :style="{ '--ap-rows': apRows }">
     <header>
       <span class="label">{{ phaseLabel }}</span>
       <span class="actions"> 
@@ -64,6 +64,7 @@
   })
 
   const apTotal = computed(() => gameState.actionPointsPerRound)
+  const apRows = computed(() => Math.ceil(apTotal.value / 2))
 
   const items = computed<Item[]>(() => {
     const list: Item[] = []
@@ -185,7 +186,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 pixel-sim-space(5);
-    min-height: pixel-sim-space(13);
+    min-height: pixel-sim-space(12);
     
     > .label {
       @include ts-heading-secondary;
@@ -217,18 +218,19 @@
 
   .slots {
     display: grid;
-    grid-auto-columns: 1fr;
-    grid-template-rows: repeat(var(--ap-total), minmax(pixel-sim-space(6), auto));
+    grid-auto-flow: column;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(var(--ap-rows), minmax(pixel-sim-space(6), auto));
     min-inline-size: pixel-sim-space(40);
     background-color: var(--color-darkest-gray);
-    padding-block: pixel-sim-space(1);
+    padding: pixel-sim-space(2) pixel-sim-space(5);
+    gap: pixel-sim-space(1);
   }
 
   .slot {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 pixel-sim-space(5);
     overflow: hidden;
     transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
     color: var(--color-lightest-gray);

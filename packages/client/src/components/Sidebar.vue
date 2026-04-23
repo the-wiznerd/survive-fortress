@@ -118,7 +118,6 @@
     position: absolute;
     inset: 0;
     overflow-y: auto;
-    scrollbar-gutter: stable;
   }
 
   .drawer-push-enter-active,
