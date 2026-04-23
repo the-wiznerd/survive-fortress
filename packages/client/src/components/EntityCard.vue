@@ -53,7 +53,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '~styles/mixins';
 
   .traits {
     display: flex;

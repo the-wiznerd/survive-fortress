@@ -86,7 +86,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '~styles/mixins';
 
   .settings {
     margin-block: auto 0;
@@ -133,7 +132,7 @@
     .toggle {
       display: block;
       cursor: pointer;
-      @include mixins.label;
+      @include ts-label;
     }
 
     .debug-actions {

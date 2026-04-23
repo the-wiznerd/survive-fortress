@@ -1,0 +1,13 @@
+// Barrel of utility helpers, auto-injected into every Vue SFC <style> block
+// and non-styles/ scss module via vite.config.ts.
+//
+// Forwarded with topical prefixes so call sites self-document the source:
+//   pixel-sim-space(2)
+//   @include pixel-sim-border
+//   @include button-base
+//   @include button-back-button
+//   @include ts-heading-primary
+//   @include ts-label
+@forward 'pixel-sim' as pixel-sim-*;
+@forward 'ts' as ts-*;
+@forward 'button' as button-*;

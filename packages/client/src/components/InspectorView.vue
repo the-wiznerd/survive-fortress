@@ -34,7 +34,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '~styles/mixins';
 
   .inspector-view {
     padding: 0.5rem 1.5rem;
@@ -53,7 +52,7 @@
   }
 
   .back {
-    @include mixins.back-button
+    @include button-back-button
   }
 
   .position {

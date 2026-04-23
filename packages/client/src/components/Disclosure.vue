@@ -47,7 +47,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '~styles/mixins';
 
   .disclosure {
     border-block-start: var(--border-width) solid var(--color-darkest-gray);
@@ -59,7 +58,7 @@
       padding: 1rem 0;
 
       .label {
-        @include mixins.heading-secondary;
+        @include ts-heading-secondary;
         margin-block: 0;
       }
     }

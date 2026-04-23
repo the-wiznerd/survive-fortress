@@ -50,11 +50,10 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '~styles/mixins';
 
   .equipment {
     >.label {
-      @include mixins.label;
+      @include ts-label;
       margin: 0 0 0.25em;
       font-size: inherit;
       font-weight: normal;

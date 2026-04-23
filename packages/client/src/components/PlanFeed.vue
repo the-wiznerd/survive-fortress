@@ -151,10 +151,9 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '~styles/mixins';
 
   .plan-feed {
-    @include mixins.pixel-border;
+    @include pixel-sim-border;
 
     --border-color: var(--color-dark-blue);
 
@@ -187,7 +186,7 @@
   }
 
   header {
-    @include mixins.heading-secondary;
+    @include ts-heading-secondary;
     padding: 0 0.5rem;
     margin-block: 0;
     color: var(--color-white);
@@ -261,7 +260,7 @@
   }
 
   button {
-    @include mixins.button;
+    @include button-base;
 
     --border-color: var(--color-lightest-blue);
     background-color: transparent;

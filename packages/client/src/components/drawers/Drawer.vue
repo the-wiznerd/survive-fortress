@@ -20,7 +20,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '~styles/mixins';
 
   .drawer {
     padding: 1rem 1.5rem;
@@ -39,12 +38,12 @@
     margin-block-end: 1rem;
 
     h2 {
-      @include mixins.heading-primary;
+      @include ts-heading-primary;
     }
   }
 
   .back {
-    @include mixins.back-button;
+    @include button-back-button;
     margin-block: -0.75rem;
   }
 

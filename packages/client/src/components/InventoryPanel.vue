@@ -103,11 +103,10 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '~styles/mixins';
 
   .inventory {
     >.label {
-      @include mixins.heading-secondary;
+      @include ts-heading-secondary;
     }
 
     .empty {

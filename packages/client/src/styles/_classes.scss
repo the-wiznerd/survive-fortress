@@ -1,4 +1,4 @@
-@use '~styles/mixins';
+@use '~styles/utilities' as *;
 
 .section {
   margin-block-end: 2rem;
@@ -6,7 +6,7 @@
 
 .stat {
   >.label {
-    @include mixins.label;
+    @include ts-label;
   }
 }
 
