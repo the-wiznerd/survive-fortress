@@ -243,6 +243,22 @@ export const useGameStore = defineStore('game', () => {
     plan.value = []
   }
 
+  /** Remove the first action in the plan matching the given target action.
+   *  For target-bearing actions (harvest/pickup/eat/drop) this matches by
+   *  type + targetId. For move/wait this is a no-op — those don't have a
+   *  stable identity to match against. */
+  function removeFromPlan(action: PlayerAction) {
+    if (phase.value !== 'planning') return
+    const idx = plan.value.findIndex(p => {
+      if (p.type !== action.type) return false
+      if ('targetId' in action && 'targetId' in p) {
+        return p.targetId === action.targetId
+      }
+      return false
+    })
+    if (idx >= 0) plan.value.splice(idx, 1)
+  }
+
   function submitPlan() {
     if (phase.value !== 'planning') return
     if (!game) return
@@ -317,6 +333,7 @@ export const useGameStore = defineStore('game', () => {
     appendDrop,
     appendEat,
     clearPlan,
+    removeFromPlan,
     submitPlan,
     planCursor,
   }

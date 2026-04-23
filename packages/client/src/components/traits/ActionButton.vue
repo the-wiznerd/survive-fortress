@@ -1,10 +1,11 @@
 <template>
   <button
     class="action-button"
+    :class="{ '-queued': queued }"
     :disabled="disabled"
-    :title="title"
     @click="onClick"
   >
+    <Icon v-if="queued" name="check" class="queued-icon" />
     <span class="label">{{ label }}</span>
     <span class="cost">{{ cost }}<Icon name="ap" label="action points" /></span>
   </button>
@@ -28,20 +29,17 @@
 
   const disabled = computed(() => {
     if (game.phase !== 'planning') return true
-    if (queued.value) return true
+    if (queued.value) return false
     if (!affordable.value) return true
     return false
   })
 
-  const title = computed(() => {
-    if (game.phase !== 'planning') return 'Submit your plan to start planning a new one'
-    if (queued.value) return 'Already in plan'
-    if (!affordable.value) return 'Not enough action points remaining'
-    return `Add ${props.label} (${cost.value} AP) to plan`
-  })
-
   function onClick() {
     if (disabled.value) return
+    if (queued.value) {
+      game.removeFromPlan(props.action)
+      return
+    }
     const a = props.action
     switch (a.type) {
       case 'harvest': game.appendHarvest(a.targetId); break
@@ -69,33 +67,35 @@
 
 <style lang="scss" scoped>
   .action-button {
-    display: inline-flex;
-    align-items: center;
-    gap: pixel-sim-space(2);
-    padding: pixel-sim-space(2) pixel-sim-space(3);
-    border: 0 none;
-    border-radius: 3px;
-    font-family: inherit;
-    background-color: var(--color-white);
-    color: var(--color-black);
-    cursor: pointer;
-    align-self: flex-start;
+    @include button-base;
 
-    &:hover:not(:disabled) {
-      background-color: var(--color-lightest-gray);
+
+    // // Queued state stays at full opacity — the check icon carries the meaning.
+    // &.-queued:disabled {
+    //   opacity: 1;
+    //   cursor: default;
+    //   color: var(--color-dark-gray);
+    // }
+
+    &.-queued {
+      --border-color: var(--color-lightest-green);
+      background: var(--color-dark-green);
+      color: var(--color-lightest-green);
     }
 
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
+    > .label {
+      flex: 1;
+      text-align: left;
     }
+  }
+
+  .queued-icon {
+    color: var(--color-lightest-green);
   }
 
   .cost {
     display: inline-flex;
     align-items: center;
     gap: pixel-sim-space(1);
-    opacity: 0.7;
-    text-transform: uppercase;
   }
 </style>

@@ -16,12 +16,17 @@
   display: inline-flex;
   gap: ps.space(1);
   align-items: center;
+  margin: var(--border-width);
 
-  &:hover,
-  &:focus-visible {
+  &:where(:not(:disabled):hover),
+  &:where(:not(:disabled):focus-visible) {
     --border-color: var(--color-gray);
     background-color: var(--color-dark-gray);
     color: var(--color-white);
+  }
+
+  &:where(:disabled) {
+    cursor: not-allowed;
   }
 }
 
@@ -36,5 +41,4 @@
   width: ps.space(5);
   justify-content: center;
   padding: 0;
-  margin: var(--border-width);
 }
