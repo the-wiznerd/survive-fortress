@@ -73,25 +73,11 @@
       }
 
       .toggle {
-        background: var(--color-darkest-gray);
-        color: var(--color-lightest-gray);
-        font-family: var(--font-base);
-        height: pixel-sim-space(5);
-        width: pixel-sim-space(5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;        
-        user-select: none;        
-        position: relative;
-        inset-block-start: -1px;
+        @include button-tiny;
 
         &::after {
           content: '+';        
           display: inline-block;
-          position: relative;
-          inset-block-start: 1px;
-
         }
       }
 
@@ -108,7 +94,7 @@
       padding-block: 0 pixel-sim-space(4);
       display: flex;
       flex-direction: column;
-      gap: pixel-sim-space(4);
+      gap: pixel-sim-space(1);
     }
   }
 

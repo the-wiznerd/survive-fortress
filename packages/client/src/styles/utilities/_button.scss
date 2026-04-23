@@ -28,3 +28,13 @@
 @mixin back-button {
   @include base;
 }
+
+@mixin tiny {
+  @include base;
+  min-height: 0;
+  height: ps.space(5);
+  width: ps.space(5);
+  justify-content: center;
+  padding: 0;
+  margin: var(--border-width);
+}

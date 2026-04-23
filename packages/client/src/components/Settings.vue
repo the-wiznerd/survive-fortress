@@ -4,11 +4,13 @@
       Settings
     </template>
 
-    <div class="stat">
+    <div class="stat zoom">
       <span class="label">Zoom:</span>
-      <button @click="$emit('zoom-out')" :disabled="scale <= 1">-</button>
-      <span class="zoom-value">{{ scale }}x</span>
-      <button @click="$emit('zoom-in')">+</button>
+      <span class="controls">
+        <button @click="$emit('zoom-out')" :disabled="scale <= 1">-</button>
+        <span class="zoom-value">{{ scale }}x</span>
+        <button @click="$emit('zoom-in')">+</button>
+      </span>
     </div>
 
     <div class="stat mode-picker">
@@ -94,23 +96,18 @@
       margin-inline-end: 0.75ch;
     }
 
-    button {
-      background: var(--color-darkest-gray);
-      color: var(--color-lightest-gray);
-      font-family: var(--font-base);
-      border: 0 none;
-      padding: pixel-sim-space(1) pixel-sim-space(2);
-      cursor: pointer;
-      position: relative;
-      inset-block-start: -1px;
+    .zoom {
+      display: flex;
+      align-items: center;
 
-      &:hover:not(:disabled) {
-        background: var(--color-dark-gray);
-      }
+      > .controls {
+        display: flex;
+        gap: pixel-sim-space(1);
+        align-items: center;
 
-      &:disabled {
-        opacity: 0.4;
-        cursor: default;
+        > button {
+          @include button-tiny;
+        }
       }
     }
 
