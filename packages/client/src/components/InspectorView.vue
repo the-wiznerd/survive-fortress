@@ -1,68 +1,42 @@
 <template>
   <div class="inspector-view">
+    <header class="drawer-header">
+      <button class="back" @click="close">&larr; Back</button>
+      <span class="position" v-if="inspectedCell">
+        ({{ inspectedCell.x }}, {{ inspectedCell.y }})
+      </span>
+    </header>
+
+    <div v-if="!entities.length" class="stat empty">Empty</div>
     <EntityCard
-      v-if="player"
-      :entity="player"
-      :collapsible="false"
-      class="player"
+      v-for="e in entities"
+      :key="e.id"
+      :entity="e"
+      :start-open="true"
     />
-
-    <div v-if="selection" class="selection">
-      <div v-if="selection.entities.length === 0" class="stat">Empty</div>
-      <EntityCard
-        v-for="e in selection.entities"
-        :key="e.id"
-        :entity="e"
-      />
-    </div>
-
-    <SidebarSettings
-      :scale="scale"
-      :turn-mode="turnMode"
-      @zoom-in="zoomIn"
-      @zoom-out="zoomOut"
-      @turn-mode-change="setTurnMode"
-    />
-
-    <DebugPanel v-if="debugEnabled" />
   </div>
 </template>
 
 <script setup lang="ts">
   import { computed } from 'vue'
-  import type { ViewEntity } from '@repo/server/sdk'
   import { storeToRefs } from 'pinia'
   import EntityCard from '~client/components/EntityCard.vue'
-  import DebugPanel from '~client/components/DebugPanel.vue'
-  import SidebarSettings from '~client/components/SidebarSettings.vue'
-  import { DEBUG_ENABLED } from '~client/utils/debug'
   import { useGameStore } from '~client/stores/game'
 
-  const debugEnabled = DEBUG_ENABLED
-
   const gameStore = useGameStore()
-  const { view, inspectedCell, inspectResult, scale, turnMode } = storeToRefs(gameStore)
-  const setScale = (n: number) => gameStore.setScale(n)
-  const setTurnMode = (mode: 'manual' | 'auto') => gameStore.setTurnMode(mode)
+  const { view, inspectedCell, inspectResult } = storeToRefs(gameStore)
 
-  const zoomIn = () => setScale(scale.value + 1)
-  const zoomOut = () => setScale(scale.value - 1)
-
-  const player = computed<ViewEntity | null>(() => {
-    if (!view.value) return null
-    return view.value.entities.find(e => String(e.id) === view.value!.playerId) ?? null
-  })
-
-  const selection = computed(() => {
-    if (!inspectResult.value || !inspectedCell.value) return null
+  const entities = computed(() => {
+    if (!inspectResult.value) return []
     const playerId = view.value?.playerId
-    return {
-      ...inspectedCell.value,
-      entities: inspectResult.value.entities
-        .filter(e => !e.traits.contained && String(e.id) !== playerId)
-        .sort((a, b) => b.z - a.z),
-    }
+    return inspectResult.value.entities
+      .filter(e => !e.traits.contained && String(e.id) !== playerId)
+      .sort((a, b) => b.z - a.z)
   })
+
+  function close() {
+    gameStore.setInspectedCell(null)
+  }
 </script>
 
 <style lang="scss" scoped>
@@ -76,11 +50,32 @@
     background: var(--color-black);
   }
 
-  .player {
-    border-block-start: 0 none;
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-block-end: 1rem;
   }
 
-  .selection {
-    padding-top: 2rem;
+  .back {
+    background: var(--color-darkest-gray);
+    color: inherit;
+    border: 1px solid var(--color-dark-gray);
+    font: inherit;
+    padding: 0.2em 0.6em;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-dark-gray);
+    }
+  }
+
+  .position {
+    color: var(--color-gray);
+    font-size: 0.875rem;
+  }
+
+  .empty {
+    opacity: 0.6;
   }
 </style>

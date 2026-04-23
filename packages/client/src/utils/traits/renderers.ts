@@ -1,13 +1,13 @@
 import type { Component } from 'vue'
-import type { TraitViews, VisibleTraitName } from '@repo/server/sdk'
+import type { TraitViews, ViewEntity, VisibleTraitName } from '@repo/server/sdk'
 import StatText from '~client/components/traits/StatText.vue'
-import ActionBadge from '~client/components/traits/ActionBadge.vue'
+import ActionButton from '~client/components/traits/ActionButton.vue'
 import EquipmentSlots from '~client/components/traits/EquipmentSlots.vue'
 
 type TraitRendererMap = {
   [K in VisibleTraitName]?: {
     component: Component
-    props: (data: TraitViews[K]) => Record<string, unknown> | null
+    props: (data: TraitViews[K], entity: ViewEntity) => Record<string, unknown> | null
   }
 }
 
@@ -50,8 +50,10 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
       : null
   },
   harvestable: {
-    component: ActionBadge,
-    props: d => d.available ? { action: 'Harvest' } : null
+    component: ActionButton,
+    props: (d, entity) => d.available
+      ? { label: 'Harvest', action: { type: 'harvest', targetId: entity.id } }
+      : null
   },
   carriable: {
     component: StatText,
@@ -85,11 +87,15 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
 /** Look up and apply a trait renderer. The renderer ↔ data correlation is
  *  guaranteed by the shared VisibleTraitName key; the cast is needed because
  *  TypeScript can't verify correlated record access through a union key. */
-export function renderTrait(name: VisibleTraitName, data: TraitViews[VisibleTraitName]) {
+export function renderTrait(
+  name: VisibleTraitName,
+  data: TraitViews[VisibleTraitName],
+  entity: ViewEntity,
+) {
   const renderer = TRAIT_RENDERERS[name] as
-    | { component: Component; props: (data: TraitViews[VisibleTraitName]) => Record<string, unknown> | null }
+    | { component: Component; props: (data: TraitViews[VisibleTraitName], entity: ViewEntity) => Record<string, unknown> | null }
     | undefined
   if (!renderer) return null
-  const p = renderer.props(data)
+  const p = renderer.props(data, entity)
   return p ? { component: renderer.component, props: p } : null
 }

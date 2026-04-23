@@ -4,6 +4,7 @@ declare global {
   /** Discriminated union of all view kinds that can appear in the sidebar stack.
    *  Add new variants here as new drawer types are introduced. */
   type SidebarView =
+    | { kind: 'player' }
     | { kind: 'inspector' }
     | { kind: 'bag' }
 

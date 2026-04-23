@@ -45,7 +45,7 @@
       if (name === 'position' && !showPositionTraits.value) continue
       const data = props.entity.traits[name]
       if (!data) continue
-      const rendered = renderTrait(name, data)
+      const rendered = renderTrait(name, data, props.entity)
       if (rendered) result.push({ name, ...rendered })
     }
     return result

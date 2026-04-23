@@ -16,22 +16,30 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue'
+  import { computed, watch } from 'vue'
   import { storeToRefs } from 'pinia'
   import { TICKS_PER_DAY } from '@repo/server/sdk'
+  import PlayerView from '~client/components/PlayerView.vue'
   import InspectorView from '~client/components/InspectorView.vue'
   import BagView from '~client/components/BagView.vue'
   import PlanFeed from '~client/components/PlanFeed.vue'
   import PlanControls from '~client/components/PlanControls.vue'
-  import { sidebarStack, sidebarTop, sidebarDirection } from '~client/utils/sidebarStack'
+  import {
+    sidebarStack,
+    sidebarTop,
+    sidebarDirection,
+    pushSidebarView,
+    popToSidebarView,
+  } from '~client/utils/sidebarStack'
   import { useGameStore } from '~client/stores/game'
 
   const stack = sidebarStack
   const topId = computed(() => stack.value[stack.value.length - 1]?.id ?? 0)
   const currentComponent = computed(() => {
     const top = sidebarTop.value
-    if (!top) return InspectorView
+    if (!top) return PlayerView
     switch (top.kind) {
+      case 'player': return PlayerView
       case 'inspector': return InspectorView
       case 'bag': return BagView
     }
@@ -41,11 +49,22 @@
     sidebarDirection.value === 'push' ? 'drawer-push' : 'drawer-pop'
   )
 
-  const { view } = storeToRefs(useGameStore())
+  const { view, inspectedCell } = storeToRefs(useGameStore())
   const day = computed(() => view.value ? Math.floor(view.value.tick / TICKS_PER_DAY) + 1 : 0)
   const tickOfDay = computed(() =>
     view.value ? String(view.value.tick % TICKS_PER_DAY).padStart(2, '0') : '00'
   )
+
+  // Inspected cell drives the inspector drawer: present → push (if not already shown),
+  // cleared → pop back to the player drawer.
+  watch(inspectedCell, cell => {
+    const top = sidebarTop.value
+    if (cell) {
+      if (top?.kind !== 'inspector') pushSidebarView({ kind: 'inspector' })
+    } else {
+      if (top?.kind === 'inspector') popToSidebarView('player')
+    }
+  })
 </script>
 
 <style lang="scss" scoped>
