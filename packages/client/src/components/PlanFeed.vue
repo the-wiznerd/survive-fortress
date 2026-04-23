@@ -10,8 +10,12 @@
         :key="i"
         class="slot"
         :class="[`-${item.state}`, item.kind]"
-        :style="item.cost > 1 ? { gridRow: `span ${item.cost}` } : undefined"
       >
+        <span class="status">
+          <Icon v-if="item.state === 'success'" name="check" />
+          <Icon v-else-if="item.state === 'failed'" name="x" />
+          <template v-else>{{  i + 1 }}.</template>
+        </span>
         <span v-if="item.kind === 'action'" class="label">{{ item.label }}</span>
       </div>
     </div>
@@ -41,15 +45,15 @@
 <script setup lang="ts">
   import { computed } from 'vue'
   import type { PlayerAction } from '@repo/server/sdk'
-  import Icon from '~client/components/Icon.vue'
   import { useGameStore } from '~client/stores/game'
+  import Icon from './Icon.vue'
 
   const gameState = useGameStore()
 
   type SlotState = 'pending' | 'planning' | 'success' | 'failed' | 'empty'
   type Item =
-    | { kind: 'action'; label: string; cost: number; state: SlotState }
-    | { kind: 'empty'; cost: 1; state: 'empty' }
+    | { kind: 'action'; label: string; state: SlotState }
+    | { kind: 'empty'; state: 'empty' }
 
   const phaseLabel = computed(() => {
     switch (gameState.phase) {
@@ -68,12 +72,15 @@
     if (gameState.phase === 'planning') {
       for (const a of gameState.plan) {
         const cost = gameState.actionCost(a)
-        list.push({ kind: 'action', label: actionLabel(a), cost, state: 'planning' })
+        const label = actionLabel(a)
+        for (let c = 0; c < cost; c++) {
+          list.push({ kind: 'action', label, state: 'planning' })
+        }
         used += cost
       }
       // Pad trailing AP with empty slots up to the budget.
       for (let i = used; i < apTotal.value; i++) {
-        list.push({ kind: 'empty', cost: 1, state: 'empty' })
+        list.push({ kind: 'empty', state: 'empty' })
       }
       return list
     }
@@ -84,38 +91,39 @@
     const isResolving = gameState.phase === 'resolving'
     const waitCost = gameState.actionCosts.wait ?? 1
 
-    // Build a flat slot stream: the submitted actions, then waits to fill the
-    // budget. Track each slot's planned-action index (waits get -1) so we can
-    // tell, on termination, which planned actions never ran.
-    const slots: { label: string; cost: number; plannedIdx: number }[] = []
+    // Build a flat per-tick slot stream so multi-AP actions appear as repeated
+    // rows. Each slot tracks its absolute tick and the planned-action index it
+    // belongs to (waits get -1) so we can mark unreached planned actions as
+    // failed on termination.
+    const slots: { label: string; tick: number; plannedIdx: number }[] = []
     for (let i = 0; i < gameState.submittedPlan.length; i++) {
       const a = gameState.submittedPlan[i]!
       const cost = gameState.actionCost(a)
-      slots.push({ label: actionLabel(a), cost, plannedIdx: i })
+      const label = actionLabel(a)
+      for (let c = 0; c < cost; c++) {
+        slots.push({ label, tick: used + c, plannedIdx: i })
+      }
       used += cost
     }
     for (let s = used; s < apTotal.value; s += waitCost) {
-      slots.push({ label: 'Wait', cost: waitCost, plannedIdx: -1 })
+      for (let c = 0; c < waitCost; c++) {
+        slots.push({ label: 'Wait', tick: s + c, plannedIdx: -1 })
+      }
     }
 
-    // The engine keeps ticking after a plan terminates — it just stops
-    // executing this entity's remaining planned actions. Wait fillers resolve
-    // normally as elapsedTicks advances. Planned actions at or after
-    // progress.index reveal as failed only once their own tick frame elapses,
-    // so the feed unfolds in lockstep with playback rather than collapsing
-    // the whole tail to failed the moment the first one breaks.
-    let tick = 0
+    // Each per-tick slot resolves as elapsedTicks crosses it. Planned actions
+    // at or after progress.index reveal as failed only after their tick frame
+    // elapses, so the feed unfolds in lockstep with playback.
     for (const slot of slots) {
       let state: SlotState = 'pending'
-      if (isResolving && progress.elapsedTicks >= tick + slot.cost) {
+      if (isResolving && progress.elapsedTicks > slot.tick) {
         const isUnreachedPlannedAction =
           slot.plannedIdx >= 0
           && progress.terminated
           && slot.plannedIdx >= progress.index
         state = isUnreachedPlannedAction ? 'failed' : 'success'
       }
-      list.push({ kind: 'action', label: slot.label, cost: slot.cost, state })
-      tick += slot.cost
+      list.push({ kind: 'action', label: slot.label, state })
     }
     return list
   })
@@ -195,10 +203,11 @@
   .slots {
     display: grid;
     grid-auto-columns: 1fr;
-    grid-template-rows: repeat(var(--ap-total), minmax(pixel-sim-space(8), auto));
+    grid-template-rows: repeat(var(--ap-total), minmax(pixel-sim-space(6), auto));
     min-inline-size: pixel-sim-space(40);
     margin: 0 4px;
     background-color: var(--color-darkest-blue);
+    padding-block: pixel-sim-space(1);
   }
 
   .slot {
@@ -208,42 +217,21 @@
     padding: 0 pixel-sim-space(2);
     overflow: hidden;
     transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
-    border-width: var(--border-width) 0;
-    border-style: dashed;
-    border-color: transparent;
     color: var(--color-lightest-gray);
-    margin-block-end: calc(var(--border-width) * -1);
 
-    &:first-child {
-      border-block-start-width: 0;
-    }
-
-    &:last-child {
-      border-block-end-width: 0;
-      margin-block-end: 0;
-    }
-
-    &.empty {
-      border-style: dashed;
-      border-color: var(--color-dark-blue);
-    }
-
-    &.action {
-      border-color: var(--color-dark-blue);
+    .status {
+      min-width: pixel-sim-space(6);
     }
 
     &.-pending {
-      border-style: solid;
       color: var(--color-light-gray);
     }
 
     &.-success {
-      border-style: solid;
       color: var(--color-light-green);
     }
 
     &.-failed {
-      border-style: solid;
       color: var(--color-light-red);
     }
   }
