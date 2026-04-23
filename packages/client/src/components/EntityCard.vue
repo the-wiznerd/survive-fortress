@@ -22,7 +22,7 @@
   import { renderTrait } from '~client/utils/traits/renderers'
   import { ENTITY_TRAIT_NAMES } from '~client/utils/traits/entities'
   import { showPositionTraits } from '~client/utils/debug'
-  import Disclosure from './Disclosure.vue'
+  import Disclosure from '~client/components/Disclosure.vue'
 
   const props = withDefaults(defineProps<{
     entity: ViewEntity

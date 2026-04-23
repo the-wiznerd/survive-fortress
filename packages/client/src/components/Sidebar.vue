@@ -26,7 +26,7 @@
   import { storeToRefs } from 'pinia'
   import { TICKS_PER_DAY } from '@repo/server/sdk'
   import PlayerView from '~client/components/PlayerView.vue'
-  import InspectorView from '~client/components/InspectorView.vue'
+  import InspectorDrawer from '~client/components/drawers/InspectorDrawer.vue'
   import ContainerDrawer from '~client/components/drawers/ContainerDrawer.vue'
   import PlanFeed from '~client/components/PlanFeed.vue'
   import {
@@ -45,7 +45,7 @@
     if (!top) return PlayerView
     switch (top.kind) {
       case 'player': return PlayerView
-      case 'inspector': return InspectorView
+      case 'inspector': return InspectorDrawer
       case 'container': return ContainerDrawer
     }
   })

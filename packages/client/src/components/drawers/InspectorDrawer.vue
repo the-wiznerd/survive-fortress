@@ -15,7 +15,7 @@
   import { storeToRefs } from 'pinia'
   import EntityCard from '~client/components/EntityCard.vue'
   import { useGameStore } from '~client/stores/game'
-  import Drawer from './drawers/Drawer.vue'
+  import Drawer from '~client/components/drawers/Drawer.vue'
 
   const gameStore = useGameStore()
   const { view, inspectResult } = storeToRefs(gameStore)

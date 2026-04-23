@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import Disclosure from './Disclosure.vue'
+  import Disclosure from '~client/components/Disclosure.vue'
   import {
     DEBUG_ENABLED,
     debugForward,

@@ -1,7 +1,11 @@
 <template>
-  <section class="plan-feed" :class="`-${gameState.phase}`" aria-label="Plan feed"
-  :style="{ '--ap-rows': apRows }">
-    <header>
+  <section
+    class="plan-feed" 
+    :class="`-${gameState.phase}`"
+    aria-label="Plan feed"
+    :style="{ '--ap-rows': apRows }"
+  >
+    <header class="header">
       <span class="label">{{ phaseLabel }}</span>
       <span class="actions"> 
         <button
@@ -46,7 +50,7 @@
   import { computed } from 'vue'
   import type { PlayerAction } from '@repo/server/sdk'
   import { useGameStore } from '~client/stores/game'
-  import Icon from './Icon.vue'
+  import Icon from '~client/components/Icon.vue'
 
   const gameState = useGameStore()
 
@@ -181,14 +185,14 @@
     }
   }
 
-  header {
+  .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 pixel-sim-space(5);
     min-height: pixel-sim-space(12);
     
-    > .label {
+     .label {
       @include ts-heading-secondary;
       color: var(--color-white);
     }
@@ -197,6 +201,7 @@
       display: flex;
       align-items: center;
       gap: pixel-sim-space(1);
+      margin-inline-end: var(--border-width);
     }
   }
 
