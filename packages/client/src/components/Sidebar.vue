@@ -1,6 +1,6 @@
 <template>
   <aside id="sidebar">
-    <header class="sidebar-header">
+    <header class="header">
       <div class="day">
         <span class="label">Day:</span> <span class="value">{{ day }}.{{ tickOfDay }}</span>
       </div>
@@ -27,7 +27,7 @@
   import { TICKS_PER_DAY } from '@repo/server/sdk'
   import PlayerView from '~client/components/PlayerView.vue'
   import InspectorView from '~client/components/InspectorView.vue'
-  import ContainerView from '~client/components/ContainerView.vue'
+  import ContainerDrawer from '~client/components/drawers/ContainerDrawer.vue'
   import PlanFeed from '~client/components/PlanFeed.vue'
   import {
     sidebarStack,
@@ -46,7 +46,7 @@
     switch (top.kind) {
       case 'player': return PlayerView
       case 'inspector': return InspectorView
-      case 'container': return ContainerView
+      case 'container': return ContainerDrawer
     }
   })
 
@@ -90,7 +90,7 @@
     border-left: var(--border-width) solid var(--color-darkest-gray);
   }
 
-  .sidebar-header {
+  .header {
     flex: 0 0 auto;
     padding-block-start: pixel-sim-space(5);
     display: flex;
