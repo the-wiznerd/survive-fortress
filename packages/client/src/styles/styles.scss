@@ -7,9 +7,9 @@
 #app {
   background: var(--color-black);
   color: var(--color-lightest-gray);
-  font-family: var(--font-mono);
-  font-size: var(--font-mono-size);
-  line-height: var(--font-mono-line-height);
+  font-family: var(--font-base);
+  font-size: var(--font-base-size);
+  line-height: var(--font-base-line-height);
   display: flex;
   text-transform: uppercase;
   height: 100svh;

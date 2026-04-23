@@ -31,14 +31,14 @@
   --color-dark-blue: #476f7a;
   --color-darkest-blue: var(--color-darkest-green);
 
-  --font-display: 'Pixel Operator 8', monospace;
-  --font-display-size: 16px;
-  --font-display-line-height: 16px;
-  --font-display-weight: bold;
+  --font-base: 'Silkscreen', monospace;
+  --font-base-size: 16px;
+  --font-base-line-height: 12px;
 
-  --font-mono: 'Pixel Operator 8', monospace;
-  --font-mono-size: 16px;
-  --font-mono-line-height: 16px;
+  --font-heading: '04b03', monospace;
+  --font-heading-size: 24px;
+  --font-heading-line-height: 18px;
+  --font-heading-weight: normal;
 
   --border-width: 2px;
 }

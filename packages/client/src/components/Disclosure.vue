@@ -75,7 +75,7 @@
       .toggle {
         background: var(--color-darkest-gray);
         color: var(--color-lightest-gray);
-        font-family: var(--font-mono);
+        font-family: var(--font-base);
         height: pixel-sim-space(5);
         width: pixel-sim-space(5);
         display: flex;

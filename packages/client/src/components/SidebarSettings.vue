@@ -97,7 +97,7 @@
     button {
       background: var(--color-darkest-gray);
       color: var(--color-lightest-gray);
-      font-family: var(--font-mono);
+      font-family: var(--font-base);
       border: 0 none;
       padding: pixel-sim-space(1) pixel-sim-space(2);
       cursor: pointer;
@@ -117,7 +117,7 @@
     select {
       background: var(--color-darkest-gray);
       color: var(--color-lightest-gray);
-      font-family: var(--font-mono);
+      font-family: var(--font-base);
       border: 0 none;
       padding: pixel-sim-space(1) pixel-sim-space(2);
       text-transform: uppercase;

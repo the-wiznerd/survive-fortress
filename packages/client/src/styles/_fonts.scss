@@ -1,95 +1,34 @@
 @font-face {
-  font-family: 'Pixel Operator 8';
-  src: url('/fonts/pixelOperator/PixelOperator8.ttf') format('truetype');
+  font-family: '04b03';
+  src: url('/fonts/04b03/04b03.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-  font-display: swap;
+  font-heading: swap;
 }
 
 @font-face {
-  font-family: 'Pixel Operator 8';
-  src: url('/fonts/pixelOperator/PixelOperator8-Bold.ttf') format('truetype');
+  font-family: 'Silkscreen';
+  src: url('/fonts/Silkscreen/Silkscreen-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-heading: swap;
+}
+
+@font-face {
+  font-family: 'Silkscreen';
+  src: url('/fonts/Silkscreen/Silkscreen-Bold.ttf') format('truetype');
   font-weight: bold;
   font-style: normal;
-  font-display: swap;
+  font-heading: swap;
 }
 
 @font-face {
-  font-family: 'Pixel Operator';
-  src: url('/fonts/pixelOperator/PixelOperator.ttf') format('truetype');
+  font-family: 'Departure Mono';
+  src:
+    url('/fonts/DepartureMono/DepartureMono-Regular.woff2') format('woff2'),
+    url('/fonts/DepartureMono/DepartureMono-Regular.woff') format('woff'),
+    url('/fonts/DepartureMono/DepartureMono-Regular.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pixel Operator';
-  src: url('/fonts/pixelOperator/PixelOperator-Bold.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pixel Times';
-  src: url('/fonts/pixelTimes/Pixel Times.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pixel Times';
-  src: url('/fonts/pixelTimes/Pixel Times Bold.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Pixelade';
-  src: url('/fonts/pixelade/Pixelade.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'ZX Spectrum-7';
-  src: url('/fonts/zxSpectrum7/zx_spectrum-7.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'ZX Spectrum-7';
-  src: url('/fonts/zxSpectrum7/zx_spectrum-7_bold.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'm3x6';
-  src: url('/fonts/m3x6.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'm5x7';
-  src: url('/fonts/m5x7.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Cozette';
-  src: url('/fonts/CozetteVector.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+  font-heading: swap;
 }
