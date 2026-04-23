@@ -1,12 +1,5 @@
 <template>
-  <div class="inspector-view">
-    <header class="drawer-header">
-      <button class="back" @click="close">&lt; Back</button>
-      <span class="position" v-if="inspectedCell">
-        ({{ inspectedCell.x }}, {{ inspectedCell.y }})
-      </span>
-    </header>
-
+  <Drawer title="Inspecting" @close="onClose">
     <div v-if="!entities.length" class="stat empty">Empty</div>
     <EntityCard
       v-for="e in entities"
@@ -14,7 +7,7 @@
       :entity="e"
       :start-open="true"
     />
-  </div>
+  </Drawer>
 </template>
 
 <script setup lang="ts">
@@ -22,9 +15,10 @@
   import { storeToRefs } from 'pinia'
   import EntityCard from '~client/components/EntityCard.vue'
   import { useGameStore } from '~client/stores/game'
+  import Drawer from './drawers/Drawer.vue'
 
   const gameStore = useGameStore()
-  const { view, inspectedCell, inspectResult } = storeToRefs(gameStore)
+  const { view, inspectResult } = storeToRefs(gameStore)
 
   const entities = computed(() => {
     if (!inspectResult.value) return []
@@ -34,12 +28,14 @@
       .sort((a, b) => b.z - a.z)
   })
 
-  function close() {
+  function onClose() {
     gameStore.setInspectedCell(null)
   }
 </script>
 
 <style lang="scss" scoped>
+  @use '~styles/mixins';
+
   .inspector-view {
     padding: 0.5rem 1.5rem;
     line-height: 1.5;
@@ -58,16 +54,7 @@
   }
 
   .back {
-    background: var(--color-darkest-gray);
-    color: inherit;
-    border: 1px solid var(--color-dark-gray);
-    font: inherit;
-    padding: 0.2em 0.6em;
-    cursor: pointer;
-
-    &:hover {
-      background: var(--color-dark-gray);
-    }
+    @include mixins.back-button
   }
 
   .position {

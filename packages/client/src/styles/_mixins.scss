@@ -5,8 +5,15 @@
 @mixin heading {
   color: var(--color-lightest-yellow);
   margin-block-end: 1em;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: bold;
+}
+
+@mixin heading-lg {
+  color: var(--color-white);
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: -0.08em;
 }
 
 @mixin label {
@@ -17,20 +24,25 @@
   @include pixel-border;
 
   --border-width: 2px;
-  --border-color: var(--color-white);
+  --border-color: var(--color-dark-gray);
 
   cursor: pointer;
   text-transform: uppercase;
-  min-height: 2rem;
+  min-height: 1.85rem;
   padding: 0 0.75rem;
   border: 0 none;
   background-color: var(--color-darkest-gray);
-  color: var(--color-white);
+  color: var(--color-lightest-gray);
   transition: 0.1s ease;
 
   &:hover,
   &:focus-visible {
-    background-color: var(--color-lightest-gray);
-    color: var(--color-black);
+    --border-color: var(--color-light-gray);
+    background-color: var(--color-dark-gray);
+    color: var(--color-white);
   }
+}
+
+@mixin back-button {
+  @include button;
 }
