@@ -31,7 +31,14 @@
   --color-dark-blue: #476f7a;
   --color-darkest-blue: var(--color-darkest-green);
 
+  --font-display: 'Pixel Operator 8', monospace;
+  --font-display-size: 16px;
+  --font-display-line-height: 16px;
+  --font-display-weight: bold;
+
   --font-mono: 'Pixel Operator 8', monospace;
+  --font-mono-size: 16px;
+  --font-mono-line-height: 16px;
 
   --border-width: 2px;
 }

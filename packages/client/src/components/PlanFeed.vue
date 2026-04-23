@@ -178,11 +178,11 @@
 
   header,
   footer {
-    padding: 6px;
+    padding: 0 pixel-sim-space(2);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: pixel-sim-space(11);
+    min-height: pixel-sim-space(13);
   }
 
   header {
@@ -195,7 +195,7 @@
   .slots {
     display: grid;
     grid-auto-columns: 1fr;
-    grid-template-rows: repeat(var(--ap-total), minmax(pixel-sim-space(9), auto));
+    grid-template-rows: repeat(var(--ap-total), minmax(pixel-sim-space(10), auto));
     min-inline-size: pixel-sim-space(40);
     margin: 0 4px;
     background-color: var(--color-darkest-blue);

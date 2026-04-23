@@ -67,7 +67,7 @@
 
 <style lang="scss" scoped>
   #sidebar {
-    width: 330px;
+    width: 500px;
     display: flex;
     flex-direction: column;
     background: var(--color-black);
@@ -76,11 +76,11 @@
 
   .sidebar-header {
     flex: 0 0 auto;
-    padding: pixel-sim-space(4) pixel-sim-space(6) pixel-sim-space(6);
-    border-block-end: 1px solid var(--color-darkest-gray);
+    padding: pixel-sim-space(5);
+    border-block-end: var(--border-width) solid var(--color-darkest-gray);
     display: flex;
     flex-direction: column;
-    gap: pixel-sim-space(3);
+    gap: pixel-sim-space(4);
   }
 
   .day {
@@ -101,6 +101,7 @@
     position: absolute;
     inset: 0;
     overflow-y: auto;
+    scrollbar-gutter: stable;
   }
 
   // Push: new view slides in from the right and covers the previous drawer

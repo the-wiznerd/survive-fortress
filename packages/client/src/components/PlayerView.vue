@@ -41,7 +41,7 @@
 
 <style lang="scss" scoped>
   .player-view {
-    padding: pixel-sim-space(1) pixel-sim-space(6) pixel-sim-space(2);
+    padding: pixel-sim-space(3) pixel-sim-space(6) pixel-sim-space(2);
     display: flex;
     flex-direction: column;
     min-height: 100%;

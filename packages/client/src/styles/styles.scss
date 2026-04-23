@@ -8,8 +8,8 @@
   background: var(--color-black);
   color: var(--color-lightest-gray);
   font-family: var(--font-mono);
-  font-size: 16px;
-  line-height: 16px;
+  font-size: var(--font-mono-size);
+  line-height: var(--font-mono-line-height);
   display: flex;
   text-transform: uppercase;
   height: 100svh;

@@ -54,7 +54,6 @@
   .equipment {
     >.label {
       @include ts-label;
-      margin: 0 0 pixel-sim-space(1);
       font-size: inherit;
       font-weight: normal;
     }
@@ -63,10 +62,10 @@
   .slots {
     display: flex;
     flex-direction: column;
-    gap: pixel-sim-space(2);
+    gap: pixel-sim-space(4);
     margin: 0;
     list-style: none;
-    padding: pixel-sim-space(2) 0 0 pixel-sim-space(2);
+    padding: pixel-sim-space(4) 0 0 pixel-sim-space(4);
   }
 
   .slot {
