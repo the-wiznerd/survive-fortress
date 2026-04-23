@@ -1846,7 +1846,7 @@
       "entityType": "player",
       "position": {
         "x": 5,
-        "y": -3,
+        "y": 0,
         "z": 1
       },
       "movement": {
