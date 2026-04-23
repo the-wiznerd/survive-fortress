@@ -76,7 +76,6 @@
     border: 0 none;
     border-radius: 3px;
     font-family: inherit;
-    font-size: var(--font-size-base);
     background-color: var(--color-white);
     color: var(--color-black);
     cursor: pointer;
@@ -96,7 +95,6 @@
     display: inline-flex;
     align-items: center;
     gap: 0.25em;
-    font-size: var(--font-size-sm);
     opacity: 0.7;
     text-transform: uppercase;
     letter-spacing: 0.05em;

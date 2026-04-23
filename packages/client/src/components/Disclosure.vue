@@ -59,7 +59,7 @@
       padding: 1rem 0;
 
       .label {
-        @include mixins.heading;
+        @include mixins.heading-secondary;
         margin-block: 0;
       }
     }
@@ -77,7 +77,6 @@
         background: var(--color-darkest-gray);
         color: var(--color-lightest-gray);
         font-family: var(--font-mono);
-        font-size: var(--font-size-base);
         height: 1.25rem;
         width: 1.25rem;
         display: flex;

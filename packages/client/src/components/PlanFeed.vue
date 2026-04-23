@@ -187,7 +187,7 @@
   }
 
   header {
-    @include mixins.heading;
+    @include mixins.heading-secondary;
     padding: 0 0.5rem;
     margin-block: 0;
     color: var(--color-white);
@@ -207,7 +207,6 @@
     align-items: center;
     justify-content: flex-start;
     padding: 0 0.75rem;
-    font-size: var(--font-size-base);
     overflow: hidden;
     transition: background 200ms ease, color 200ms ease, opacity 200ms ease, border-color 200ms ease;
     border-width: var(--border-width) 0;

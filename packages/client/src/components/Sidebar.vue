@@ -84,7 +84,6 @@
   }
 
   .day {
-    font-size: var(--font-size-xl);
     font-weight: bold;
 
     .label {

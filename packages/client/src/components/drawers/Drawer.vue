@@ -39,7 +39,7 @@
     margin-block-end: 1rem;
 
     h2 {
-      @include mixins.heading-lg;
+      @include mixins.heading-primary;
     }
   }
 

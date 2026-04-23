@@ -107,7 +107,7 @@
 
   .inventory {
     >.label {
-      @include mixins.heading;
+      @include mixins.heading-secondary;
     }
 
     .empty {

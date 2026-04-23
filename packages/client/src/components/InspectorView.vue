@@ -58,7 +58,6 @@
 
   .position {
     color: var(--color-gray);
-    font-size: var(--font-size-lg);
   }
 
   .empty {

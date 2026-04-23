@@ -22,9 +22,9 @@
 <style lang="scss" scoped>
   .icon {
     display: inline-block;
-    width: 1.25em;
-    height: 1.25em;
-    vertical-align: -0.3em;
+    width: 16px;
+    height: 16px;
+    vertical-align: -0.2em;
     fill: currentColor;
     flex-shrink: 0;
     overflow: visible;

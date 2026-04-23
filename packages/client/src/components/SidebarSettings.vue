@@ -100,7 +100,6 @@
       color: var(--color-lightest-gray);
       font-family: var(--font-mono);
       border: 0 none;
-      font-size: var(--font-size-base);
       padding: 0.15rem 0.5rem;
       cursor: pointer;
       position: relative;
@@ -121,7 +120,6 @@
       color: var(--color-lightest-gray);
       font-family: var(--font-mono);
       border: 0 none;
-      font-size: var(--font-size-base);
       padding: 0.2rem 0.35rem;
       text-transform: uppercase;
     }
