@@ -2,7 +2,27 @@
   <section class="plan-feed" :class="`-${gameState.phase}`" aria-label="Plan feed"
   :style="{ '--ap-total': apTotal }">
     <header>
-      {{ phaseLabel }}
+      <span class="label">{{ phaseLabel }}</span>
+      <span class="actions"> 
+        <button
+          v-if="canClear"
+          type="button"
+          class="clear"
+          @click="onClear"
+          aria-label="Clear"
+        >
+          x
+        </button> 
+        <button
+          v-if="canSubmit"
+          type="button"
+          class="submit"
+          @click="onSubmit"
+        >
+          <Icon name="check" />
+          Submit
+        </button>
+      </span>
     </header>
     <div class="slots">
       <div
@@ -19,26 +39,6 @@
         <span v-if="item.kind === 'action'" class="label">{{ item.label }}</span>
       </div>
     </div>
-    <footer>
-      <button
-        v-if="canSubmit"
-        type="button"
-        class="submit"
-        @click="onSubmit"
-      >
-        <Icon name="check" />
-        Submit
-      </button>
-      <button
-        v-if="canClear"
-        type="button"
-        class="clear"
-        @click="onClear"
-        aria-label="Clear"
-      >
-        x
-      </button>
-    </footer>
   </section>
 </template>
 
@@ -58,7 +58,7 @@
   const phaseLabel = computed(() => {
     switch (gameState.phase) {
       case 'planning': return 'Planning'
-      case 'submitted': return 'Submitted'
+      case 'submitted': return 'Submitting...'
       case 'resolving': return 'Resolving'
     }
   })
@@ -168,24 +168,51 @@
     background-color: var(--border-color);
 
     &.-planning { 
-      --border-color: var(--color-dark-blue);
+      --border-color: var(--color-dark-green);
     }
 
     &.-submitted { 
-      --border-color: var(--color-dark-yellow);
+      --border-color: var(--color-dark-blue);
     }
 
     &.-resolving { 
-      --border-color: var(--color-dark-green);
+      --border-color: var(--color-dark-blue);
     }
   }
 
   header {
-    @include ts-heading-secondary;
     display: flex;
     align-items: center;
-    padding: pixel-sim-space(4) pixel-sim-space(5);
-    color: var(--color-white);
+    justify-content: space-between;
+    padding: 0 pixel-sim-space(5);
+    min-height: pixel-sim-space(13);
+    
+    > .label {
+      @include ts-heading-secondary;
+      color: var(--color-white);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: pixel-sim-space(1);
+    }
+  }
+
+  button {
+    @include button-base;
+
+    --border-color: var(--color-lightest-green);
+    background-color: transparent;
+    color: var(--color-lightest-green);
+    margin: var(--border-width);
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-light-green);
+      color: var(--color-black);
+      --border-color: var(--color-light-green);
+    }
   }
 
   .slots {
@@ -193,7 +220,7 @@
     grid-auto-columns: 1fr;
     grid-template-rows: repeat(var(--ap-total), minmax(pixel-sim-space(6), auto));
     min-inline-size: pixel-sim-space(40);
-    background-color: var(--color-darkest-blue);
+    background-color: var(--color-darkest-gray);
     padding-block: pixel-sim-space(1);
   }
 
@@ -227,31 +254,5 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-  }
-
-  footer {
-    padding: 0 pixel-sim-space(5);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    display: flex;
-    justify-content: space-between;
-    min-height: pixel-sim-space(14);
-  }
-
-  button {
-    @include button-base;
-
-    --border-color: var(--color-lightest-blue);
-    background-color: transparent;
-    color: var(--color-lightest-blue);
-    margin: var(--border-width);
-
-    &:hover,
-    &:focus-visible {
-      background-color: var(--color-light-blue);
-      color: var(--color-black);
-      --border-color: var(--color-light-blue);
-    }
   }
 </style>
