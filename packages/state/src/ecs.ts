@@ -163,8 +163,19 @@ export interface Tool {
 
 // ─── Actions ───
 
+/** A cardinal direction. Movement and other directional actions take one of these. */
+export type Direction = 'n' | 's' | 'e' | 'w'
+
+/** Unit (dx, dy) offset for each cardinal direction, with y- = north. */
+export const DIRECTION_DELTAS: Readonly<Record<Direction, { dx: number; dy: number }>> = {
+  n: { dx: 0, dy: -1 },
+  s: { dx: 0, dy: 1 },
+  e: { dx: 1, dy: 0 },
+  w: { dx: -1, dy: 0 },
+}
+
 export type Action =
-  | { type: 'move'; dx: number; dy: number }
+  | { type: 'move'; direction: Direction }
   | { type: 'wait' }
   | { type: 'harvest'; targetId: number }
   | { type: 'pickup'; targetId: number }

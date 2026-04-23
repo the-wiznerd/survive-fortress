@@ -101,7 +101,7 @@
 
   function actionLabel(a: PlayerAction): string {
     switch (a.type) {
-      case 'move': return moveLabel(a.dx, a.dy)
+      case 'move': return moveLabel(a.direction)
       case 'wait': return 'Wait'
       case 'harvest': return 'Harvest'
       case 'pickup': return 'Pick up'
@@ -110,13 +110,13 @@
     }
   }
 
-  function moveLabel(dx: number, dy: number): string {
-    const parts: string[] = []
-    if (dy < 0) parts.push('North')
-    if (dy > 0) parts.push('South')
-    if (dx > 0) parts.push('East')
-    if (dx < 0) parts.push('West')
-    return parts.length ? `Move ${parts.join('')}` : 'Wait'
+  function moveLabel(direction: 'n' | 's' | 'e' | 'w'): string {
+    switch (direction) {
+      case 'n': return 'Move North'
+      case 's': return 'Move South'
+      case 'e': return 'Move East'
+      case 'w': return 'Move West'
+    }
   }
 </script>
 

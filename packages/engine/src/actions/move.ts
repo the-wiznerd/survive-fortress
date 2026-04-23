@@ -1,6 +1,7 @@
 import {
   getComponent,
   getEntitiesAt,
+  DIRECTION_DELTAS,
   type World,
   type EntityId,
   type Action,
@@ -45,10 +46,11 @@ function pickMode(world: World, actorId: EntityId, action: MoveAction): Movement
   const pos = getComponent(world, actorId, 'position')
   if (!movement || !pos) return null
 
-  const dx = pos.x + action.dx
-  const dy = pos.y + action.dy
-  const dest = getMaterialAt(world, dx, dy, pos.z)
-  const floor = getMaterialAt(world, dx, dy, pos.z - 1)
+  const { dx, dy } = DIRECTION_DELTAS[action.direction]
+  const tx = pos.x + dx
+  const ty = pos.y + dy
+  const dest = getMaterialAt(world, tx, ty, pos.z)
+  const floor = getMaterialAt(world, tx, ty, pos.z - 1)
 
   let best: MovementMode | null = null
   for (const m of movement.modes) {
@@ -65,7 +67,8 @@ registerAction<MoveAction>({
   validate: (world, actorId, action) => pickMode(world, actorId, action) !== null,
   execute: (world, actorId, action) => {
     const pos = getComponent(world, actorId, 'position')!
-    pos.x = pos.x + action.dx
-    pos.y = pos.y + action.dy
+    const { dx, dy } = DIRECTION_DELTAS[action.direction]
+    pos.x += dx
+    pos.y += dy
   },
 })

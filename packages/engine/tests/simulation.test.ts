@@ -96,7 +96,7 @@ describe('movement system', () => {
     getComponent(world, player, 'movement')!.modes[0]!.pace = 1
 
     const pc = getComponent(world, player, 'playerControlled')!
-    pc.plan = [{ type: 'move', dx: 1, dy: 0 }]
+    pc.plan = [{ type: 'move', direction: 'e' }]
     pc.planIndex = 0
 
     tick(world)
@@ -119,8 +119,8 @@ describe('movement system', () => {
 
     const pc = getComponent(world, player, 'playerControlled')!
     pc.plan = [
-      { type: 'move', dx: 1, dy: 0 },
-      { type: 'move', dx: 1, dy: 0 },
+      { type: 'move', direction: 'e' },
+      { type: 'move', direction: 'e' },
     ]
     pc.planIndex = 0
 
@@ -161,7 +161,7 @@ describe('movement system', () => {
     getComponent(world, player, 'movement')!.modes[0]!.pace = 1
 
     const pc = getComponent(world, player, 'playerControlled')!
-    pc.plan = [{ type: 'move', dx: 1, dy: 0 }]
+    pc.plan = [{ type: 'move', direction: 'e' }]
     pc.planIndex = 0
 
     tick(world)

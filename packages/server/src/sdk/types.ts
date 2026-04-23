@@ -1,7 +1,7 @@
-import type { Health, Hunger, Movement, Moisture, GroundCover, Vision, Carriable, Edible, Wearable, Tool, Actor, EntityId } from '@repo/state'
+import type { Health, Hunger, Movement, Moisture, GroundCover, Vision, Carriable, Edible, Wearable, Tool, Actor, EntityId, Direction } from '@repo/state'
 export { TICKS_PER_DAY } from '@repo/state'
 
-export type { MovementMode } from '@repo/state'
+export type { MovementMode, Direction } from '@repo/state'
 
 // ─── Trait Views ───
 // What the client receives for each visible trait.
@@ -68,7 +68,7 @@ export interface ViewEntity {
 
 /** The action a player can send to the server. */
 export type PlayerAction =
-  | { type: 'move'; dx: number; dy: number }
+  | { type: 'move'; direction: Direction }
   | { type: 'wait' }
   | { type: 'harvest'; targetId: number }
   | { type: 'pickup'; targetId: number }

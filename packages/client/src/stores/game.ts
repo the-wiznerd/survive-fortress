@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
-import type { ActionCosts, Game, GameView, InspectResult, PlayerAction, TurnMode } from '@repo/server/sdk'
+import type { ActionCosts, Direction, Game, GameView, InspectResult, PlayerAction, TurnMode } from '@repo/server/sdk'
+import { DIRECTION_DELTAS } from '@repo/server/sdk'
 import { connect } from '~client/utils/net/connection'
 import { playFrames, type PlaybackHandle } from '~client/utils/net/playback'
 
@@ -150,9 +151,9 @@ export const useGameStore = defineStore('game', () => {
 
   // ─── Plan Management ───
 
-  function appendMove(dx: number, dy: number) {
+  function appendMove(direction: Direction) {
     if (phase.value !== 'planning') return
-    const action: PlayerAction = { type: 'move', dx, dy }
+    const action: PlayerAction = { type: 'move', direction }
     if (!canAfford(action)) return
     plan.value.push(action)
   }
@@ -166,7 +167,11 @@ export const useGameStore = defineStore('game', () => {
     let x = player.x
     let y = player.y
     for (const action of plan.value) {
-      if (action.type === 'move') { x += action.dx; y += action.dy }
+      if (action.type === 'move') {
+        const { dx, dy } = DIRECTION_DELTAS[action.direction]
+        x += dx
+        y += dy
+      }
     }
     return { x, y }
   }
@@ -190,9 +195,10 @@ export const useGameStore = defineStore('game', () => {
     // on ties). Each emitted action moves exactly one tile cardinally.
     while (remX > 0 || remY > 0) {
       const stepX = remX >= remY && remX > 0
-      const action: PlayerAction = stepX
-        ? { type: 'move', dx: sx, dy: 0 }
-        : { type: 'move', dx: 0, dy: sy }
+      const direction: Direction = stepX
+        ? (sx > 0 ? 'e' : 'w')
+        : (sy > 0 ? 's' : 'n')
+      const action: PlayerAction = { type: 'move', direction }
       if (!canAfford(action)) return
       plan.value.push(action)
       if (stepX) remX--

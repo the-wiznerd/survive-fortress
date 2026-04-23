@@ -1,4 +1,5 @@
 import type { GameView } from '@repo/server/sdk'
+import { DIRECTION_DELTAS } from '@repo/server/sdk'
 import { WorldRenderer, CELL_W, CELL_H, TOP_H, FRONT_H, zKey, type RenderEntity, type EntityRenderer } from '@repo/rendering'
 import { useGameStore } from '~client/stores/game'
 
@@ -176,14 +177,15 @@ export class Renderer {
 
     for (const action of plan) {
       if (action.type === 'move') {
-        x += action.dx
-        y += action.dy
+        const { dx, dy } = DIRECTION_DELTAS[action.direction]
+        x += dx
+        y += dy
 
         const sx = x - this.cameraX
         const sy = y - this.cameraY
         if (sx < 0 || sx >= this.viewWidth || sy < 0 || sy >= this.viewHeight) continue
 
-        const col = arrowCol(action.dx, action.dy)
+        const col = arrowCol(dx, dy)
         ctx.drawImage(spriteSheet,
           col * CELL_W, ARROW_ROW * CELL_H, CELL_W, TOP_H,
           sx * CELL_W, (sy + 1) * TOP_H - player.z * FRONT_H,

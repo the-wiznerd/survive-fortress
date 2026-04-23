@@ -23,5 +23,7 @@ export type {
   JoinedMessage,
   RoundResolveMessage,
   ServerErrorMessage,
+  Direction,
 } from './types.js'
 export { TICKS_PER_DAY } from './types.js'
+export { DIRECTION_DELTAS } from '@repo/state'
