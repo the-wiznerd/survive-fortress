@@ -2,10 +2,6 @@
   <Drawer :title="title" @close="onClose">
     <div v-if="!container" class="empty">Container not found.</div>
     <template v-else>
-      <div class="capacity stat">
-        <span class="label">Capacity:</span>
-        <span class="value">{{ capacity.used }}/{{ capacity.total }}</span>
-      </div>
       <div v-if="items.length === 0" class="empty">Empty</div>
       <ul v-else class="items">
         <li v-for="item in items" :key="item.id" class="item">
@@ -42,12 +38,10 @@
   const title = computed(() => {
     const c = container.value
     if (!c) return 'Container'
-    return c.name ?? c.type
-  })
-
-  const capacity = computed(() => {
-    const c = container.value?.traits.container
-    return { used: c?.usedCapacity ?? 0, total: c?.capacity ?? 0 }
+    const base = c.name ?? c.type
+    const cap = c.traits.container
+    if (!cap) return base
+    return `${base} (${cap.usedCapacity}/${cap.capacity})`
   })
 
   const items = computed<ViewEntity[]>(() => {
@@ -61,7 +55,7 @@
   function itemLabel(item: ViewEntity): string {
     const base = item.name ? `${item.name} (${item.type})` : item.type
     const count = item.traits.stackable?.count ?? 1
-    return count > 1 ? `${base} \u00d7 ${count}` : base
+    return count > 1 ? `${base} (${count})` : base
   }
 
   function onClose() {
@@ -70,10 +64,6 @@
 </script>
 
 <style lang="scss" scoped>
-  .capacity {
-    margin-block-end: pixel-sim-space(4);
-  }
-
   .empty {
     opacity: 0.6;
   }

@@ -55,10 +55,8 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
       ? { label: 'Harvest', action: { type: 'harvest', targetId: entity.id } }
       : null
   },
-  carriable: {
-    component: StatText,
-    props: d => ({ label: 'Size', value: String(d.size) })
-  },
+  // carriable size and stackable count are intentionally not rendered as
+  // separate stats — callers surface them in the entity label instead.
   container: {
     component: StatText,
     props: d => ({ label: 'Bag', value: `${d.usedCapacity}/${d.capacity}` })
@@ -76,10 +74,6 @@ export const TRAIT_RENDERERS: TraitRendererMap = {
       label: 'Drop',
       action: { type: 'drop', targetId: entity.id, dx: 0, dy: 0 },
     }),
-  },
-  stackable: {
-    component: StatText,
-    props: d => d.count > 1 ? { label: 'Count', value: String(d.count) } : null,
   },
   wearable: {
     component: StatText,

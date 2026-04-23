@@ -37,6 +37,7 @@
   })
 
   const label = computed(() => {
+    if (props.label) return props.label
     const e = props.entity
     return e.name ? `${e.name} (${e.type})` : e.type
   })
