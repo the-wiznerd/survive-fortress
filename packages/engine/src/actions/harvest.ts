@@ -14,7 +14,10 @@ function isAdjacent(world: World, actorId: EntityId, targetId: EntityId): boolea
 
 registerAction<HarvestAction>({
   type: 'harvest',
-  cost: () => 1,
+  cost: (world, _actorId, action) => {
+    const target = getComponent(world, action.targetId, 'harvestable')
+    return target?.cost ?? 1
+  },
   validate: (world, actorId, action) => {
     const target = getComponent(world, action.targetId, 'harvestable')
     if (!target || target.amount <= 0) return false

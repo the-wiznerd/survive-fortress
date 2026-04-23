@@ -22,6 +22,7 @@ export class Bush extends BaseEntityType {
     if (savedSize === 'small' || savedSize === 'large') this.size = savedSize
     this.berryYield = this.size === 'small' ? 4 : 8
     this.harvestable.amount = this.berryYield
+    this.harvestable.cost = this.size === 'small' ? 2 : 3
     this.harvestable.onHarvest = (harvesterId) => {
       const yielded = this.harvestable.amount
       this.harvestable.amount = 0

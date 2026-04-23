@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
-import type { ActionCosts, ActionType, Game, GameView, InspectResult, PlayerAction, TurnMode } from '@repo/server/sdk'
+import type { ActionCosts, Game, GameView, InspectResult, PlayerAction, TurnMode } from '@repo/server/sdk'
 import { connect } from '~client/utils/net/connection'
 import { playFrames, type PlaybackHandle } from '~client/utils/net/playback'
 
@@ -57,9 +57,18 @@ export const useGameStore = defineStore('game', () => {
   const actionPointsPerRound = ref<number>(8)
   /** AP cost per action type. Set on connect from the `joined` message. */
   const actionCosts = ref<ActionCosts>({ move: 1, wait: 1, harvest: 1, pickup: 1, drop: 1, eat: 1 })
+  /** Resolve the AP cost of a concrete action, including per-target costs (e.g. harvest). */
+  function actionCost(action: PlayerAction): number {
+    if (action.type === 'harvest') {
+      const target = view.value?.entities.find(e => e.id === action.targetId)
+      const h = target?.traits.harvestable as { cost?: number } | undefined
+      return h?.cost ?? actionCosts.value.harvest ?? 1
+    }
+    return actionCosts.value[action.type] ?? 1
+  }
   /** Total AP cost of the currently planned actions. */
   const planCost = computed(() =>
-    plan.value.reduce((sum, a) => sum + (actionCosts.value[a.type] ?? 1), 0)
+    plan.value.reduce((sum, a) => sum + actionCost(a), 0)
   )
 
   // ─── Non-reactive backing state ───
@@ -134,46 +143,50 @@ export const useGameStore = defineStore('game', () => {
     return game
   }
 
-  /** Whether appending an action of `type` would fit in the AP budget. */
-  function canAfford(type: ActionType): boolean {
-    const cost = actionCosts.value[type] ?? 1
-    return planCost.value + cost <= actionPointsPerRound.value
+  /** Whether appending `action` would fit in the AP budget. */
+  function canAfford(action: PlayerAction): boolean {
+    return planCost.value + actionCost(action) <= actionPointsPerRound.value
   }
 
   // ─── Plan Management ───
 
   function appendMove(dx: number, dy: number) {
     if (phase.value !== 'planning') return
-    if (!canAfford('move')) return
-    plan.value.push({ type: 'move', dx, dy })
+    const action: PlayerAction = { type: 'move', dx, dy }
+    if (!canAfford(action)) return
+    plan.value.push(action)
   }
 
   function appendHarvest(targetId: number) {
     if (phase.value !== 'planning') return
-    if (!canAfford('harvest')) return
+    const action: PlayerAction = { type: 'harvest', targetId }
+    if (!canAfford(action)) return
     if (plan.value.some(a => a.type === 'harvest' && a.targetId === targetId)) return
-    plan.value.push({ type: 'harvest', targetId })
+    plan.value.push(action)
   }
 
   function appendPickup(targetId: number) {
     if (phase.value !== 'planning') return
-    if (!canAfford('pickup')) return
+    const action: PlayerAction = { type: 'pickup', targetId }
+    if (!canAfford(action)) return
     if (plan.value.some(a => a.type === 'pickup' && a.targetId === targetId)) return
-    plan.value.push({ type: 'pickup', targetId })
+    plan.value.push(action)
   }
 
   function appendDrop(targetId: number, dx = 0, dy = 0) {
     if (phase.value !== 'planning') return
-    if (!canAfford('drop')) return
+    const action: PlayerAction = { type: 'drop', targetId, dx, dy }
+    if (!canAfford(action)) return
     if (plan.value.some(a => a.type === 'drop' && a.targetId === targetId)) return
-    plan.value.push({ type: 'drop', targetId, dx, dy })
+    plan.value.push(action)
   }
 
   function appendEat(targetId: number) {
     if (phase.value !== 'planning') return
-    if (!canAfford('eat')) return
+    const action: PlayerAction = { type: 'eat', targetId }
+    if (!canAfford(action)) return
     if (plan.value.some(a => a.type === 'eat' && a.targetId === targetId)) return
-    plan.value.push({ type: 'eat', targetId })
+    plan.value.push(action)
   }
 
   function clearPlan() {
@@ -250,6 +263,7 @@ export const useGameStore = defineStore('game', () => {
     inspectResult,
     actionPointsPerRound,
     actionCosts,
+    actionCost,
     planCost,
     // lifecycle
     init,

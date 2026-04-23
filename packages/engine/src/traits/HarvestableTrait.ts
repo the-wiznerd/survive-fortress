@@ -4,6 +4,7 @@ import { Trait } from '~engine/traits/Trait.js'
 export class HarvestableTrait extends Trait<'harvestable'> {
   readonly component = 'harvestable' as const
   declare amount: number
+  declare cost: number
 
   /**
    * Called by the harvest system when a valid harvester triggers this entity.
@@ -16,6 +17,6 @@ export class HarvestableTrait extends Trait<'harvestable'> {
   }
 
   defaults(): Harvestable {
-    return { amount: 0, ...this.overrides }
+    return { amount: 0, cost: 1, ...this.overrides }
   }
 }

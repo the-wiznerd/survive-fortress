@@ -4,6 +4,7 @@
       v-if="player"
       :entity="player"
       :collapsible="false"
+      class="player"
     />
 
     <div v-if="selection" class="selection">
@@ -66,13 +67,17 @@
 
 <style lang="scss" scoped>
   .inspector-view {
-    padding: 1.5rem 1.5rem 0.5rem;
+    padding: 0.5rem 1.5rem;
     line-height: 1.5;
     display: flex;
     flex-direction: column;
     min-height: 100%;
     box-sizing: border-box;
     background: var(--color-black);
+  }
+
+  .player {
+    border-block-start: 0 none;
   }
 
   .selection {

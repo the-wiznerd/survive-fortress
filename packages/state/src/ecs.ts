@@ -120,6 +120,8 @@ export interface Instance {
 export interface Harvestable {
   /** Current available amount. 0 = nothing to harvest. */
   amount: number
+  /** AP cost a harvester pays per harvest action. Reflects how time-consuming the harvest is. */
+  cost: number
 }
 
 export interface Carriable {

@@ -15,7 +15,7 @@ export interface TraitViews {
   moisture: Moisture
   groundCover: GroundCover
   vision: Vision
-  harvestable: { available: boolean }
+  harvestable: { available: boolean; cost: number }
   carriable: Carriable
   contained: { parentId: EntityId }
   container: { capacity: number; usedCapacity: number; contents: EntityId[] }

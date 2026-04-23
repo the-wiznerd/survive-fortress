@@ -5,7 +5,7 @@
     </header>
     <div
       class="slots"
-      :style="{ gridTemplateRows: `repeat(${apTotal}, minmax(1.6rem, auto))` }"
+      :style="{ gridTemplateRows: `repeat(${apTotal}, minmax(2.5rem, auto))` }"
     >
       <div
         v-for="(item, i) in items"
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
   import { computed } from 'vue'
-  import type { ActionType, PlayerAction } from '@repo/server/sdk'
+  import type { PlayerAction } from '@repo/server/sdk'
   import { useGameStore } from '~client/stores/game'
 
   const gameState = useGameStore()
@@ -48,7 +48,7 @@
 
     if (gameState.phase === 'planning') {
       for (const a of gameState.plan) {
-        const cost = costOf(a.type)
+        const cost = gameState.actionCost(a)
         list.push({ kind: 'action', label: actionLabel(a), cost, state: 'planning' })
         used += cost
       }
@@ -63,7 +63,7 @@
     // AP with synthesized wait actions (the simulation idles those ticks).
     const progress = gameState.planProgress
     const isResolving = gameState.phase === 'resolving'
-    const waitCost = costOf('wait')
+    const waitCost = gameState.actionCosts.wait ?? 1
 
     // Build a flat slot stream: the submitted actions, then waits to fill the
     // budget. Track each slot's planned-action index (waits get -1) so we can
@@ -71,8 +71,9 @@
     const slots: { label: string; cost: number; plannedIdx: number }[] = []
     for (let i = 0; i < gameState.submittedPlan.length; i++) {
       const a = gameState.submittedPlan[i]!
-      slots.push({ label: actionLabel(a), cost: costOf(a.type), plannedIdx: i })
-      used += costOf(a.type)
+      const cost = gameState.actionCost(a)
+      slots.push({ label: actionLabel(a), cost, plannedIdx: i })
+      used += cost
     }
     for (let s = used; s < apTotal.value; s += waitCost) {
       slots.push({ label: 'Wait', cost: waitCost, plannedIdx: -1 })
@@ -99,10 +100,6 @@
     }
     return list
   })
-
-  function costOf(type: ActionType): number {
-    return gameState.actionCosts[type] ?? 1
-  }
 
   function actionLabel(a: PlayerAction): string {
     switch (a.type) {
@@ -166,16 +163,15 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    min-height: 2.25rem;
     padding: 0 0.75rem;
     font-size: 0.75rem;
     overflow: hidden;
     transition: background 200ms ease, color 200ms ease, opacity 200ms ease, border-color 200ms ease;
     border-width: 1px 0;
-    border-style: solid;
+    border-style: dashed;
     border-color: transparent;
     color: var(--color-lightest-gray);
-    margin-bottom: -1px;
+    margin-block-end: -1px;
 
     &:first-child {
       border-block-start-width: 0;
@@ -183,6 +179,7 @@
 
     &:last-child {
       border-block-end-width: 0;
+      margin-block-end: 0;
     }
 
     &.empty {
@@ -195,17 +192,18 @@
     }
 
     &.-pending {
+      border-style: solid;
       color: var(--color-light-gray);
     }
 
     &.-success {
+      border-style: solid;
       color: var(--color-light-green);
-      border-color: var(--color-green);
     }
 
     &.-failed {
+      border-style: solid;
       color: var(--color-light-red);
-      border-color: var(--color-red);
     }
   }
 
