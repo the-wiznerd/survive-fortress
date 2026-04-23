@@ -1,8 +1,8 @@
 <template>
   <section class="plan-feed" :class="`-${gameState.phase}`" aria-label="Plan feed"
   :style="{ '--ap-total': apTotal }">
-    <header class="phase-header">
-      <span class="phase-name">{{ phaseLabel }}</span>
+    <header>
+      {{ phaseLabel }}
     </header>
     <div class="slots">
       <div
@@ -15,6 +15,25 @@
         <span v-if="item.kind === 'action'" class="label">{{ item.label }}</span>
       </div>
     </div>
+    <footer>
+      <button
+        v-if="canSubmit"
+        type="button"
+        class="submit"
+        @click="onSubmit"
+      >
+        Submit
+      </button>
+      <button
+        v-if="canClear"
+        type="button"
+        class="clear"
+        @click="onClear"
+        aria-label="Clear"
+      >
+        x
+      </button>
+    </footer>
   </section>
 </template>
 
@@ -99,6 +118,12 @@
     return list
   })
 
+  const canSubmit = computed(() => gameState.phase === 'planning')
+
+  const canClear = computed(() => 
+    gameState.phase === 'planning' && gameState.plan.length > 0
+  )
+
   function actionLabel(a: PlayerAction): string {
     switch (a.type) {
       case 'move': return moveLabel(a.direction)
@@ -118,6 +143,9 @@
       case 'w': return 'Move West'
     }
   }
+
+  function onClear() { gameState.clearPlan() }
+  function onSubmit() { gameState.submitPlan() }
 </script>
 
 <style lang="scss" scoped>
@@ -142,9 +170,18 @@
     }
   }
 
-  .phase-header {
+  header,
+  footer {
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 2.75rem;
+  }
+
+  header {
     @include mixins.heading;
-    padding: 0.5rem 0.5rem;
+    padding: 0 0.5rem;
     margin-block: 0;
     color: var(--color-white);
   }
@@ -154,7 +191,7 @@
     grid-auto-columns: 1fr;
     grid-template-rows: repeat(var(--ap-total), minmax(2.25rem, auto));
     min-inline-size: 10rem;
-    margin: 0 4px 4px;
+    margin: 0 4px;
     background-color: var(--color-black);
   }
 
@@ -212,9 +249,22 @@
     text-overflow: ellipsis;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .slot {
-      transition: none;
+  footer {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  button {
+    @include mixins.button;
+    
+    --border-color: var(--color-lightest-blue);
+    background-color: transparent;
+    color: var(--color-lightest-blue);
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--color-light-blue);
+      color: var(--color-black);
     }
   }
 </style>

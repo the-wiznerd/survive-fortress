@@ -1,7 +1,7 @@
 <template>
   <div class="inspector-view">
     <header class="drawer-header">
-      <button class="back" @click="close">&larr; Back</button>
+      <button class="back" @click="close">&lt; Back</button>
       <span class="position" v-if="inspectedCell">
         ({{ inspectedCell.x }}, {{ inspectedCell.y }})
       </span>

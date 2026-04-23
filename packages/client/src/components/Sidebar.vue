@@ -3,7 +3,6 @@
     <header class="sidebar-header">
       <div class="day"><span class="label">Day:</span> {{ day }}.{{ tickOfDay }}</div>
       <PlanFeed />
-      <PlanControls />
     </header>
     <div class="drawer-area">
       <Transition :name="transitionName">
@@ -23,7 +22,6 @@
   import InspectorView from '~client/components/InspectorView.vue'
   import BagView from '~client/components/BagView.vue'
   import PlanFeed from '~client/components/PlanFeed.vue'
-  import PlanControls from '~client/components/PlanControls.vue'
   import {
     sidebarStack,
     sidebarTop,
