@@ -9,6 +9,7 @@ const DEFAULT_SAVE: String = "test-world"
 var _connection: GameConnection
 var _world_renderer: WorldRenderer
 var _camera: Camera2D
+var _sidebar: Sidebar
 
 func _ready() -> void:
 	_world_renderer = WorldRenderer.new()
@@ -20,7 +21,17 @@ func _ready() -> void:
 	# Pixel-art friendly defaults: integer snapping + nearest-neighbor scaling.
 	_camera.zoom = Vector2(3.0, 3.0)
 	_camera.position_smoothing_enabled = false
+	# Sidebar covers the right WIDTH screen pixels. Shift the camera target
+	# right (in world units) by half the sidebar width so the player ends up
+	# centered in the *visible* (non-sidebar) region instead of behind it.
+	_camera.offset = Vector2(Sidebar.WIDTH * 0.5 / _camera.zoom.x, 0)
 	add_child(_camera)
+
+	_sidebar = Sidebar.new()
+	_sidebar.name = "Sidebar"
+	_sidebar.bag_clicked.connect(_on_bag_clicked)
+	_sidebar.settings_clicked.connect(_on_settings_clicked)
+	add_child(_sidebar)
 
 	_connection = GameConnection.new()
 	_connection.name = "GameConnection"
@@ -56,6 +67,7 @@ func _on_joined(msg: ServerMessage) -> void:
 	])
 	print("[Main] Action costs: ", msg.action_costs)
 	_world_renderer.render_view(view)
+	_sidebar.update_view(view)
 	_center_camera_on_player(view)
 
 func _on_round_resolve(msg: ServerMessage) -> void:
@@ -64,6 +76,7 @@ func _on_round_resolve(msg: ServerMessage) -> void:
 		var last: GameView = msg.frames[msg.frames.size() - 1]
 		print("[Main]   final tick=%d entities=%d" % [last.tick, last.entities.size()])
 		_world_renderer.render_view(last)
+		_sidebar.update_view(last)
 		_center_camera_on_player(last)
 
 func _on_server_error(message: String) -> void:
@@ -71,6 +84,12 @@ func _on_server_error(message: String) -> void:
 
 func _on_unknown_message(raw: Dictionary) -> void:
 	push_warning("[Main] Unknown message: " + str(raw.keys()))
+
+func _on_bag_clicked() -> void:
+	print("[Main] Bag clicked (container popup not implemented yet).")
+
+func _on_settings_clicked() -> void:
+	print("[Main] Settings clicked (settings popup not implemented yet).")
 
 ## Move the camera to the player's projected screen position, offset to the
 ## center of the tile so the player sprite sits in the middle of the viewport.

@@ -18,6 +18,10 @@ const FRONT_FACE_H: int = 10
 ## row spacing works for both face kinds.
 const ATLAS_ROW_H: int = 12
 
+## Number of ticks in one in-game day. Mirrors `TICKS_PER_DAY` in
+## packages/state/src/ecs.ts.
+const TICKS_PER_DAY: int = 100
+
 ## Sort position for an entity at world (x, y). Used as the EntityNode's
 ## `position` so Godot's Y-sort orders entities row-by-row (north → south),
 ## independent of elevation. The visual z-offset is applied separately to a
