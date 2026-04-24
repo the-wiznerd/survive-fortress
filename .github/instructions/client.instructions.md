@@ -32,6 +32,24 @@ Server SDK (GameView)
   → Sidebar.vue / EntityCard.vue show selected entity details
 ```
 
+## UX Design Principles
+
+These four principles govern all client-side UI decisions. When a design choice conflicts with them, revisit the design rather than the principles.
+
+### 1. Proximity — controls live near the thing they control
+The player's eyes and cursor should not have to travel between the canvas and a distant panel without that travel feeling intentional and meaningful. Mouse travel is a proxy for cognitive effort. When an entity is on the canvas, its info and actions belong spatially close to it — ideally anchored to its canvas position via a DOM overlay, not in a sidebar far away.
+
+### 2. Continuity — things that move should be seen to move
+The brain tracks object identity spatially. When a thing disappears from one place and reappears in another without being seen to travel, the player loses track of it. Always provide a visual bridge — a particle, a flash, a toast — so the player's spatial model stays coherent. The canonical example: berries disappearing from a bush when harvested should *visibly travel* to the bag, not just vanish.
+
+### 3. Unbroken feedback loops — live state must always be visible
+Anything that changes over time and drives player decisions (health, hunger, AP budget, plan status) must be **always on screen, never behind a disclosure**. Collapsibles are for archival or secondary info. Watching your hunger bar climb while eating is satisfying; missing that because the hunger row was collapsed is not — it breaks the cause-and-effect contract with the player. Do not collapse live state.
+
+### 4. Show, don't tell
+The canvas is truth. Text labels and numbers are annotation. Prefer graphical representations of state (bars, icons, visual indicators) over prose descriptions. When in doubt: can a player understand what's happening by *watching*, rather than by reading?
+
+---
+
 ## User Interaction & UI Architecture
 
 The client is **pointer-first** (mouse or touch) and **DOM-first** (Vue for everything that isn't the world itself). These are the load-bearing rules for all UI work in this package.

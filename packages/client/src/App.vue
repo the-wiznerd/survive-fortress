@@ -1,9 +1,9 @@
 <template>
+  <Sidebar />
   <div id="game-container" :class="`-${phase}`">
     <GameCanvas />
     <ToastOverlay />
   </div>
-  <Sidebar />
 </template>
 
 <script setup lang="ts">

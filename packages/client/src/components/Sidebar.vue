@@ -87,7 +87,7 @@
     display: flex;
     flex-direction: column;
     background: var(--color-black);
-    border-left: var(--border-width) solid var(--color-darkest-gray);
+    border-inline-end: var(--border-width) solid var(--color-darkest-gray);
   }
 
   .header {
