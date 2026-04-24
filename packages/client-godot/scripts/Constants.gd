@@ -5,6 +5,11 @@ extends Object
 ## Pseudo-isometric pixel projection: an entity at world (x, y, z) renders at
 ## screen position (x * TILE_W, y * TOP_FACE_H - z * FRONT_FACE_H).
 
+## Simulated pixel size for UI chrome (dividers, notches, etc). The UI is not
+## actually scaled — this is just the unit we measure pixelated UI features
+## in so they read as chunky pixels regardless of camera zoom.
+const UI_PIXEL: int = 2
+
 ## Width of a tile in pixels (shared by all cell types).
 const TILE_W: int = 16
 ## Height of a non-terrain sprite cell in the sprite sheet.

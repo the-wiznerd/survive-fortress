@@ -23,7 +23,7 @@ const _VALUE_COLOR: Color = Palette.LIGHTEST_GRAY
 const _MUTED_COLOR: Color = Palette.LIGHT_GRAY
 const _SECTION_HPAD: int = 20
 const _SECTION_VPAD: int = 8
-const _DIVIDER_HEIGHT: int = 2
+const _DIVIDER_HEIGHT: int = Constants.UI_PIXEL
 
 signal bag_clicked
 signal settings_clicked
@@ -103,14 +103,10 @@ func _build_player_section(parent: VBoxContainer) -> void:
 	back_label.add_theme_color_override("font_color", _TEXT_COLOR)
 	Fonts.apply_base(back_label)
 	back_row.add_child(back_label)
-	_back_button = Button.new()
-	_back_button.flat = true
+	_back_button = Link.make_on_dark("empty")
 	_back_button.disabled = true
 	_back_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_back_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_back_button.add_theme_color_override("font_color", _VALUE_COLOR)
-	Fonts.apply_base(_back_button)
-	_back_button.text = "empty"
 	_back_button.pressed.connect(func() -> void: bag_clicked.emit())
 	back_row.add_child(_back_button)
 
@@ -135,11 +131,7 @@ func _build_settings_section(parent: VBoxContainer) -> void:
 	var spacer: Control = Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_child(spacer)
-	var settings: Button = Button.new()
-	settings.text = "⚙"
-	settings.flat = true
-	settings.add_theme_color_override("font_color", _TEXT_COLOR)
-	Fonts.apply_base(settings)
+	var settings: Button = Link.make_on_dark("⚙")
 	settings.pressed.connect(func() -> void: settings_clicked.emit())
 	box.add_child(settings)
 

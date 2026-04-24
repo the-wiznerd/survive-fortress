@@ -73,6 +73,7 @@ func _on_joined(msg: ServerMessage) -> void:
 	print("[Main] Action costs: ", msg.action_costs)
 	_world_renderer.render_view(view)
 	_sidebar.update_view(view)
+	_column_inspector.set_view(view)
 	_center_camera_on_player(view)
 
 func _on_round_resolve(msg: ServerMessage) -> void:
@@ -82,6 +83,7 @@ func _on_round_resolve(msg: ServerMessage) -> void:
 		print("[Main]   final tick=%d entities=%d" % [last.tick, last.entities.size()])
 		_world_renderer.render_view(last)
 		_sidebar.update_view(last)
+		_column_inspector.set_view(last)
 		_center_camera_on_player(last)
 
 func _on_server_error(message: String) -> void:
