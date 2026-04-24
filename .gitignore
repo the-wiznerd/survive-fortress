@@ -140,3 +140,6 @@ vite.config.ts.timestamp-*
 
 # Turborepo
 .turbo
+
+# Godot client
+packages/client-godot/.godot/
