@@ -9,5 +9,12 @@
   ],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
+  },
+  "godotTools.editorPath.godot4": "/home/bcooper/.local/bin/godot4",
+  "godotTools.lsp.serverPort": 6005,
+  "godotTools.lsp.serverHost": "127.0.0.1",
+  "[gdscript]": {
+    "editor.insertSpaces": false,
+    "editor.detectIndentation": false
   }
 }
