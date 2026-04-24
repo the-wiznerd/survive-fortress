@@ -6,4 +6,4 @@ extends RefCounted
 ## added (UI atlas, particle textures, etc.).
 
 var sheet: SpriteSheet = null
-var terrain_atlas: TerrainAtlas = null
+var terrain_sheet: TerrainSheet = null

@@ -16,12 +16,29 @@ const TERRAIN_TYPES: Dictionary = {
 	"water": true,
 }
 
-# "x,y" -> int (highest z of any terrain in that column)
+## Terrain types that count as "solid" for non-water terrain's neighbor checks.
+## Water is intentionally excluded so e.g. dirt next to water still draws a
+## cliff border. Water uses its own type-aware neighbor logic in WaterNode.
+const SOLID_TERRAIN_TYPES: Dictionary = {
+	"dirt": true,
+	"sand": true,
+	"stone": true,
+}
+
+# "x,y" -> int (highest z of any terrain in that column, water included)
 var _max_z: Dictionary = {}
-# "x,y" -> int (lowest z of any terrain in that column)
+# "x,y" -> int (lowest z of any terrain in that column, water included)
 var _min_z: Dictionary = {}
-# "x,y,z" -> bool (terrain present at this exact position)
+# "x,y" -> int (highest z of any SOLID terrain, i.e. excluding water)
+var _max_z_solid: Dictionary = {}
+# "x,y" -> int (lowest z of any SOLID terrain)
+var _min_z_solid: Dictionary = {}
+# "x,y,z" -> bool (any terrain present at this exact position)
 var _terrain_at: Dictionary = {}
+# "x,y,z" -> bool (solid terrain present at this exact position)
+var _solid_at: Dictionary = {}
+# "x,y,z" -> String (terrain type at this exact position)
+var _type_at: Dictionary = {}
 
 static func build(view: GameView) -> WorldIndex:
 	var idx: WorldIndex = WorldIndex.new()
@@ -33,12 +50,21 @@ static func build(view: GameView) -> WorldIndex:
 		var ck: String = "%d,%d" % [entity.x, entity.y]
 		var pk: String = "%d,%d,%d" % [entity.x, entity.y, entity.z]
 		idx._terrain_at[pk] = true
+		idx._type_at[pk] = entity.type_name
 		var prev_max: Variant = idx._max_z.get(ck)
 		if prev_max == null or entity.z > (prev_max as int):
 			idx._max_z[ck] = entity.z
 		var prev_min: Variant = idx._min_z.get(ck)
 		if prev_min == null or entity.z < (prev_min as int):
 			idx._min_z[ck] = entity.z
+		if SOLID_TERRAIN_TYPES.has(entity.type_name):
+			idx._solid_at[pk] = true
+			var prev_max_s: Variant = idx._max_z_solid.get(ck)
+			if prev_max_s == null or entity.z > (prev_max_s as int):
+				idx._max_z_solid[ck] = entity.z
+			var prev_min_s: Variant = idx._min_z_solid.get(ck)
+			if prev_min_s == null or entity.z < (prev_min_s as int):
+				idx._min_z_solid[ck] = entity.z
 	return idx
 
 # --- Top face edges ---
@@ -89,3 +115,44 @@ func front_edge_west(x: int, y: int, z: int) -> int:
 
 func front_occluded(x: int, y: int, z: int) -> bool:
 	return _terrain_at.has("%d,%d,%d" % [x, y + 1, z])
+
+## Terrain type at the exact position, or "" if no terrain is there.
+func type_at(x: int, y: int, z: int) -> String:
+	return SdkUtil.to_string_or(_type_at.get("%d,%d,%d" % [x, y, z], ""))
+
+# --- Solid-only variants (water doesn't count as a neighbor) ---
+# Used by non-water terrain so a stone tile sitting next to water still draws
+# its cliff border on the water-facing side. Same shape as the methods above
+# but consults _max_z_solid / _min_z_solid / _solid_at.
+
+func top_edge_north_solid(x: int, y: int, z: int) -> int:
+	return _edge_taller_than_solid_neighbor(x, y - 1, z)
+
+func top_edge_east_solid(x: int, y: int, z: int) -> int:
+	return _edge_taller_than_solid_neighbor(x + 1, y, z)
+
+func top_edge_west_solid(x: int, y: int, z: int) -> int:
+	return _edge_taller_than_solid_neighbor(x - 1, y, z)
+
+func _edge_taller_than_solid_neighbor(nx: int, ny: int, z: int) -> int:
+	var v: Variant = _max_z_solid.get("%d,%d" % [nx, ny])
+	if v == null:
+		return 0
+	return 1 if (v as int) < z else 0
+
+func front_edge_south_solid(x: int, y: int, z: int) -> int:
+	var min_v: Variant = _min_z_solid.get("%d,%d" % [x, y])
+	if min_v == null:
+		return 0
+	if (min_v as int) >= z:
+		return 0
+	return 0 if _solid_at.has("%d,%d,%d" % [x, y, z - 1]) else 1
+
+func front_edge_east_solid(x: int, y: int, z: int) -> int:
+	return _edge_taller_than_solid_neighbor(x + 1, y, z)
+
+func front_edge_west_solid(x: int, y: int, z: int) -> int:
+	return _edge_taller_than_solid_neighbor(x - 1, y, z)
+
+func front_occluded_solid(x: int, y: int, z: int) -> bool:
+	return _solid_at.has("%d,%d,%d" % [x, y + 1, z])

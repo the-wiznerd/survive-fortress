@@ -17,7 +17,7 @@ func _ready() -> void:
 	y_sort_enabled = true
 	_resources = RenderResources.new()
 	_resources.sheet = SpriteSheet.new()
-	_resources.terrain_atlas = TerrainAtlas.build(TerrainAtlas.default_entries())
+	_resources.terrain_sheet = TerrainSheet.new()
 
 ## Reconcile our scene against the entities in `view`.
 ##  - existing nodes get a new push_state()
