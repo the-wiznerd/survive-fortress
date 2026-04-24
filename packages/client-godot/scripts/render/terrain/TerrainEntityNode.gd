@@ -39,17 +39,16 @@ func push_state(entity: ViewEntity, world: WorldIndex = null) -> void:
 	super.push_state(entity, world)
 	if world == null or _sheet == null:
 		return
-	# Non-water terrain treats water as empty for neighbor checks, so a stone
-	# tile next to water still draws its cliff border on the water-facing side.
 	var name: String = _terrain_name()
-	var n: int = world.top_edge_north_solid(entity.x, entity.y, entity.z)
-	var e: int = world.top_edge_east_solid(entity.x, entity.y, entity.z)
-	var w: int = world.top_edge_west_solid(entity.x, entity.y, entity.z)
+	var n: int = world.top_edge_north(entity.x, entity.y, entity.z)
+	var e: int = world.top_edge_east(entity.x, entity.y, entity.z)
+	var w: int = world.top_edge_west(entity.x, entity.y, entity.z)
 	_top.texture = _sheet.top_region(name, n, e, w)
+	# Front face uses solid-only checks so a tile next to water still shows it.
 	var occluded: bool = world.front_occluded_solid(entity.x, entity.y, entity.z)
 	_front.visible = not occluded
 	if not occluded:
 		var s_flag: int = world.front_edge_south_solid(entity.x, entity.y, entity.z)
-		var fe: int = world.front_edge_east_solid(entity.x, entity.y, entity.z)
-		var fw: int = world.front_edge_west_solid(entity.x, entity.y, entity.z)
+		var fe: int = world.front_edge_east(entity.x, entity.y, entity.z)
+		var fw: int = world.front_edge_west(entity.x, entity.y, entity.z)
 		_front.texture = _sheet.front_region(name, s_flag, fe, fw)

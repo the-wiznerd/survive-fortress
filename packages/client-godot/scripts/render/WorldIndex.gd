@@ -16,24 +16,24 @@ const TERRAIN_TYPES: Dictionary = {
 	"water": true,
 }
 
-## Terrain types that count as "solid" for non-water terrain's neighbor checks.
-## Water is intentionally excluded so e.g. dirt next to water still draws a
-## cliff border. Water uses its own type-aware neighbor logic in WaterNode.
+## Terrain types that count as "solid" for front-face support/occlusion. Water
+## is excluded so e.g. a stone tile sitting next to water still shows its
+## front face (water shouldn't hide it). Top-face border variants still treat
+## water as a neighbor (no border against water — borders are for true
+## elevation changes), so only the front-face checks have a solid variant.
 const SOLID_TERRAIN_TYPES: Dictionary = {
 	"dirt": true,
 	"sand": true,
 	"stone": true,
 }
 
-# "x,y" -> int (highest z of any terrain in that column, water included)
+# "x,y" -> int (highest z of any terrain in that column)
 var _max_z: Dictionary = {}
-# "x,y" -> int (lowest z of any terrain in that column, water included)
+# "x,y" -> int (lowest z of any terrain in that column)
 var _min_z: Dictionary = {}
-# "x,y" -> int (highest z of any SOLID terrain, i.e. excluding water)
-var _max_z_solid: Dictionary = {}
-# "x,y" -> int (lowest z of any SOLID terrain)
+# "x,y" -> int (lowest z of any SOLID terrain in that column, water excluded)
 var _min_z_solid: Dictionary = {}
-# "x,y,z" -> bool (any terrain present at this exact position)
+# "x,y,z" -> bool (terrain present at this exact position)
 var _terrain_at: Dictionary = {}
 # "x,y,z" -> bool (solid terrain present at this exact position)
 var _solid_at: Dictionary = {}
@@ -59,9 +59,6 @@ static func build(view: GameView) -> WorldIndex:
 			idx._min_z[ck] = entity.z
 		if SOLID_TERRAIN_TYPES.has(entity.type_name):
 			idx._solid_at[pk] = true
-			var prev_max_s: Variant = idx._max_z_solid.get(ck)
-			if prev_max_s == null or entity.z > (prev_max_s as int):
-				idx._max_z_solid[ck] = entity.z
 			var prev_min_s: Variant = idx._min_z_solid.get(ck)
 			if prev_min_s == null or entity.z < (prev_min_s as int):
 				idx._min_z_solid[ck] = entity.z
@@ -120,39 +117,18 @@ func front_occluded(x: int, y: int, z: int) -> bool:
 func type_at(x: int, y: int, z: int) -> String:
 	return SdkUtil.to_string_or(_type_at.get("%d,%d,%d" % [x, y, z], ""))
 
-# --- Solid-only variants (water doesn't count as a neighbor) ---
-# Used by non-water terrain so a stone tile sitting next to water still draws
-# its cliff border on the water-facing side. Same shape as the methods above
-# but consults _max_z_solid / _min_z_solid / _solid_at.
-
-func top_edge_north_solid(x: int, y: int, z: int) -> int:
-	return _edge_taller_than_solid_neighbor(x, y - 1, z)
-
-func top_edge_east_solid(x: int, y: int, z: int) -> int:
-	return _edge_taller_than_solid_neighbor(x + 1, y, z)
-
-func top_edge_west_solid(x: int, y: int, z: int) -> int:
-	return _edge_taller_than_solid_neighbor(x - 1, y, z)
-
-func _edge_taller_than_solid_neighbor(nx: int, ny: int, z: int) -> int:
-	var v: Variant = _max_z_solid.get("%d,%d" % [nx, ny])
-	if v == null:
-		return 0
-	return 1 if (v as int) < z else 0
+# --- Solid-only front-face checks (water doesn't count) ---
+# Used so terrain next to or above water still shows its front face / bottom
+# border. Top-face border variants intentionally still treat water as a
+# neighbor — borders are reserved for true elevation changes.
 
 func front_edge_south_solid(x: int, y: int, z: int) -> int:
 	var min_v: Variant = _min_z_solid.get("%d,%d" % [x, y])
 	if min_v == null:
-		return 0
+		return 0 if _solid_at.has("%d,%d,%d" % [x, y, z - 1]) else 1
 	if (min_v as int) >= z:
 		return 0
 	return 0 if _solid_at.has("%d,%d,%d" % [x, y, z - 1]) else 1
-
-func front_edge_east_solid(x: int, y: int, z: int) -> int:
-	return _edge_taller_than_solid_neighbor(x + 1, y, z)
-
-func front_edge_west_solid(x: int, y: int, z: int) -> int:
-	return _edge_taller_than_solid_neighbor(x - 1, y, z)
 
 func front_occluded_solid(x: int, y: int, z: int) -> bool:
 	return _solid_at.has("%d,%d,%d" % [x, y + 1, z])

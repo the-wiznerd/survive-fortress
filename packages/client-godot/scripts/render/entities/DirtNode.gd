@@ -27,12 +27,12 @@ func push_state(entity: ViewEntity, world: WorldIndex = null) -> void:
 	_grass_top.visible = has_grass
 	_grass_front.visible = has_grass and _front.visible
 	if has_grass:
-		var n: int = world.top_edge_north_solid(entity.x, entity.y, entity.z)
-		var e: int = world.top_edge_east_solid(entity.x, entity.y, entity.z)
-		var w: int = world.top_edge_west_solid(entity.x, entity.y, entity.z)
+		var n: int = world.top_edge_north(entity.x, entity.y, entity.z)
+		var e: int = world.top_edge_east(entity.x, entity.y, entity.z)
+		var w: int = world.top_edge_west(entity.x, entity.y, entity.z)
 		_grass_top.texture = _sheet.top_region("grass", n, e, w)
 		if _front.visible:
 			var s_flag: int = world.front_edge_south_solid(entity.x, entity.y, entity.z)
-			var fe: int = world.front_edge_east_solid(entity.x, entity.y, entity.z)
-			var fw: int = world.front_edge_west_solid(entity.x, entity.y, entity.z)
+			var fe: int = world.front_edge_east(entity.x, entity.y, entity.z)
+			var fw: int = world.front_edge_west(entity.x, entity.y, entity.z)
 			_grass_front.texture = _sheet.front_region("grass", s_flag, fe, fw)
