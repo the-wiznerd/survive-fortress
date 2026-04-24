@@ -20,7 +20,6 @@ func _ready() -> void:
 	# Pixel-art friendly defaults: integer snapping + nearest-neighbor scaling.
 	_camera.zoom = Vector2(3.0, 3.0)
 	_camera.position_smoothing_enabled = false
-	_camera.position = Vector2.ZERO
 	add_child(_camera)
 
 	_connection = GameConnection.new()
@@ -57,6 +56,7 @@ func _on_joined(msg: ServerMessage) -> void:
 	])
 	print("[Main] Action costs: ", msg.action_costs)
 	_world_renderer.render_view(view)
+	_center_camera_on_player(view)
 
 func _on_round_resolve(msg: ServerMessage) -> void:
 	print("[Main] Round resolved with %d frames." % msg.frames.size())
@@ -64,9 +64,21 @@ func _on_round_resolve(msg: ServerMessage) -> void:
 		var last: GameView = msg.frames[msg.frames.size() - 1]
 		print("[Main]   final tick=%d entities=%d" % [last.tick, last.entities.size()])
 		_world_renderer.render_view(last)
+		_center_camera_on_player(last)
 
 func _on_server_error(message: String) -> void:
 	push_error("[Main] Server error: " + message)
 
 func _on_unknown_message(raw: Dictionary) -> void:
 	push_warning("[Main] Unknown message: " + str(raw.keys()))
+
+## Move the camera to the player's projected screen position, offset to the
+## center of the tile so the player sprite sits in the middle of the viewport.
+func _center_camera_on_player(view: GameView) -> void:
+	var player_id_int: int = view.player_id.to_int()
+	for entity: ViewEntity in view.entities:
+		if entity.id == player_id_int:
+			var half_tile: Vector2 = Vector2(Constants.TILE_W, Constants.TOP_FACE_H) * 0.5
+			_camera.position = Constants.project(entity.x, entity.y, entity.z) + half_tile
+			return
+	push_warning("[Main] Player entity (id=%d) not found in view; camera not centered." % player_id_int)

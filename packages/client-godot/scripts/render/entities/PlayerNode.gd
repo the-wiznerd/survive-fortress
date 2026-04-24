@@ -16,7 +16,6 @@ func setup(sheet: SpriteSheet) -> void:
 	_sprite.centered = false
 	_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	# Anchor the sprite's bottom at the bottom of the tile's front face.
-	# Sprite top-left = projected_origin + (0, TOP_FACE_H + FRONT_FACE_H - sprite_pixel_height).
 	var sprite_h_px: int = SPRITE_H_CELLS * Constants.SPRITE_H
 	_sprite.position = Vector2(0, Constants.TOP_FACE_H + Constants.FRONT_FACE_H - sprite_h_px)
-	add_child(_sprite)
+	visual.add_child(_sprite)

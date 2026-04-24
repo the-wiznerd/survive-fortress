@@ -24,7 +24,7 @@ func setup(sheet: SpriteSheet) -> void:
 	_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var sprite_h_px: int = SPRITE_H_CELLS * Constants.SPRITE_H
 	_sprite.position = Vector2(0, Constants.TOP_FACE_H + Constants.FRONT_FACE_H - sprite_h_px)
-	add_child(_sprite)
+	visual.add_child(_sprite)
 
 func push_state(entity: ViewEntity) -> void:
 	super.push_state(entity)

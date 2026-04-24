@@ -24,6 +24,11 @@ func _ready() -> void:
 func render_view(view: GameView) -> void:
 	var seen: Dictionary = {}
 	for entity: ViewEntity in view.entities:
+		# Skip entities that live inside a container (bag contents, equipped
+		# items, etc). They appear in the view so the client can show inventory,
+		# but they have no meaningful world position to render.
+		if entity.has_trait("contained"):
+			continue
 		seen[entity.id] = true
 		var node: EntityNode = _nodes.get(entity.id, null) as EntityNode
 		if node == null:

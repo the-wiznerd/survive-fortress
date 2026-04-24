@@ -16,4 +16,4 @@ func setup(_sheet: SpriteSheet) -> void:
 		(Constants.TILE_W - SIZE_PX) / 2,
 		Constants.TOP_FACE_H + Constants.FRONT_FACE_H - SIZE_PX,
 	)
-	add_child(rect)
+	visual.add_child(rect)

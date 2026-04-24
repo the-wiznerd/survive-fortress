@@ -16,13 +16,13 @@ func setup(_sheet: SpriteSheet) -> void:
 	_top = ColorRect.new()
 	_top.size = Vector2(Constants.TILE_W, Constants.TOP_FACE_H)
 	_top.position = Vector2.ZERO
-	add_child(_top)
+	visual.add_child(_top)
 
 	_front = ColorRect.new()
 	_front.color = FRONT
 	_front.size = Vector2(Constants.TILE_W, Constants.FRONT_FACE_H)
 	_front.position = Vector2(0, Constants.TOP_FACE_H)
-	add_child(_front)
+	visual.add_child(_front)
 
 func push_state(entity: ViewEntity) -> void:
 	super.push_state(entity)
