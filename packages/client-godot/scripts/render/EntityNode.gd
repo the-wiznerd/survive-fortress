@@ -27,7 +27,11 @@ func _ready() -> void:
 ##  - z_index = z so taller entities in the same row paint over shorter ones
 ##  - visual.position = the z-offset so we appear at the right screen pixel
 ## Subclasses can override to interpolate, animate, or queue transitions.
-func push_state(entity: ViewEntity) -> void:
+##
+## `world` carries per-frame neighbor info used by terrain nodes for edge
+## selection and occlusion. Non-terrain nodes can ignore it. Pass null only
+## when calling outside the normal render_view() path (none today).
+func push_state(entity: ViewEntity, _world: WorldIndex = null) -> void:
 	current_state = entity
 	position = Constants.sort_position(entity.x, entity.y)
 	z_index = Constants.z_index_for(entity.z)
@@ -36,5 +40,5 @@ func push_state(entity: ViewEntity) -> void:
 ## Subclasses can override to set up sprite resources etc. Called by
 ## WorldRenderer immediately after instantiation, before the first push_state.
 ## Subclasses should add their visuals as children of `visual`, not `self`.
-func setup(_sheet: SpriteSheet) -> void:
+func setup(_resources: RenderResources) -> void:
 	pass

@@ -10,9 +10,9 @@ const SPRITE_H_CELLS: int = 3
 
 var _sprite: Sprite2D = null
 
-func setup(sheet: SpriteSheet) -> void:
+func setup(resources: RenderResources) -> void:
 	_sprite = Sprite2D.new()
-	_sprite.texture = sheet.region(SPRITE_COL, SPRITE_ROW, 1, SPRITE_H_CELLS)
+	_sprite.texture = resources.sheet.region(SPRITE_COL, SPRITE_ROW, 1, SPRITE_H_CELLS)
 	_sprite.centered = false
 	_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	# Anchor the sprite's bottom at the bottom of the tile's front face.

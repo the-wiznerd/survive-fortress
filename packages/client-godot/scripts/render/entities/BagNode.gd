@@ -7,7 +7,7 @@ extends EntityNode
 const SIZE_PX: int = 10
 const COLOR: Color = Color("#7f5845")
 
-func setup(_sheet: SpriteSheet) -> void:
+func setup(_resources: RenderResources) -> void:
 	var rect: ColorRect = ColorRect.new()
 	rect.color = COLOR
 	rect.size = Vector2(SIZE_PX, SIZE_PX)

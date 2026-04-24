@@ -13,6 +13,10 @@ const SPRITE_H: int = 12
 const TOP_FACE_H: int = 12
 ## Height of a terrain front (side) face.
 const FRONT_FACE_H: int = 10
+## Per-row pixel height in the procedurally baked terrain atlas. Each row of the
+## atlas is sized to fit the taller of TOP_FACE_H and FRONT_FACE_H so a single
+## row spacing works for both face kinds.
+const ATLAS_ROW_H: int = 12
 
 ## Sort position for an entity at world (x, y). Used as the EntityNode's
 ## `position` so Godot's Y-sort orders entities row-by-row (north → south),

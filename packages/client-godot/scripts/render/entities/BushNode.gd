@@ -17,8 +17,8 @@ var _sprite: Sprite2D = null
 var _sheet: SpriteSheet = null
 var _last_col: int = -1
 
-func setup(sheet: SpriteSheet) -> void:
-	_sheet = sheet
+func setup(resources: RenderResources) -> void:
+	_sheet = resources.sheet
 	_sprite = Sprite2D.new()
 	_sprite.centered = false
 	_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -26,8 +26,8 @@ func setup(sheet: SpriteSheet) -> void:
 	_sprite.position = Vector2(0, Constants.TOP_FACE_H + Constants.FRONT_FACE_H - sprite_h_px)
 	visual.add_child(_sprite)
 
-func push_state(entity: ViewEntity) -> void:
-	super.push_state(entity)
+func push_state(entity: ViewEntity, world: WorldIndex = null) -> void:
+	super.push_state(entity, world)
 	var col: int = _select_column(entity)
 	if col != _last_col:
 		_sprite.texture = _sheet.region(col, SPRITE_ROW, 1, SPRITE_H_CELLS)
