@@ -10,6 +10,7 @@ var _connection: GameConnection
 var _world_renderer: WorldRenderer
 var _camera: Camera2D
 var _sidebar: Sidebar
+var _column_inspector: ColumnInspector
 
 func _ready() -> void:
 	_world_renderer = WorldRenderer.new()
@@ -32,6 +33,10 @@ func _ready() -> void:
 	_sidebar.bag_clicked.connect(_on_bag_clicked)
 	_sidebar.settings_clicked.connect(_on_settings_clicked)
 	add_child(_sidebar)
+
+	_column_inspector = ColumnInspector.new()
+	_column_inspector.name = "ColumnInspector"
+	add_child(_column_inspector)
 
 	_connection = GameConnection.new()
 	_connection.name = "GameConnection"
@@ -90,6 +95,25 @@ func _on_bag_clicked() -> void:
 
 func _on_settings_clicked() -> void:
 	print("[Main] Settings clicked (settings popup not implemented yet).")
+
+## Left-click on the world opens the column inspector. _unhandled_input fires
+## only for events not consumed by Control nodes (sidebar, inspector chrome),
+## so clicks on UI never reach this handler.
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mb: InputEventMouseButton = event
+		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+			_open_inspector_at(mb.position)
+
+## Convert a screen-space mouse position to a world column (x, y) and open
+## the inspector there. The screen → world transform is the inverse of the
+## viewport's canvas transform (which encodes the active Camera2D).
+func _open_inspector_at(screen_pos: Vector2) -> void:
+	var world_pos: Vector2 = get_viewport().get_canvas_transform().affine_inverse() * screen_pos
+	var col_x: int = floori(world_pos.x / float(Constants.TILE_W))
+	var col_y: int = floori(world_pos.y / float(Constants.TOP_FACE_H))
+	var top_z: int = _world_renderer.top_z_at(col_x, col_y)
+	_column_inspector.show_column(col_x, col_y, top_z)
 
 ## Move the camera to the player's projected screen position, offset to the
 ## center of the tile so the player sprite sits in the middle of the viewport.

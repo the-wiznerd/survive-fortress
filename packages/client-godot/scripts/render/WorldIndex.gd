@@ -117,6 +117,13 @@ func front_occluded(x: int, y: int, z: int) -> bool:
 func type_at(x: int, y: int, z: int) -> String:
 	return SdkUtil.to_string_or(_type_at.get("%d,%d,%d" % [x, y, z], ""))
 
+## Highest terrain z in the given column, or -1 if no terrain is known there.
+func max_z_at(x: int, y: int) -> int:
+	var v: Variant = _max_z.get("%d,%d" % [x, y])
+	if v == null:
+		return -1
+	return v as int
+
 # --- Solid-only front-face checks (water doesn't count) ---
 # Used so terrain next to or above water still shows its front face / bottom
 # border. Top-face border variants intentionally still treat water as a

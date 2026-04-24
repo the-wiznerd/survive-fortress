@@ -12,6 +12,10 @@ extends Node2D
 var _resources: RenderResources = null
 ## entity_id (int) → EntityNode currently mounted as our child.
 var _nodes: Dictionary = {}
+## Most recent spatial index. Cached so other systems (inspector, picker) can
+## query column metadata without rebuilding it. Null until the first
+## render_view() call.
+var _last_index: WorldIndex = null
 
 func _ready() -> void:
 	y_sort_enabled = true
@@ -25,6 +29,7 @@ func _ready() -> void:
 ##  - nodes whose ids are no longer in the view are queue_free()'d
 func render_view(view: GameView) -> void:
 	var world_index: WorldIndex = WorldIndex.build(view)
+	_last_index = world_index
 	var seen: Dictionary = {}
 	for entity: ViewEntity in view.entities:
 		# Skip entities that live inside a container (bag contents, equipped
@@ -57,3 +62,10 @@ func render_view(view: GameView) -> void:
 		var node: EntityNode = _nodes[id] as EntityNode
 		_nodes.erase(id)
 		node.queue_free()
+
+## Top-most terrain z at the given column, or -1 if no terrain is known there.
+## Uses the spatial index from the last render_view() call.
+func top_z_at(x: int, y: int) -> int:
+	if _last_index == null:
+		return -1
+	return _last_index.max_z_at(x, y)
