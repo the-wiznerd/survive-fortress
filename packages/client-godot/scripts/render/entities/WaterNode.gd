@@ -11,6 +11,9 @@ extends EntityNode
 ## edge — matching the canvas behavior.
 
 const FRAME_INTERVAL_MS: int = 250
+## Pixel offset applied to both faces so water sits a touch lower than its
+## surroundings (matches the canvas WaterRenderer's vertical nudge).
+const WATER_Y_OFFSET: int = 2
 
 var _sheet: TerrainSheet = null
 var _top: Sprite2D = null
@@ -30,8 +33,8 @@ var _last_frame: int = -1
 
 func setup(resources: RenderResources) -> void:
 	_sheet = resources.terrain_sheet
-	_top = _make_face_sprite(0)
-	_front = _make_face_sprite(Constants.TOP_FACE_H)
+	_top = _make_face_sprite(WATER_Y_OFFSET)
+	_front = _make_face_sprite(Constants.TOP_FACE_H + WATER_Y_OFFSET)
 
 func _make_face_sprite(y_offset: int) -> Sprite2D:
 	var s: Sprite2D = Sprite2D.new()

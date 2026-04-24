@@ -7,10 +7,13 @@ extends RefCounted
 ## frames continue along the same two rows after the static terrains.
 ##
 ## Authoring layout (left → right within each strip):
-##   col 0: flat   col 1: E      col 2: EW     col 3: W
+##   col 0: flat   col 1: W      col 2: EW     col 3: E
 ##   col 4: NW/SW  col 5: NEW/SEW col 6: NE/SE col 7: N/S
 ## Labels mark sides that have NO same-z neighbor (i.e. the cliff edge to draw
 ## a border on). "flat" = surrounded; "NEW" or "SEW" = isolated tile.
+## Note: water reuses the same column order, but its border semantics are
+## reversed — water draws a border on the side where it DOES have a non-water
+## neighbor (it laps against the land).
 
 const _TOP_ROW: int = 0
 const _FRONT_ROW: int = 1
@@ -20,8 +23,8 @@ const _STRIP_COLS: int = 8
 ## the column offset within an 8-cell strip.
 const _COL_FOR_INDEX: Array[int] = [
 	0, # 0 = flat
-	3, # 1 = W
-	1, # 2 = E
+	1, # 1 = W
+	3, # 2 = E
 	2, # 3 = EW
 	7, # 4 = N (or S)
 	4, # 5 = NW (or SW)
