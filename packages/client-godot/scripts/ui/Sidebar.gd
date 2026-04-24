@@ -16,23 +16,24 @@ extends CanvasLayer
 
 const WIDTH: int = 300
 
-const _BG_COLOR: Color = Palette.DARKEST_GRAY
-const _DIVIDER_COLOR: Color = Palette.DARK_GRAY
+const _BG_COLOR: Color = Palette.BLACK
+const _DIVIDER_COLOR: Color = Palette.DARKEST_GRAY
 const _TEXT_COLOR: Color = Palette.WHITE
+const _VALUE_COLOR: Color = Palette.LIGHTEST_GRAY
 const _MUTED_COLOR: Color = Palette.LIGHT_GRAY
-const _SECTION_HPAD: int = 12
+const _SECTION_HPAD: int = 20
 const _SECTION_VPAD: int = 8
-const _DIVIDER_HEIGHT: int = 1
+const _DIVIDER_HEIGHT: int = 2
 
 signal bag_clicked
 signal settings_clicked
 
 # --- Section widgets we update per-frame ---
 var _day_label: Label = null
-var _health_label: Label = null
-var _hunger_label: Label = null
-var _left_hand_label: Label = null
-var _right_hand_label: Label = null
+var _health_value: Label = null
+var _hunger_value: Label = null
+var _left_hand_value: Label = null
+var _right_hand_value: Label = null
 var _back_button: Button = null
 var _feed_container: VBoxContainer = null
 
@@ -84,23 +85,34 @@ func _build_player_section(parent: VBoxContainer) -> void:
 	# Vitals + equipment live in one section — no heading needed; the player
 	# is the implicit subject.
 	var box: VBoxContainer = _make_section(parent)
-	_health_label = _make_stat_label(box, "Health —")
-	_hunger_label = _make_stat_label(box, "Hunger —")
+	_health_value = _make_kv_row(box, "Health:", "—")
+	_hunger_value = _make_kv_row(box, "Hunger:", "—")
 	# Small gap between vitals and slots.
 	var gap: Control = Control.new()
 	gap.custom_minimum_size = Vector2(0, _SECTION_VPAD)
 	box.add_child(gap)
-	_left_hand_label = _make_stat_label(box, "Left hand: empty")
-	_right_hand_label = _make_stat_label(box, "Right hand: empty")
+	_left_hand_value = _make_kv_row(box, "Left hand:", "empty")
+	_right_hand_value = _make_kv_row(box, "Right hand:", "empty")
+	# Back slot is clickable: separate label + button so the value styling
+	# matches the other rows but the value remains pressable.
+	var back_row: HBoxContainer = HBoxContainer.new()
+	back_row.add_theme_constant_override("separation", 6)
+	box.add_child(back_row)
+	var back_label: Label = Label.new()
+	back_label.text = "Back:"
+	back_label.add_theme_color_override("font_color", _TEXT_COLOR)
+	Fonts.apply_base(back_label)
+	back_row.add_child(back_label)
 	_back_button = Button.new()
-	_back_button.text = "Back: empty"
-	_back_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_back_button.flat = true
 	_back_button.disabled = true
-	_back_button.add_theme_color_override("font_color", _TEXT_COLOR)
+	_back_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_back_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_back_button.add_theme_color_override("font_color", _VALUE_COLOR)
 	Fonts.apply_base(_back_button)
+	_back_button.text = "empty"
 	_back_button.pressed.connect(func() -> void: bag_clicked.emit())
-	box.add_child(_back_button)
+	back_row.add_child(_back_button)
 
 func _build_feed_section(parent: VBoxContainer) -> void:
 	# Feed expands to fill remaining vertical space between player section and
@@ -142,11 +154,11 @@ func update_view(view: GameView) -> void:
 
 	var player: ViewEntity = _find_player(view)
 	if player == null:
-		_health_label.text = "Health —"
-		_hunger_label.text = "Hunger —"
-		_left_hand_label.text = "Left hand: empty"
-		_right_hand_label.text = "Right hand: empty"
-		_back_button.text = "Back: empty"
+		_health_value.text = "—"
+		_hunger_value.text = "—"
+		_left_hand_value.text = "empty"
+		_right_hand_value.text = "empty"
+		_back_button.text = "empty"
 		_back_button.disabled = true
 		return
 
@@ -156,17 +168,17 @@ func update_view(view: GameView) -> void:
 func _update_vitals(player: ViewEntity) -> void:
 	var health: Dictionary = player.get_trait("health")
 	if health.is_empty():
-		_health_label.text = "Health —"
+		_health_value.text = "—"
 	else:
-		_health_label.text = "Health %d/%d" % [
+		_health_value.text = "%d/%d" % [
 			SdkUtil.to_int(health.get("current", 0)),
 			SdkUtil.to_int(health.get("max", 0)),
 		]
 	var hunger: Dictionary = player.get_trait("hunger")
 	if hunger.is_empty():
-		_hunger_label.text = "Hunger —"
+		_hunger_value.text = "—"
 	else:
-		_hunger_label.text = "Hunger %d/%d" % [
+		_hunger_value.text = "%d/%d" % [
 			SdkUtil.to_int(hunger.get("current", 0)),
 			SdkUtil.to_int(hunger.get("max", 0)),
 		]
@@ -174,10 +186,10 @@ func _update_vitals(player: ViewEntity) -> void:
 func _update_slots(player: ViewEntity, view: GameView) -> void:
 	var equipment: Dictionary = player.get_trait("equipment")
 	var slots: Dictionary = SdkUtil.to_dict(equipment.get("slots", {}))
-	_left_hand_label.text = "Left hand: " + _slot_text(slots.get("leftHand"), view)
-	_right_hand_label.text = "Right hand: " + _slot_text(slots.get("rightHand"), view)
+	_left_hand_value.text = _slot_text(slots.get("leftHand"), view)
+	_right_hand_value.text = _slot_text(slots.get("rightHand"), view)
 	var back_id: Variant = slots.get("back")
-	_back_button.text = "Back: " + _slot_text(back_id, view)
+	_back_button.text = _slot_text(back_id, view)
 	_back_button.disabled = back_id == null
 
 func _slot_text(slot_id: Variant, view: GameView) -> String:
@@ -221,6 +233,25 @@ func _make_stat_label(parent: VBoxContainer, text: String) -> Label:
 	Fonts.apply_base(lbl)
 	parent.add_child(lbl)
 	return lbl
+
+## Build a "Label: value" row and return the *value* label so callers can
+## update it in place. Label uses the standard text color; value uses the
+## lighter VALUE_COLOR so it pops without competing with the section heading.
+func _make_kv_row(parent: VBoxContainer, label_text: String, value_text: String) -> Label:
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	parent.add_child(row)
+	var lbl: Label = Label.new()
+	lbl.text = label_text
+	lbl.add_theme_color_override("font_color", _TEXT_COLOR)
+	Fonts.apply_base(lbl)
+	row.add_child(lbl)
+	var val: Label = Label.new()
+	val.text = value_text
+	val.add_theme_color_override("font_color", _VALUE_COLOR)
+	Fonts.apply_base(val)
+	row.add_child(val)
+	return val
 
 func _add_divider(parent: VBoxContainer) -> void:
 	var div: ColorRect = ColorRect.new()
