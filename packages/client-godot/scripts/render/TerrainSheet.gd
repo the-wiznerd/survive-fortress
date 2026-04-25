@@ -34,7 +34,7 @@ const _COL_FOR_INDEX: Array[int] = [
 
 ## Terrain name (matches server entity type_name) → starting column of the
 ## terrain's 8-cell strip on rows 0/1.
-const _BASE_COL: Dictionary = {
+const _BASE_COL: Dictionary[String, int] = {
 	"dirt": 0, # cols 0..7
 	"grass": 8, # cols 8..15
 	"sand": 16, # cols 16..23
@@ -61,22 +61,22 @@ func has_terrain(name: String) -> bool:
 	return _BASE_COL.has(name)
 
 func top_region(name: String, n: int, e: int, w: int) -> AtlasTexture:
-	var col: int = (_BASE_COL[name] as int) + _COL_FOR_INDEX[n * 4 + e * 2 + w]
+	var col: int = _BASE_COL[name] + _COL_FOR_INDEX[n * 4 + e * 2 + w]
 	return _make_region(col, _TOP_ROW, Constants.TOP_FACE_H)
 
 func front_region(name: String, s: int, e: int, w: int) -> AtlasTexture:
-	var col: int = (_BASE_COL[name] as int) + _COL_FOR_INDEX[s * 4 + e * 2 + w]
+	var col: int = _BASE_COL[name] + _COL_FOR_INDEX[s * 4 + e * 2 + w]
 	return _make_region(col, _FRONT_ROW, Constants.FRONT_FACE_H)
 
 ## Top-face region for the given water animation frame.
 func water_top_region(frame: int, n: int, e: int, w: int) -> AtlasTexture:
-	var row: int = _WATER_BASE_ROW + (frame % WATER_FRAME_COUNT) * 2
+	var row: int = _WATER_BASE_ROW + Utils.modi(frame, WATER_FRAME_COUNT) * 2
 	var col: int = _WATER_BASE_COL + _COL_FOR_INDEX[n * 4 + e * 2 + w]
 	return _make_region(col, row, Constants.TOP_FACE_H)
 
 ## Front-face region for the given water animation frame.
 func water_front_region(frame: int, s: int, e: int, w: int) -> AtlasTexture:
-	var row: int = _WATER_BASE_ROW + (frame % WATER_FRAME_COUNT) * 2 + 1
+	var row: int = _WATER_BASE_ROW + Utils.modi(frame, WATER_FRAME_COUNT) * 2 + 1
 	var col: int = _WATER_BASE_COL + _COL_FOR_INDEX[s * 4 + e * 2 + w]
 	return _make_region(col, row, Constants.FRONT_FACE_H)
 

@@ -33,9 +33,9 @@ func _ready() -> void:
 ## when calling outside the normal render_view() path (none today).
 func push_state(entity: ViewEntity, _world: WorldIndex = null) -> void:
 	current_state = entity
-	position = Constants.sort_position(entity.x, entity.y)
-	z_index = Constants.z_index_for(entity.z)
-	visual.position = Constants.visual_offset_for_z(entity.z)
+	position = Utils.sort_position(entity.x, entity.y)
+	z_index = Utils.z_index_for(entity.z)
+	visual.position = Utils.visual_offset_for_z(entity.z)
 
 ## Subclasses can override to set up sprite resources etc. Called by
 ## WorldRenderer immediately after instantiation, before the first push_state.

@@ -146,12 +146,12 @@ func _rebuild_entity_list() -> void:
 	# Detach synchronously (queue_free is deferred — without remove_child the
 	# old rows would still be in the tree when we add new ones, causing the
 	# panel to grow with every refresh).
-	for child in _entity_list.get_children():
+	for child: Node in _entity_list.get_children():
 		_entity_list.remove_child(child)
 		child.queue_free()
 	var entities: Array[ViewEntity] = _entities_in_column()
 	_empty_label.visible = entities.is_empty()
-	for i in entities.size():
+	for i: int in entities.size():
 		if i > 0:
 			_entity_list.add_child(_make_divider())
 		_entity_list.add_child(_make_entity_card(entities[i]))
@@ -189,7 +189,7 @@ func _make_entity_card(entity: ViewEntity) -> Control:
 	title.add_theme_color_override("font_color", _TITLE_COLOR)
 	Fonts.apply_base(title)
 	card.add_child(title)
-	for row in _body_rows_for(entity):
+	for row: Control in _body_rows_for(entity):
 		card.add_child(row)
 	return card
 
@@ -278,19 +278,19 @@ func _make_action_button(label_text: String, action: PlayerAction) -> Control:
 func _make_divider() -> Control:
 	# Vertical padding above + UI-pixel line + vertical padding below, so
 	# adjacent cards aren't crammed against the divider.
-	var wrap: VBoxContainer = VBoxContainer.new()
-	wrap.add_theme_constant_override("separation", 0)
+	var wrapper: VBoxContainer = VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 0)
 	var pad_top: Control = Control.new()
 	pad_top.custom_minimum_size = Vector2(0, _DIVIDER_PAD)
-	wrap.add_child(pad_top)
+	wrapper.add_child(pad_top)
 	var line: ColorRect = ColorRect.new()
 	line.color = _DIVIDER_COLOR
 	line.custom_minimum_size = Vector2(0, Constants.UI_PIXEL)
-	wrap.add_child(line)
+	wrapper.add_child(line)
 	var pad_bot: Control = Control.new()
 	pad_bot.custom_minimum_size = Vector2(0, _DIVIDER_PAD)
-	wrap.add_child(pad_bot)
-	return wrap
+	wrapper.add_child(pad_bot)
+	return wrapper
 
 func _label_for(entity: ViewEntity) -> String:
 	if entity.entity_name != "":
@@ -310,7 +310,7 @@ func _update_anchor_position() -> void:
 	# CanvasLayer children are NOT auto-transformed by the active Camera2D,
 	# so we apply the viewport's canvas transform manually to convert from
 	# world space to screen space.
-	var world_pos: Vector2 = Constants.project(_column_x, _column_y, _column_z)
+	var world_pos: Vector2 = Utils.project(_column_x, _column_y, _column_z)
 	var screen_pos: Vector2 = get_viewport().get_canvas_transform() * world_pos
 	# Anchor to the upper-right corner of the column (offset diagonally so the
 	# panel sits beside the tile, not on top of it).

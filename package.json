@@ -15,6 +15,7 @@
     "dev:server": "turbo watch build dev --filter=@repo/server",
     "dev:godot": "godot4 -e --path packages/client-godot",
     "dev:godot:run": "godot4 --path packages/client-godot",
+    "dev:godot:clean-fonts": "rm -fv packages/client-godot/.godot/imported/icons.fnt-*.fontdata packages/client-godot/.godot/imported/icons.fnt-*.md5 packages/client-godot/.godot/imported/icons.png-*.ctex packages/client-godot/.godot/imported/icons.png-*.md5",
     "build": "yarn lint && turbo build",
     "dev:kill": "lsof -ti :5173 -ti :5174 -ti :5175 -ti :5176 | xargs kill -9 2>/dev/null; echo 'Dev servers killed'"
   },

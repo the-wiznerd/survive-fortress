@@ -9,7 +9,7 @@ extends RefCounted
 
 ## Type names that participate in terrain neighbor logic. Lowercase to match
 ## server-side entity type names (see entityTypes/*.ts).
-const TERRAIN_TYPES: Dictionary = {
+const TERRAIN_TYPES: Dictionary[String, bool] = {
 	"dirt": true,
 	"sand": true,
 	"stone": true,
@@ -21,24 +21,28 @@ const TERRAIN_TYPES: Dictionary = {
 ## front face (water shouldn't hide it). Top-face border variants still treat
 ## water as a neighbor (no border against water — borders are for true
 ## elevation changes), so only the front-face checks have a solid variant.
-const SOLID_TERRAIN_TYPES: Dictionary = {
+const SOLID_TERRAIN_TYPES: Dictionary[String, bool] = {
 	"dirt": true,
 	"sand": true,
 	"stone": true,
 }
 
-# "x,y" -> int (highest z of any terrain in that column)
-var _max_z: Dictionary = {}
-# "x,y" -> int (lowest z of any terrain in that column)
-var _min_z: Dictionary = {}
-# "x,y" -> int (lowest z of any SOLID terrain in that column, water excluded)
-var _min_z_solid: Dictionary = {}
-# "x,y,z" -> bool (terrain present at this exact position)
-var _terrain_at: Dictionary = {}
-# "x,y,z" -> bool (solid terrain present at this exact position)
-var _solid_at: Dictionary = {}
-# "x,y,z" -> String (terrain type at this exact position)
-var _type_at: Dictionary = {}
+# Sentinel returned for "no terrain in this column" lookups. Any real z is
+# >= 0, so -1 is a safe out-of-band marker.
+const _NO_Z: int = -1
+
+# "x,y" -> highest z of any terrain in that column.
+var _max_z: Dictionary[String, int] = {}
+# "x,y" -> lowest z of any terrain in that column.
+var _min_z: Dictionary[String, int] = {}
+# "x,y" -> lowest z of any SOLID terrain in that column (water excluded).
+var _min_z_solid: Dictionary[String, int] = {}
+# "x,y,z" -> terrain present at this exact position.
+var _terrain_at: Dictionary[String, bool] = {}
+# "x,y,z" -> solid terrain present at this exact position.
+var _solid_at: Dictionary[String, bool] = {}
+# "x,y,z" -> terrain type at this exact position.
+var _type_at: Dictionary[String, String] = {}
 
 static func build(view: GameView) -> WorldIndex:
 	var idx: WorldIndex = WorldIndex.new()
@@ -51,16 +55,13 @@ static func build(view: GameView) -> WorldIndex:
 		var pk: String = "%d,%d,%d" % [entity.x, entity.y, entity.z]
 		idx._terrain_at[pk] = true
 		idx._type_at[pk] = entity.type_name
-		var prev_max: Variant = idx._max_z.get(ck)
-		if prev_max == null or entity.z > (prev_max as int):
+		if entity.z > idx._max_z.get(ck, _NO_Z):
 			idx._max_z[ck] = entity.z
-		var prev_min: Variant = idx._min_z.get(ck)
-		if prev_min == null or entity.z < (prev_min as int):
+		if not idx._min_z.has(ck) or entity.z < idx._min_z[ck]:
 			idx._min_z[ck] = entity.z
 		if SOLID_TERRAIN_TYPES.has(entity.type_name):
 			idx._solid_at[pk] = true
-			var prev_min_s: Variant = idx._min_z_solid.get(ck)
-			if prev_min_s == null or entity.z < (prev_min_s as int):
+			if not idx._min_z_solid.has(ck) or entity.z < idx._min_z_solid[ck]:
 				idx._min_z_solid[ck] = entity.z
 	return idx
 
@@ -80,10 +81,10 @@ func top_edge_west(x: int, y: int, z: int) -> int:
 	return _edge_taller_than_neighbor(x - 1, y, z)
 
 func _edge_taller_than_neighbor(nx: int, ny: int, z: int) -> int:
-	var v: Variant = _max_z.get("%d,%d" % [nx, ny])
-	if v == null:
+	var ck: String = "%d,%d" % [nx, ny]
+	if not _max_z.has(ck):
 		return 0
-	return 1 if (v as int) < z else 0
+	return 1 if _max_z[ck] < z else 0
 
 # --- Front face edges ---
 # Bottom (south) edge of the front face: drawn when there's terrain below me
@@ -91,10 +92,8 @@ func _edge_taller_than_neighbor(nx: int, ny: int, z: int) -> int:
 # and the bottom of my front face is exposed).
 
 func front_edge_south(x: int, y: int, z: int) -> int:
-	var min_v: Variant = _min_z.get("%d,%d" % [x, y])
-	if min_v == null:
-		return 0
-	if (min_v as int) >= z:
+	var ck: String = "%d,%d" % [x, y]
+	if not _min_z.has(ck) or _min_z[ck] >= z:
 		return 0
 	return 0 if _terrain_at.has("%d,%d,%d" % [x, y, z - 1]) else 1
 
@@ -115,14 +114,11 @@ func front_occluded(x: int, y: int, z: int) -> bool:
 
 ## Terrain type at the exact position, or "" if no terrain is there.
 func type_at(x: int, y: int, z: int) -> String:
-	return SdkUtil.to_string_or(_type_at.get("%d,%d,%d" % [x, y, z], ""))
+	return _type_at.get("%d,%d,%d" % [x, y, z], "")
 
 ## Highest terrain z in the given column, or -1 if no terrain is known there.
 func max_z_at(x: int, y: int) -> int:
-	var v: Variant = _max_z.get("%d,%d" % [x, y])
-	if v == null:
-		return -1
-	return v as int
+	return _max_z.get("%d,%d" % [x, y], _NO_Z)
 
 # --- Solid-only front-face checks (water doesn't count) ---
 # Used so terrain next to or above water still shows its front face / bottom
@@ -130,10 +126,8 @@ func max_z_at(x: int, y: int) -> int:
 # neighbor — borders are reserved for true elevation changes.
 
 func front_edge_south_solid(x: int, y: int, z: int) -> int:
-	var min_v: Variant = _min_z_solid.get("%d,%d" % [x, y])
-	if min_v == null:
-		return 0 if _solid_at.has("%d,%d,%d" % [x, y, z - 1]) else 1
-	if (min_v as int) >= z:
+	var ck: String = "%d,%d" % [x, y]
+	if _min_z_solid.has(ck) and _min_z_solid[ck] >= z:
 		return 0
 	return 0 if _solid_at.has("%d,%d,%d" % [x, y, z - 1]) else 1
 

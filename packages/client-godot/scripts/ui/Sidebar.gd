@@ -140,8 +140,8 @@ func _build_settings_section(parent: VBoxContainer) -> void:
 ## Refresh every section from the latest GameView. Safe to call every frame.
 func update_view(view: GameView) -> void:
 	# Day count starts at 1 to match the canvas client (Day 1.00 on boot).
-	var day: int = view.tick / Constants.TICKS_PER_DAY + 1
-	var tick_in_day: int = view.tick % Constants.TICKS_PER_DAY
+	var day: int = Utils.divi(view.tick, Constants.TICKS_PER_DAY) + 1
+	var tick_in_day: int = Utils.modi(view.tick, Constants.TICKS_PER_DAY)
 	_day_label.text = "Day %d.%02d" % [day, tick_in_day]
 
 	var player: ViewEntity = _find_player(view)

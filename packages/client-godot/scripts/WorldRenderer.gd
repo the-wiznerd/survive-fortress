@@ -11,7 +11,7 @@ extends Node2D
 
 var _resources: RenderResources = null
 ## entity_id (int) → EntityNode currently mounted as our child.
-var _nodes: Dictionary = {}
+var _nodes: Dictionary[int, EntityNode] = {}
 ## Most recent spatial index. Cached so other systems (inspector, picker) can
 ## query column metadata without rebuilding it. Null until the first
 ## render_view() call.
@@ -38,7 +38,7 @@ func render_view(view: GameView) -> void:
 		if entity.has_trait("contained"):
 			continue
 		seen[entity.id] = true
-		var node: EntityNode = _nodes.get(entity.id, null) as EntityNode
+		var node: EntityNode = _nodes.get(entity.id, null)
 		if node == null:
 			node = EntityNodeFactory.build(entity.type_name)
 			if node == null:
@@ -58,7 +58,7 @@ func render_view(view: GameView) -> void:
 			var id: int = id_variant
 			if not seen.has(id):
 				to_remove.append(id)
-	for id in to_remove:
+	for id: int in to_remove:
 		var node: EntityNode = _nodes[id] as EntityNode
 		_nodes.erase(id)
 		node.queue_free()
