@@ -30,7 +30,7 @@ static func make(text: String, ctx: Text.Ctx = Text.Ctx.ON_DARK) -> Button:
 
 static func _make(text: String, idle: Color, hover: Color, pressed: Color) -> Button:
 	var btn: Button = Button.new()
-	btn.text = text
+	btn.text = text.to_upper()
 	btn.flat = true
 	btn.focus_mode = Control.FOCUS_NONE
 	btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND

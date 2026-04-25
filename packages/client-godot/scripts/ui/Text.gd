@@ -60,9 +60,19 @@ static func sublabel(text: String, ctx: Ctx = Ctx.ON_DARK) -> Label:
 static func subvalue(text: String, ctx: Ctx = Ctx.ON_DARK) -> Label:
 	return _make_label(_subvalue, text, ctx)
 
+## Update the `text` property of a label/button created via this design
+## system, applying the project-wide uppercase convention. Use this anywhere
+## you'd otherwise write `node.text = "..."` so dynamic strings get the same
+## treatment as factory-built ones.
+static func set_text(node: Control, text: String) -> void:
+	node.set("text", text.to_upper())
+
 static func _make_label(style: _Style, text: String, ctx: Ctx) -> Label:
 	var lbl: Label = Label.new()
-	lbl.text = text
+	# Project-wide convention: all UI text is uppercase. Done here so call
+	# sites can write natural sentence case and the design system enforces
+	# the visual treatment.
+	lbl.text = text.to_upper()
 	lbl.add_theme_font_override("font", style.font())
 	lbl.add_theme_font_size_override("font_size", style.size)
 	lbl.add_theme_color_override("font_color", style.color(ctx))

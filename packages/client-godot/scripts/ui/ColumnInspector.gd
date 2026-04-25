@@ -15,11 +15,9 @@ extends CanvasLayer
 
 const LAYER: int = 5
 const _PANEL_MIN_WIDTH: int = 200
-const _PANEL_HPAD: int = 10
-const _PANEL_VPAD: int = 8
 const _SCREEN_MARGIN: int = 4
 ## Gap (screen px) between the caret tip and the nearest tile edge.
-const _PANEL_GAP: int = 4
+const _PANEL_GAP: int = 0
 ## Caret depth — perpendicular to the panel edge (screen px).
 const _CARET_W: int = 8
 ## Caret base length — along the panel edge (screen px).
@@ -27,7 +25,6 @@ const _CARET_H: int = 12
 
 const _BG_COLOR: Color = Palette.WHITE
 const _DIVIDER_COLOR: Color = Palette.LIGHTEST_GRAY
-const _DIVIDER_PAD: int = 8
 
 signal closed
 ## Emitted when the user clicks an action button inside an entity card (e.g.
@@ -49,6 +46,7 @@ var _view: GameView = null
 var _panel: PanelContainer = null
 var _entity_list: VBoxContainer = null
 var _empty_label: Label = null
+var _close_btn: Button = null
 var _caret: _CaretNode = null
 
 ## Which side of the tile the panel currently occupies.
@@ -118,33 +116,23 @@ func _build() -> void:
 	_panel.name = "InspectorPanel"
 	_panel.custom_minimum_size = Vector2(_PANEL_MIN_WIDTH, 0)
 	_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+
 	# Background only — no border. Each corner has a square 2 game-pixel
 	# chunk knocked out (NotchedStyleBox draws a "+"-shaped fill, no
 	# anti-aliasing).
 	var sb: NotchedStyleBox = NotchedStyleBox.new()
 	sb.bg_color = _BG_COLOR
 	sb.notch_size = 2 * Constants.UI_PIXEL
-	sb.content_margin_left = _PANEL_HPAD
-	sb.content_margin_right = _PANEL_HPAD
-	sb.content_margin_top = _PANEL_VPAD
-	sb.content_margin_bottom = _PANEL_VPAD
+	sb.content_margin_left = Spacing.MD
+	sb.content_margin_right = Spacing.MD
+	sb.content_margin_top = Spacing.MD
+	sb.content_margin_bottom = Spacing.MD
 	_panel.add_theme_stylebox_override("panel", sb)
 	add_child(_panel)
 
 	var col: VBoxContainer = VBoxContainer.new()
 	col.add_theme_constant_override("separation", 0)
 	_panel.add_child(col)
-
-	# Header: just a close button, right-aligned. No title — coordinates aren't
-	# meaningful to the player and there's nothing else worth saying here yet.
-	var header: HBoxContainer = HBoxContainer.new()
-	col.add_child(header)
-	var header_spacer: Control = Control.new()
-	header_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header.add_child(header_spacer)
-	var close_btn: Button = Link.make("close", Text.Ctx.ON_LIGHT)
-	close_btn.pressed.connect(_on_close_pressed)
-	header.add_child(close_btn)
 
 	# Body: one entity card per entity in the column, separated by 1px
 	# dividers. Rebuilt every refresh.
@@ -153,6 +141,13 @@ func _build() -> void:
 	col.add_child(_entity_list)
 	_empty_label = Text.value("Empty", Text.Ctx.ON_LIGHT)
 	col.add_child(_empty_label)
+
+	# Close button floats over the panel's top-right corner. Added as a sibling
+	# of the panel (last child of self) so it renders above the panel content,
+	# and positioned each frame in `_update_anchor_position`.
+	_close_btn = Link.make("x", Text.Ctx.ON_LIGHT)
+	_close_btn.pressed.connect(_on_close_pressed)
+	add_child(_close_btn)
 
 ## Open the inspector on a world column. `z` is the topmost terrain z (used
 ## for vertical anchoring above the stack); -1 means "ground level".
@@ -234,11 +229,16 @@ func _entities_in_column() -> Array[ViewEntity]:
 ## walker — different types want different curated info, and a per-type
 ## function keeps the data choices explicit and reviewable.
 func _make_entity_card(entity: ViewEntity) -> Control:
+	# Asymmetric vertical rhythm: tighter (2px) between the title and the
+	# first body row, then XS between subsequent rows. Done with explicit
+	# gaps because a single VBox separation applies uniformly.
 	var card: VBoxContainer = VBoxContainer.new()
-	card.add_theme_constant_override("separation", 2)
+	card.add_theme_constant_override("separation", 0)
 	card.add_child(Text.heading(_label_for(entity), Text.Ctx.ON_LIGHT))
-	for row: Control in _body_rows_for(entity):
-		card.add_child(row)
+	var rows: Array[Control] = _body_rows_for(entity)
+	for i: int in rows.size():
+		Spacing.gap_v(card, 0 if i == 0 else Spacing.XS)
+		card.add_child(rows[i])
 	return card
 
 ## Dispatch on entity type to produce the body rows. Unknown types render
@@ -296,7 +296,7 @@ func _bush_rows(entity: ViewEntity) -> Array[Control]:
 ## surface curated stats under the entity title.
 func _make_kv_row(key: String, value_text: String) -> Control:
 	var row: HBoxContainer = HBoxContainer.new()
-	row.add_theme_constant_override("separation", 6)
+	row.add_theme_constant_override("separation", Spacing.SM)
 	row.add_child(Text.label("%s:" % key, Text.Ctx.ON_LIGHT))
 	row.add_child(Text.value(value_text, Text.Ctx.ON_LIGHT))
 	return row
@@ -316,20 +316,17 @@ func _make_action_button(label_text: String, action: PlayerAction) -> Control:
 	return row
 
 func _make_divider() -> Control:
-	# Vertical padding above + UI-pixel line + vertical padding below, so
-	# adjacent cards aren't crammed against the divider.
+	# MD gap, 1px line, MD gap — same shape as Sidebar's section separator,
+	# wrapped in a single node so the caller can interleave it between cards
+	# with one add_child().
 	var wrapper: VBoxContainer = VBoxContainer.new()
 	wrapper.add_theme_constant_override("separation", 0)
-	var pad_top: Control = Control.new()
-	pad_top.custom_minimum_size = Vector2(0, _DIVIDER_PAD)
-	wrapper.add_child(pad_top)
+	Spacing.gap_v(wrapper, Spacing.MD)
 	var line: ColorRect = ColorRect.new()
 	line.color = _DIVIDER_COLOR
 	line.custom_minimum_size = Vector2(0, Constants.UI_PIXEL)
 	wrapper.add_child(line)
-	var pad_bot: Control = Control.new()
-	pad_bot.custom_minimum_size = Vector2(0, _DIVIDER_PAD)
-	wrapper.add_child(pad_bot)
+	Spacing.gap_v(wrapper, Spacing.MD)
 	return wrapper
 
 func _label_for(entity: ViewEntity) -> String:
@@ -428,6 +425,15 @@ func _update_anchor_position() -> void:
 
 	_panel.position = pos
 	_update_caret(side, pos, ps, tile_ctr)
+	_update_close_button_position(pos, ps)
+
+## Float the close button at the panel's top-right corner with a small inset.
+func _update_close_button_position(panel_pos: Vector2, panel_size: Vector2) -> void:
+	var btn_size: Vector2 = _close_btn.get_combined_minimum_size()
+	_close_btn.position = Vector2(
+		panel_pos.x + panel_size.x - btn_size.x - 10,
+		panel_pos.y + Spacing.SM,
+	)
 
 ## Position and orient the caret triangle so its tip points toward the tile.
 ## Centered on the tile's screen center and clamped inside the panel bounds

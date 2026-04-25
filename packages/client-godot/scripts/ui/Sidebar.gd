@@ -58,7 +58,7 @@ func _build() -> void:
 	col.offset_left = Spacing.LG
 	col.offset_right = - Spacing.LG
 	col.offset_top = Spacing.LG
-	col.offset_bottom = - Spacing.MD
+	col.offset_bottom = - Spacing.SM
 	col.add_theme_constant_override("separation", 0)
 	root.add_child(col)
 
@@ -74,28 +74,28 @@ func _build() -> void:
 
 func _build_game_state_section(parent: VBoxContainer) -> void:
 	var box: VBoxContainer = _make_section(parent)
-	_day_label = Text.heading("DAY: \u2014")
+	_day_label = Text.heading("Day —")
 	box.add_child(_day_label)
 
 func _build_player_section(parent: VBoxContainer) -> void:
 	# Vitals + equipment under a "Player" heading.
 	var box: VBoxContainer = _make_section(parent)
-	box.add_child(_make_heading("PLAYER"))
+	box.add_child(_make_heading("Player"))
 	_health_value = _make_kv_row(box, "Health:", "—")
 	_hunger_value = _make_kv_row(box, "Hunger:", "—")
 
 	# Equipment subgroup: own sub-heading, slots indented one MD step under it
 	# and styled as sublabel/subvalue so they read as a tier below vitals.
 	box.add_child(Text.label("Equipment:"))
-	_left_hand_value = _make_sub_kv_row(box, "Left hand:", "empty")
-	_right_hand_value = _make_sub_kv_row(box, "Right hand:", "empty")
+	_left_hand_value = _make_sub_kv_row(box, "Left hand:", "-")
+	_right_hand_value = _make_sub_kv_row(box, "Right hand:", "-")
 
 	# Back slot is clickable: separate label + button so the value styling
 	# matches the other rows but the value remains pressable.
 	var back_row: HBoxContainer = HBoxContainer.new()
-	back_row.add_theme_constant_override("separation", Spacing.MD)
+	back_row.add_theme_constant_override("separation", Spacing.SM)
 	box.add_child(back_row)
-	Spacing.gap_h(back_row, Spacing.MD)
+	Spacing.gap_h(back_row, Spacing.SM)
 	back_row.add_child(Text.sublabel("Back:"))
 	_back_button = Link.make("empty")
 	_back_button.disabled = true
@@ -109,12 +109,12 @@ func _build_feed_section(parent: VBoxContainer) -> void:
 	# settings.
 	var box: VBoxContainer = VBoxContainer.new()
 	box.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	box.add_theme_constant_override("separation", Spacing.SM)
+	box.add_theme_constant_override("separation", Spacing.XS)
 	parent.add_child(box)
-	box.add_child(Text.heading("FEED"))
+	box.add_child(Text.heading("Feed"))
 	_feed_container = VBoxContainer.new()
 	_feed_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_feed_container.add_theme_constant_override("separation", Spacing.SM)
+	_feed_container.add_theme_constant_override("separation", Spacing.XS)
 	box.add_child(_feed_container)
 
 func _build_settings_section(parent: VBoxContainer) -> void:
@@ -134,15 +134,15 @@ func update_view(view: GameView) -> void:
 	# Day count starts at 1 to match the canvas client (Day 1.00 on boot).
 	var day: int = Utils.divi(view.tick, Constants.TICKS_PER_DAY) + 1
 	var tick_in_day: int = Utils.modi(view.tick, Constants.TICKS_PER_DAY)
-	_day_label.text = "DAY: %d.%02d" % [day, tick_in_day]
+	Text.set_text(_day_label, "Day %d.%02d" % [day, tick_in_day])
 
 	var player: ViewEntity = _find_player(view)
 	if player == null:
-		_health_value.text = "—"
-		_hunger_value.text = "—"
-		_left_hand_value.text = "empty"
-		_right_hand_value.text = "empty"
-		_back_button.text = "empty"
+		Text.set_text(_health_value, "—")
+		Text.set_text(_hunger_value, "—")
+		Text.set_text(_left_hand_value, "empty")
+		Text.set_text(_right_hand_value, "empty")
+		Text.set_text(_back_button, "empty")
 		_back_button.disabled = true
 		return
 
@@ -152,28 +152,28 @@ func update_view(view: GameView) -> void:
 func _update_vitals(player: ViewEntity) -> void:
 	var health: Dictionary = player.get_trait("health")
 	if health.is_empty():
-		_health_value.text = "—"
+		Text.set_text(_health_value, "—")
 	else:
-		_health_value.text = "%d/%d" % [
+		Text.set_text(_health_value, "%d/%d" % [
 			SdkUtil.to_int(health.get("current", 0)),
 			SdkUtil.to_int(health.get("max", 0)),
-		]
+		])
 	var hunger: Dictionary = player.get_trait("hunger")
 	if hunger.is_empty():
-		_hunger_value.text = "—"
+		Text.set_text(_hunger_value, "—")
 	else:
-		_hunger_value.text = "%d/%d" % [
+		Text.set_text(_hunger_value, "%d/%d" % [
 			SdkUtil.to_int(hunger.get("current", 0)),
 			SdkUtil.to_int(hunger.get("max", 0)),
-		]
+		])
 
 func _update_slots(player: ViewEntity, view: GameView) -> void:
 	var equipment: Dictionary = player.get_trait("equipment")
 	var slots: Dictionary = SdkUtil.to_dict(equipment.get("slots", {}))
-	_left_hand_value.text = _slot_text(slots.get("leftHand"), view)
-	_right_hand_value.text = _slot_text(slots.get("rightHand"), view)
+	Text.set_text(_left_hand_value, _slot_text(slots.get("leftHand"), view))
+	Text.set_text(_right_hand_value, _slot_text(slots.get("rightHand"), view))
 	var back_id: Variant = slots.get("back")
-	_back_button.text = _slot_text(back_id, view)
+	Text.set_text(_back_button, _slot_text(back_id, view))
 	_back_button.disabled = back_id == null
 
 func _slot_text(slot_id: Variant, view: GameView) -> String:
@@ -198,7 +198,7 @@ func _find_player(view: GameView) -> ViewEntity:
 
 func _make_section(parent: VBoxContainer) -> VBoxContainer:
 	var box: VBoxContainer = VBoxContainer.new()
-	box.add_theme_constant_override("separation", Spacing.SM)
+	box.add_theme_constant_override("separation", Spacing.XS)
 	parent.add_child(box)
 	return box
 
@@ -209,7 +209,7 @@ func _make_heading(text: String) -> Label:
 ## update it in place.
 func _make_kv_row(parent: VBoxContainer, label_text: String, value_text: String) -> Label:
 	var row: HBoxContainer = HBoxContainer.new()
-	row.add_theme_constant_override("separation", Spacing.MD)
+	row.add_theme_constant_override("separation", Spacing.SM)
 	parent.add_child(row)
 	row.add_child(Text.label(label_text))
 	var val: Label = Text.value(value_text)
@@ -222,9 +222,9 @@ func _make_kv_row(parent: VBoxContainer, label_text: String, value_text: String)
 ## one tier below the section's primary stats.
 func _make_sub_kv_row(parent: VBoxContainer, label_text: String, value_text: String) -> Label:
 	var row: HBoxContainer = HBoxContainer.new()
-	row.add_theme_constant_override("separation", Spacing.MD)
+	row.add_theme_constant_override("separation", Spacing.SM)
 	parent.add_child(row)
-	Spacing.gap_h(row, Spacing.MD)
+	Spacing.gap_h(row, Spacing.SM)
 	row.add_child(Text.sublabel(label_text))
 	var val: Label = Text.subvalue(value_text)
 	row.add_child(val)
@@ -234,9 +234,9 @@ func _make_sub_kv_row(parent: VBoxContainer, label_text: String, value_text: Str
 ## the separator itself so section builders don't have to remember to add
 ## breathing room before/after.
 func _add_divider(parent: VBoxContainer) -> void:
-	Spacing.gap_v(parent, Spacing.MD)
+	Spacing.gap_v(parent, Spacing.SM)
 	var div: ColorRect = ColorRect.new()
 	div.color = _DIVIDER_COLOR
 	div.custom_minimum_size = Vector2(0, _DIVIDER_HEIGHT)
 	parent.add_child(div)
-	Spacing.gap_v(parent, Spacing.MD + 3)
+	Spacing.gap_v(parent, Spacing.SM + 3)
