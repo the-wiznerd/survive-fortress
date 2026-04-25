@@ -239,7 +239,7 @@ func _bush_rows(entity: ViewEntity) -> Array[Control]:
 		return rows
 	var cost: int = SdkUtil.to_int(harvestable.get("cost", 0))
 	rows.append(_make_action_button(
-		"harvest  %d%s" % [cost, Fonts.ICON_AP],
+		"harvest %d%s" % [cost, Fonts.ICON_AP],
 		PlayerAction.harvest(entity.id),
 	))
 	return rows
