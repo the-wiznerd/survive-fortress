@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://bo6rphwweavew"
+path="res://.godot/imported/icons.fnt-3991cdea449c76b1ff7b2d4ec93e4c57.fontdata"
+
+[deps]
+
+source_file="res://assets/fonts/icons/icons.fnt"
+dest_files=["res://.godot/imported/icons.fnt-3991cdea449c76b1ff7b2d4ec93e4c57.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=2
