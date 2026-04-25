@@ -5,33 +5,28 @@ extends Object
 ## sized to its text, that uses a blue text-link palette and a pointing-hand
 ## cursor on hover.
 ##
-## Two variants for our two backdrops:
-##   • Link.make_on_dark(text)  — for the BLACK sidebar / dark surfaces.
-##     LIGHTEST_BLUE → LIGHT_BLUE on hover.
-##   • Link.make_on_light(text) — for the WHITE inspector / light surfaces.
-##     BLUE → DARK_BLUE on hover.
+## Usage:
+##   Link.make("close", Text.Ctx.ON_LIGHT)
+##   Link.make("⚙", Text.Ctx.ON_DARK)
 ##
-## Lives as a static factory rather than a scene/class so callers stay in
-## charge of parenting and signal wiring — same shape as the rest of the UI
-## builders.
+## Default ctx is ON_DARK to match the dominant sidebar surface.
 
 const _DISABLED_COLOR: Color = Palette.DARK_GRAY
 
 # On dark backgrounds (sidebar): light blue idle, lighter blue on hover.
-const _DARK_BG_COLOR: Color = Palette.LIGHTEST_BLUE
-const _DARK_BG_HOVER_COLOR: Color = Palette.LIGHT_BLUE
-const _DARK_BG_PRESSED_COLOR: Color = Palette.BLUE
+const _ON_DARK_IDLE: Color = Palette.LIGHTEST_BLUE
+const _ON_DARK_HOVER: Color = Palette.LIGHT_BLUE
+const _ON_DARK_PRESSED: Color = Palette.BLUE
 
 # On light backgrounds (inspector): mid blue idle, dark blue on hover.
-const _LIGHT_BG_COLOR: Color = Palette.BLUE
-const _LIGHT_BG_HOVER_COLOR: Color = Palette.DARK_BLUE
-const _LIGHT_BG_PRESSED_COLOR: Color = Palette.DARKEST_BLUE
+const _ON_LIGHT_IDLE: Color = Palette.BLUE
+const _ON_LIGHT_HOVER: Color = Palette.DARK_BLUE
+const _ON_LIGHT_PRESSED: Color = Palette.DARKEST_BLUE
 
-static func make_on_dark(text: String) -> Button:
-	return _make(text, _DARK_BG_COLOR, _DARK_BG_HOVER_COLOR, _DARK_BG_PRESSED_COLOR)
-
-static func make_on_light(text: String) -> Button:
-	return _make(text, _LIGHT_BG_COLOR, _LIGHT_BG_HOVER_COLOR, _LIGHT_BG_PRESSED_COLOR)
+static func make(text: String, ctx: Text.Ctx = Text.Ctx.ON_DARK) -> Button:
+	if ctx == Text.Ctx.ON_LIGHT:
+		return _make(text, _ON_LIGHT_IDLE, _ON_LIGHT_HOVER, _ON_LIGHT_PRESSED)
+	return _make(text, _ON_DARK_IDLE, _ON_DARK_HOVER, _ON_DARK_PRESSED)
 
 static func _make(text: String, idle: Color, hover: Color, pressed: Color) -> Button:
 	var btn: Button = Button.new()

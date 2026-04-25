@@ -28,10 +28,6 @@ const _CARET_H: int = 12
 const _BG_COLOR: Color = Palette.WHITE
 const _DIVIDER_COLOR: Color = Palette.LIGHTEST_GRAY
 const _DIVIDER_PAD: int = 8
-const _TITLE_COLOR: Color = Palette.BLACK
-const _LABEL_COLOR: Color = Palette.DARKEST_GRAY
-const _VALUE_COLOR: Color = Palette.BLACK
-const _MUTED_COLOR: Color = Palette.DARK_GRAY
 
 signal closed
 ## Emitted when the user clicks an action button inside an entity card (e.g.
@@ -146,7 +142,7 @@ func _build() -> void:
 	var header_spacer: Control = Control.new()
 	header_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(header_spacer)
-	var close_btn: Button = Link.make_on_light("close")
+	var close_btn: Button = Link.make("close", Text.Ctx.ON_LIGHT)
 	close_btn.pressed.connect(_on_close_pressed)
 	header.add_child(close_btn)
 
@@ -155,7 +151,7 @@ func _build() -> void:
 	_entity_list = VBoxContainer.new()
 	_entity_list.add_theme_constant_override("separation", 0)
 	col.add_child(_entity_list)
-	_empty_label = Text.body("Empty", _MUTED_COLOR)
+	_empty_label = Text.value("Empty", Text.Ctx.ON_LIGHT)
 	col.add_child(_empty_label)
 
 ## Open the inspector on a world column. `z` is the topmost terrain z (used
@@ -240,7 +236,7 @@ func _entities_in_column() -> Array[ViewEntity]:
 func _make_entity_card(entity: ViewEntity) -> Control:
 	var card: VBoxContainer = VBoxContainer.new()
 	card.add_theme_constant_override("separation", 2)
-	card.add_child(Text.heading(_label_for(entity), _TITLE_COLOR))
+	card.add_child(Text.heading(_label_for(entity), Text.Ctx.ON_LIGHT))
 	for row: Control in _body_rows_for(entity):
 		card.add_child(row)
 	return card
@@ -301,15 +297,15 @@ func _bush_rows(entity: ViewEntity) -> Array[Control]:
 func _make_kv_row(key: String, value_text: String) -> Control:
 	var row: HBoxContainer = HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
-	row.add_child(Text.body("%s:" % key, _LABEL_COLOR))
-	row.add_child(Text.body(value_text, _VALUE_COLOR))
+	row.add_child(Text.label("%s:" % key, Text.Ctx.ON_LIGHT))
+	row.add_child(Text.value(value_text, Text.Ctx.ON_LIGHT))
 	return row
 
 ## A clickable action row, rendered as a link. The action is captured by
 ## value (PlayerAction is a RefCounted) and emitted back through
 ## `action_requested` on click.
 func _make_action_button(label_text: String, action: PlayerAction) -> Control:
-	var btn: Button = Link.make_on_light(label_text)
+	var btn: Button = Link.make(label_text, Text.Ctx.ON_LIGHT)
 	btn.pressed.connect(func() -> void: action_requested.emit(action))
 	# Wrap in an HBox so the link sits left-aligned instead of stretching.
 	var row: HBoxContainer = HBoxContainer.new()
