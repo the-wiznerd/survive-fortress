@@ -26,7 +26,6 @@ const _CARET_W: int = 8
 const _CARET_H: int = 12
 
 const _BG_COLOR: Color = Palette.WHITE
-const _BORDER_COLOR: Color = Palette.DARKEST_GRAY
 const _DIVIDER_COLOR: Color = Palette.LIGHTEST_GRAY
 const _DIVIDER_PAD: int = 8
 const _TITLE_COLOR: Color = Palette.BLACK
@@ -57,7 +56,7 @@ var _empty_label: Label = null
 var _caret: _CaretNode = null
 
 ## Which side of the tile the panel currently occupies.
-enum _Side { RIGHT, LEFT, ABOVE, BELOW }
+enum _Side {RIGHT, LEFT, ABOVE, BELOW}
 
 ## Triangular caret drawn behind the panel to point at the source tile.
 ## `w` and `h` are the Node2D extents in screen pixels; they are set each
@@ -65,13 +64,13 @@ enum _Side { RIGHT, LEFT, ABOVE, BELOW }
 ## vertical orientations without needing a separate class per direction.
 class _CaretNode extends Node2D:
 	## Caret tip points left  → panel is to the RIGHT of the tile.
-	const DIR_LEFT  = 0
+	const DIR_LEFT: int = 0
 	## Caret tip points right → panel is to the LEFT of the tile.
-	const DIR_RIGHT = 1
+	const DIR_RIGHT: int = 1
 	## Caret tip points up    → panel is BELOW the tile.
-	const DIR_UP    = 2
+	const DIR_UP: int = 2
 	## Caret tip points down  → panel is ABOVE the tile.
-	const DIR_DOWN  = 3
+	const DIR_DOWN: int = 3
 
 	var fill: Color = Color.WHITE
 	var direction: int = DIR_LEFT
@@ -86,19 +85,19 @@ class _CaretNode extends Node2D:
 	func _draw() -> void:
 		var pts: PackedVector2Array
 		match direction:
-			DIR_LEFT:   # base on right (x=w), tip on left (x=0)
+			DIR_LEFT: # base on right (x=w), tip on left (x=0)
 				pts = PackedVector2Array([
 					Vector2(w, 0.0), Vector2(w, h), Vector2(0.0, h * 0.5)
 				])
-			DIR_RIGHT:  # base on left (x=0), tip on right (x=w)
+			DIR_RIGHT: # base on left (x=0), tip on right (x=w)
 				pts = PackedVector2Array([
 					Vector2(0.0, 0.0), Vector2(0.0, h), Vector2(w, h * 0.5)
 				])
-			DIR_DOWN:   # base on top (y=0), tip on bottom (y=h)
+			DIR_DOWN: # base on top (y=0), tip on bottom (y=h)
 				pts = PackedVector2Array([
 					Vector2(0.0, 0.0), Vector2(w, 0.0), Vector2(w * 0.5, h)
 				])
-			DIR_UP:     # base on bottom (y=h), tip on top (y=0)
+			DIR_UP: # base on bottom (y=h), tip on top (y=0)
 				pts = PackedVector2Array([
 					Vector2(0.0, h), Vector2(w, h), Vector2(w * 0.5, 0.0)
 				])
@@ -156,10 +155,7 @@ func _build() -> void:
 	_entity_list = VBoxContainer.new()
 	_entity_list.add_theme_constant_override("separation", 0)
 	col.add_child(_entity_list)
-	_empty_label = Label.new()
-	_empty_label.text = "Empty"
-	_empty_label.add_theme_color_override("font_color", _MUTED_COLOR)
-	Fonts.apply_base(_empty_label)
+	_empty_label = Text.body("Empty", _MUTED_COLOR)
 	col.add_child(_empty_label)
 
 ## Open the inspector on a world column. `z` is the topmost terrain z (used
@@ -244,11 +240,7 @@ func _entities_in_column() -> Array[ViewEntity]:
 func _make_entity_card(entity: ViewEntity) -> Control:
 	var card: VBoxContainer = VBoxContainer.new()
 	card.add_theme_constant_override("separation", 2)
-	var title: Label = Label.new()
-	title.text = _label_for(entity)
-	title.add_theme_color_override("font_color", _TITLE_COLOR)
-	Fonts.apply_base(title)
-	card.add_child(title)
+	card.add_child(Text.heading(_label_for(entity), _TITLE_COLOR))
 	for row: Control in _body_rows_for(entity):
 		card.add_child(row)
 	return card
@@ -309,16 +301,8 @@ func _bush_rows(entity: ViewEntity) -> Array[Control]:
 func _make_kv_row(key: String, value_text: String) -> Control:
 	var row: HBoxContainer = HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
-	var key_lbl: Label = Label.new()
-	key_lbl.text = "%s:" % key
-	key_lbl.add_theme_color_override("font_color", _LABEL_COLOR)
-	Fonts.apply_base(key_lbl)
-	row.add_child(key_lbl)
-	var value_lbl: Label = Label.new()
-	value_lbl.text = value_text
-	value_lbl.add_theme_color_override("font_color", _VALUE_COLOR)
-	Fonts.apply_base(value_lbl)
-	row.add_child(value_lbl)
+	row.add_child(Text.body("%s:" % key, _LABEL_COLOR))
+	row.add_child(Text.body(value_text, _VALUE_COLOR))
 	return row
 
 ## A clickable action row, rendered as a link. The action is captured by
@@ -369,11 +353,11 @@ func _process(_delta: float) -> void:
 ## Returns the player entity's current screen position, or the viewport centre
 ## as a fallback when the view is unavailable.
 func _get_player_screen_pos() -> Vector2:
-	var fallback := get_viewport().get_visible_rect().size * 0.5
+	var fallback: Vector2 = get_viewport().get_visible_rect().size * 0.5
 	if _view == null:
 		return fallback
 	var player_id: int = _view.player_id.to_int()
-	var xform := get_viewport().get_canvas_transform()
+	var xform: Transform2D = get_viewport().get_canvas_transform()
 	for e: ViewEntity in _view.entities:
 		if e.id == player_id:
 			return xform * Utils.project(e.x, e.y, e.z)
@@ -391,61 +375,60 @@ func _get_player_screen_pos() -> Vector2:
 ## dimensions are available immediately after a content rebuild, eliminating
 ## the one-frame lag that occurs when reading the deferred .size property.
 func _update_anchor_position() -> void:
-	var xform    := get_viewport().get_canvas_transform()
-	var vp_size  := Vector2(get_viewport().get_visible_rect().size)
+	var xform: Transform2D = get_viewport().get_canvas_transform()
+	var vp_size: Vector2 = Vector2(get_viewport().get_visible_rect().size)
 
 	# Tile screen bounds.
-	var tile_tl  := xform * Utils.project(_column_x, _column_y, _column_z)
-	var zoom     := xform.get_scale()
-	var tile_w   := Constants.TILE_W * zoom.x
-	var tile_h   := Constants.TOP_FACE_H * zoom.y
-	var tile_ctr := tile_tl + Vector2(tile_w * 0.5, tile_h * 0.5)
+	var tile_tl: Vector2 = xform * Utils.project(_column_x, _column_y, _column_z)
+	var zoom: Vector2 = xform.get_scale()
+	var tile_w: float = Constants.TILE_W * zoom.x
+	var tile_h: float = Constants.TOP_FACE_H * zoom.y
+	var tile_ctr: Vector2 = tile_tl + Vector2(tile_w * 0.5, tile_h * 0.5)
 
-	var ps := _panel.get_combined_minimum_size()
+	var ps: Vector2 = _panel.get_combined_minimum_size()
 	if ps == Vector2.ZERO:
 		ps = _panel.size
 
 	# Side preference: opposite the player so the popup moves away from them.
-	var prefer_right := _get_player_screen_pos().x <= tile_ctr.x
+	var prefer_right: bool = _get_player_screen_pos().x <= tile_ctr.x
 
 	# Total offset from tile edge to near panel edge: caret depth + visual gap.
-	var side_off := float(_CARET_W + _PANEL_GAP)
-	var m        := float(_SCREEN_MARGIN)
+	var side_off: float = float(_CARET_W + _PANEL_GAP)
+	var m: float = float(_SCREEN_MARGIN)
 
 	# ---- Candidate positions ----
 	# RIGHT
-	var rx := tile_tl.x + tile_w + side_off
-	var ry := clampf(tile_ctr.y - ps.y * 0.5, m, vp_size.y - ps.y - m)
-	var r_ok := rx + ps.x + m <= vp_size.x
+	var rx: float = tile_tl.x + tile_w + side_off
+	var ry: float = clampf(tile_ctr.y - ps.y * 0.5, m, vp_size.y - ps.y - m)
+	var r_ok: bool = rx + ps.x + m <= vp_size.x
 
 	# LEFT
-	var lx := tile_tl.x - ps.x - side_off
-	var ly := clampf(tile_ctr.y - ps.y * 0.5, m, vp_size.y - ps.y - m)
-	var l_ok := lx >= m
+	var lx: float = tile_tl.x - ps.x - side_off
+	var ly: float = clampf(tile_ctr.y - ps.y * 0.5, m, vp_size.y - ps.y - m)
+	var l_ok: bool = lx >= m
 
 	# ABOVE
-	var ay := tile_tl.y - ps.y - side_off
-	var ax := clampf(tile_ctr.x - ps.x * 0.5, m, vp_size.x - ps.x - m)
-	var a_ok := ay >= m
+	var ay: float = tile_tl.y - ps.y - side_off
+	var ax: float = clampf(tile_ctr.x - ps.x * 0.5, m, vp_size.x - ps.x - m)
+	var a_ok: bool = ay >= m
 
 	# BELOW
-	var by := tile_tl.y + tile_h + side_off
-	var bx := clampf(tile_ctr.x - ps.x * 0.5, m, vp_size.x - ps.x - m)
-	var b_ok := by + ps.y + m <= vp_size.y
+	var by: float = tile_tl.y + tile_h + side_off
+	var bx: float = clampf(tile_ctr.x - ps.x * 0.5, m, vp_size.x - ps.x - m)
 
 	# ---- Pick placement ----
 	var pos: Vector2
 	var side: int
 	if prefer_right:
-		if   r_ok: pos = Vector2(rx, ry); side = _Side.RIGHT
+		if r_ok: pos = Vector2(rx, ry); side = _Side.RIGHT
 		elif l_ok: pos = Vector2(lx, ly); side = _Side.LEFT
 		elif a_ok: pos = Vector2(ax, ay); side = _Side.ABOVE
-		else:      pos = Vector2(bx, by); side = _Side.BELOW
+		else: pos = Vector2(bx, by); side = _Side.BELOW
 	else:
-		if   l_ok: pos = Vector2(lx, ly); side = _Side.LEFT
+		if l_ok: pos = Vector2(lx, ly); side = _Side.LEFT
 		elif r_ok: pos = Vector2(rx, ry); side = _Side.RIGHT
 		elif a_ok: pos = Vector2(ax, ay); side = _Side.ABOVE
-		else:      pos = Vector2(bx, by); side = _Side.BELOW
+		else: pos = Vector2(bx, by); side = _Side.BELOW
 
 	_panel.position = pos
 	_update_caret(side, pos, ps, tile_ctr)
@@ -460,7 +443,7 @@ func _update_caret(side: int, panel_pos: Vector2, panel_size: Vector2, tile_ctr:
 			_caret.direction = _CaretNode.DIR_LEFT
 			_caret.w = _CARET_W
 			_caret.h = _CARET_H
-			var cy := clampf(
+			var cy: float = clampf(
 				tile_ctr.y - _CARET_H * 0.5,
 				panel_pos.y, maxf(panel_pos.y, panel_pos.y + panel_size.y - _CARET_H)
 			)
@@ -470,7 +453,7 @@ func _update_caret(side: int, panel_pos: Vector2, panel_size: Vector2, tile_ctr:
 			_caret.direction = _CaretNode.DIR_RIGHT
 			_caret.w = _CARET_W
 			_caret.h = _CARET_H
-			var cy := clampf(
+			var cy: float = clampf(
 				tile_ctr.y - _CARET_H * 0.5,
 				panel_pos.y, maxf(panel_pos.y, panel_pos.y + panel_size.y - _CARET_H)
 			)
@@ -478,9 +461,9 @@ func _update_caret(side: int, panel_pos: Vector2, panel_size: Vector2, tile_ctr:
 		_Side.ABOVE:
 			# Panel is above tile → caret on panel's bottom edge, tip down.
 			_caret.direction = _CaretNode.DIR_DOWN
-			_caret.w = _CARET_H   # horizontal extent = base length
-			_caret.h = _CARET_W   # vertical extent   = depth
-			var cx := clampf(
+			_caret.w = _CARET_H # horizontal extent = base length
+			_caret.h = _CARET_W # vertical extent   = depth
+			var cx: float = clampf(
 				tile_ctr.x - _CARET_H * 0.5,
 				panel_pos.x, maxf(panel_pos.x, panel_pos.x + panel_size.x - _CARET_H)
 			)
@@ -490,7 +473,7 @@ func _update_caret(side: int, panel_pos: Vector2, panel_size: Vector2, tile_ctr:
 			_caret.direction = _CaretNode.DIR_UP
 			_caret.w = _CARET_H
 			_caret.h = _CARET_W
-			var cx := clampf(
+			var cx: float = clampf(
 				tile_ctr.x - _CARET_H * 0.5,
 				panel_pos.x, maxf(panel_pos.x, panel_pos.x + panel_size.x - _CARET_H)
 			)

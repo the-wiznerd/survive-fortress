@@ -14,7 +14,7 @@ const HEADING_PATH: String = "res://assets/fonts/04b03/04b03.ttf"
 const ICONS_PATH: String = "res://assets/fonts/icons/icons.fnt"
 
 const BASE_SIZE: int = 16
-const HEADING_SIZE: int = 16
+const HEADING_SIZE: int = 24
 
 ## Custom-glyph codepoints (Unicode Private Use Area). Embed in any string and
 ## the icons fallback bitmap font will render the matching pixel sprite, e.g.

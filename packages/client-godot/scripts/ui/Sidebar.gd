@@ -79,12 +79,13 @@ func _build() -> void:
 
 func _build_game_state_section(parent: VBoxContainer) -> void:
 	var box: VBoxContainer = _make_section(parent)
-	_day_label = _make_stat_label(box, "Day —")
+	_day_label = Text.heading("Day \u2014", _TEXT_COLOR)
+	box.add_child(_day_label)
 
 func _build_player_section(parent: VBoxContainer) -> void:
-	# Vitals + equipment live in one section — no heading needed; the player
-	# is the implicit subject.
+	# Vitals + equipment under a "Player" heading.
 	var box: VBoxContainer = _make_section(parent)
+	box.add_child(_make_heading("Player"))
 	_health_value = _make_kv_row(box, "Health:", "—")
 	_hunger_value = _make_kv_row(box, "Hunger:", "—")
 	# Small gap between vitals and slots.
@@ -98,11 +99,7 @@ func _build_player_section(parent: VBoxContainer) -> void:
 	var back_row: HBoxContainer = HBoxContainer.new()
 	back_row.add_theme_constant_override("separation", 6)
 	box.add_child(back_row)
-	var back_label: Label = Label.new()
-	back_label.text = "Back:"
-	back_label.add_theme_color_override("font_color", _TEXT_COLOR)
-	Fonts.apply_base(back_label)
-	back_row.add_child(back_label)
+	back_row.add_child(Text.body("Back:", _TEXT_COLOR))
 	_back_button = Link.make_on_dark("empty")
 	_back_button.disabled = true
 	_back_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -212,19 +209,7 @@ func _make_section(parent: VBoxContainer) -> VBoxContainer:
 	return box
 
 func _make_heading(text: String) -> Label:
-	var lbl: Label = Label.new()
-	lbl.text = text
-	lbl.add_theme_color_override("font_color", _MUTED_COLOR)
-	Fonts.apply_heading(lbl)
-	return lbl
-
-func _make_stat_label(parent: VBoxContainer, text: String) -> Label:
-	var lbl: Label = Label.new()
-	lbl.text = text
-	lbl.add_theme_color_override("font_color", _TEXT_COLOR)
-	Fonts.apply_base(lbl)
-	parent.add_child(lbl)
-	return lbl
+	return Text.heading(text, _MUTED_COLOR)
 
 ## Build a "Label: value" row and return the *value* label so callers can
 ## update it in place. Label uses the standard text color; value uses the
@@ -233,15 +218,8 @@ func _make_kv_row(parent: VBoxContainer, label_text: String, value_text: String)
 	var row: HBoxContainer = HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	parent.add_child(row)
-	var lbl: Label = Label.new()
-	lbl.text = label_text
-	lbl.add_theme_color_override("font_color", _TEXT_COLOR)
-	Fonts.apply_base(lbl)
-	row.add_child(lbl)
-	var val: Label = Label.new()
-	val.text = value_text
-	val.add_theme_color_override("font_color", _VALUE_COLOR)
-	Fonts.apply_base(val)
+	row.add_child(Text.body(label_text, _TEXT_COLOR))
+	var val: Label = Text.body(value_text, _VALUE_COLOR)
 	row.add_child(val)
 	return val
 
