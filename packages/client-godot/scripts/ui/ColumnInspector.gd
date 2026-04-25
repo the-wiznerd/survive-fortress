@@ -5,22 +5,29 @@ extends CanvasLayer
 ## it overlays the world but sits *below* the right-side Sidebar (sidebar uses
 ## layer 10).
 ##
-## Scope of this first pass: chrome + position tracking only. The panel shows
-## the column coordinates and a close button. Per-entity content (cards, chips,
-## equipment) lands in a follow-up.
+## Positioning: each frame the panel is placed beside the selected tile on the
+## side that is *away* from the player (so the popup stays out of the way).
+## If the preferred side is clipped by the viewport edge the inspector tries
+## the opposite side, then above, then below. Within the chosen side the panel
+## is vertically (side placement) or horizontally (above/below placement)
+## centred on the tile and clamped so it never leaves the screen.
+## A small triangular caret drawn behind the panel points back at the tile.
 ##
-## Anchoring: the inspector is told a world (x, y, z). Each frame in _process
-## we project that world position to screen space via the viewport's canvas
-## transform (which already encodes the active Camera2D's pan + zoom) and
-## reposition the panel. This is the Godot equivalent of the canvas client's
-## DOM-overlay-with-floating-ui approach.
+## One-frame layout-lag fix: panel size is read via get_combined_minimum_size()
+## rather than size, so the correct dimensions are available on the very first
+## frame after content is rebuilt without waiting for a deferred layout pass.
 
 const LAYER: int = 5
 const _PANEL_MIN_WIDTH: int = 200
 const _PANEL_HPAD: int = 10
 const _PANEL_VPAD: int = 8
-const _ANCHOR_OFFSET: Vector2 = Vector2(8, -8)
 const _SCREEN_MARGIN: int = 4
+## Gap (screen px) between the caret tip and the nearest tile edge.
+const _PANEL_GAP: int = 4
+## Caret depth — perpendicular to the panel edge (screen px).
+const _CARET_W: int = 8
+## Caret base length — along the panel edge (screen px).
+const _CARET_H: int = 12
 
 const _BG_COLOR: Color = Palette.WHITE
 const _BORDER_COLOR: Color = Palette.DARKEST_GRAY
@@ -51,6 +58,55 @@ var _view: GameView = null
 var _panel: PanelContainer = null
 var _entity_list: VBoxContainer = null
 var _empty_label: Label = null
+var _caret: _CaretNode = null
+
+## Which side of the tile the panel currently occupies.
+enum _Side { RIGHT, LEFT, ABOVE, BELOW }
+
+## Triangular caret drawn behind the panel to point at the source tile.
+## `w` and `h` are the Node2D extents in screen pixels; they are set each
+## frame before queue_redraw() so the triangle adapts to horizontal vs.
+## vertical orientations without needing a separate class per direction.
+class _CaretNode extends Node2D:
+	## Caret tip points left  → panel is to the RIGHT of the tile.
+	const DIR_LEFT  = 0
+	## Caret tip points right → panel is to the LEFT of the tile.
+	const DIR_RIGHT = 1
+	## Caret tip points up    → panel is BELOW the tile.
+	const DIR_UP    = 2
+	## Caret tip points down  → panel is ABOVE the tile.
+	const DIR_DOWN  = 3
+
+	var fill: Color = Color.WHITE
+	var direction: int = DIR_LEFT
+	## Extent along the x axis (depth for left/right, base for up/down).
+	var w: float = 8.0
+	## Extent along the y axis (base for left/right, depth for up/down).
+	var h: float = 12.0
+
+	func _ready() -> void:
+		z_index = -1
+
+	func _draw() -> void:
+		var pts: PackedVector2Array
+		match direction:
+			DIR_LEFT:   # base on right (x=w), tip on left (x=0)
+				pts = PackedVector2Array([
+					Vector2(w, 0.0), Vector2(w, h), Vector2(0.0, h * 0.5)
+				])
+			DIR_RIGHT:  # base on left (x=0), tip on right (x=w)
+				pts = PackedVector2Array([
+					Vector2(0.0, 0.0), Vector2(0.0, h), Vector2(w, h * 0.5)
+				])
+			DIR_DOWN:   # base on top (y=0), tip on bottom (y=h)
+				pts = PackedVector2Array([
+					Vector2(0.0, 0.0), Vector2(w, 0.0), Vector2(w * 0.5, h)
+				])
+			DIR_UP:     # base on bottom (y=h), tip on top (y=0)
+				pts = PackedVector2Array([
+					Vector2(0.0, h), Vector2(w, h), Vector2(w * 0.5, 0.0)
+				])
+		draw_colored_polygon(pts, fill)
 
 func _ready() -> void:
 	layer = LAYER
@@ -59,6 +115,14 @@ func _ready() -> void:
 	set_process(true)
 
 func _build() -> void:
+	# Caret is added first so it renders behind the panel. The panel's opaque
+	# background then covers the caret's base, leaving only the triangle tip
+	# visible — creating a seamless tooltip-arrow appearance.
+	_caret = _CaretNode.new()
+	_caret.name = "Caret"
+	_caret.fill = _BG_COLOR
+	add_child(_caret)
+
 	_panel = PanelContainer.new()
 	_panel.name = "InspectorPanel"
 	_panel.custom_minimum_size = Vector2(_PANEL_MIN_WIDTH, 0)
@@ -306,20 +370,136 @@ func _process(_delta: float) -> void:
 	if _anchored and visible:
 		_update_anchor_position()
 
+## Returns the player entity's current screen position, or the viewport centre
+## as a fallback when the view is unavailable.
+func _get_player_screen_pos() -> Vector2:
+	var fallback := get_viewport().get_visible_rect().size * 0.5
+	if _view == null:
+		return fallback
+	var player_id: int = _view.player_id.to_int()
+	var xform := get_viewport().get_canvas_transform()
+	for e: ViewEntity in _view.entities:
+		if e.id == player_id:
+			return xform * Constants.project(e.x, e.y, e.z)
+	return fallback
+
+## Reposition the panel (and caret) each frame using a side-preference
+## algorithm:
+##   1. Project the anchored tile to screen space.
+##   2. Pick preferred side = opposite of player (panel stays out of the way).
+##   3. Try preferred → opposite → above → below; pick first that fits.
+##   4. Within the chosen side, centre the panel on the tile and clamp to the
+##      viewport margins.
+##
+## Panel size is read via get_combined_minimum_size() so the correct
+## dimensions are available immediately after a content rebuild, eliminating
+## the one-frame lag that occurs when reading the deferred .size property.
 func _update_anchor_position() -> void:
-	# CanvasLayer children are NOT auto-transformed by the active Camera2D,
-	# so we apply the viewport's canvas transform manually to convert from
-	# world space to screen space.
-	var world_pos: Vector2 = Constants.project(_column_x, _column_y, _column_z)
-	var screen_pos: Vector2 = get_viewport().get_canvas_transform() * world_pos
-	# Anchor to the upper-right corner of the column (offset diagonally so the
-	# panel sits beside the tile, not on top of it).
-	var target: Vector2 = screen_pos + _ANCHOR_OFFSET
-	# Clamp into the visible viewport so the panel never disappears off-screen.
-	var viewport_size: Vector2 = Vector2(get_viewport().get_visible_rect().size)
-	var panel_size: Vector2 = _panel.size
-	if panel_size == Vector2.ZERO:
-		panel_size = _panel.get_combined_minimum_size()
-	target.x = clamp(target.x, _SCREEN_MARGIN, viewport_size.x - panel_size.x - _SCREEN_MARGIN)
-	target.y = clamp(target.y, _SCREEN_MARGIN, viewport_size.y - panel_size.y - _SCREEN_MARGIN)
-	_panel.position = target
+	var xform    := get_viewport().get_canvas_transform()
+	var vp_size  := Vector2(get_viewport().get_visible_rect().size)
+
+	# Tile screen bounds.
+	var tile_tl  := xform * Constants.project(_column_x, _column_y, _column_z)
+	var zoom     := xform.get_scale()
+	var tile_w   := Constants.TILE_W * zoom.x
+	var tile_h   := Constants.TOP_FACE_H * zoom.y
+	var tile_ctr := tile_tl + Vector2(tile_w * 0.5, tile_h * 0.5)
+
+	# Use get_combined_minimum_size() to avoid one-frame layout lag after
+	# _rebuild_entity_list(). For an auto-sized panel (no external stretch)
+	# this equals the actual rendered size.
+	var ps := _panel.get_combined_minimum_size()
+	if ps == Vector2.ZERO:
+		ps = _panel.size
+
+	# Side preference: opposite the player so the popup moves away from them.
+	var prefer_right := _get_player_screen_pos().x <= tile_ctr.x
+
+	# Total offset from tile edge to near panel edge: caret depth + visual gap.
+	var side_off := float(_CARET_W + _PANEL_GAP)
+	var m        := float(_SCREEN_MARGIN)
+
+	# ---- Candidate positions ----
+	# RIGHT
+	var rx := tile_tl.x + tile_w + side_off
+	var ry := clampf(tile_ctr.y - ps.y * 0.5, m, vp_size.y - ps.y - m)
+	var r_ok := rx + ps.x + m <= vp_size.x
+
+	# LEFT
+	var lx := tile_tl.x - ps.x - side_off
+	var ly := clampf(tile_ctr.y - ps.y * 0.5, m, vp_size.y - ps.y - m)
+	var l_ok := lx >= m
+
+	# ABOVE
+	var ay := tile_tl.y - ps.y - side_off
+	var ax := clampf(tile_ctr.x - ps.x * 0.5, m, vp_size.x - ps.x - m)
+	var a_ok := ay >= m
+
+	# BELOW
+	var by := tile_tl.y + tile_h + side_off
+	var bx := clampf(tile_ctr.x - ps.x * 0.5, m, vp_size.x - ps.x - m)
+	var b_ok := by + ps.y + m <= vp_size.y
+
+	# ---- Pick placement ----
+	var pos: Vector2
+	var side: int
+	if prefer_right:
+		if   r_ok: pos = Vector2(rx, ry); side = _Side.RIGHT
+		elif l_ok: pos = Vector2(lx, ly); side = _Side.LEFT
+		elif a_ok: pos = Vector2(ax, ay); side = _Side.ABOVE
+		else:      pos = Vector2(bx, by); side = _Side.BELOW
+	else:
+		if   l_ok: pos = Vector2(lx, ly); side = _Side.LEFT
+		elif r_ok: pos = Vector2(rx, ry); side = _Side.RIGHT
+		elif a_ok: pos = Vector2(ax, ay); side = _Side.ABOVE
+		else:      pos = Vector2(bx, by); side = _Side.BELOW
+
+	_panel.position = pos
+	_update_caret(side, pos, ps, tile_ctr)
+
+## Position and orient the caret triangle so its tip points toward the tile.
+## The caret is centred on the tile's screen centre and clamped inside the
+## panel bounds so it never overhangs the panel edge.
+func _update_caret(side: int, panel_pos: Vector2, panel_size: Vector2, tile_ctr: Vector2) -> void:
+	match side:
+		_Side.RIGHT:
+			# Panel is right of tile → caret on panel's left edge, tip left.
+			_caret.direction = _CaretNode.DIR_LEFT
+			_caret.w = _CARET_W
+			_caret.h = _CARET_H
+			var cy := clampf(
+				tile_ctr.y - _CARET_H * 0.5,
+				panel_pos.y, maxf(panel_pos.y, panel_pos.y + panel_size.y - _CARET_H)
+			)
+			_caret.position = Vector2(panel_pos.x - _CARET_W, cy)
+		_Side.LEFT:
+			# Panel is left of tile → caret on panel's right edge, tip right.
+			_caret.direction = _CaretNode.DIR_RIGHT
+			_caret.w = _CARET_W
+			_caret.h = _CARET_H
+			var cy := clampf(
+				tile_ctr.y - _CARET_H * 0.5,
+				panel_pos.y, maxf(panel_pos.y, panel_pos.y + panel_size.y - _CARET_H)
+			)
+			_caret.position = Vector2(panel_pos.x + panel_size.x, cy)
+		_Side.ABOVE:
+			# Panel is above tile → caret on panel's bottom edge, tip down.
+			_caret.direction = _CaretNode.DIR_DOWN
+			_caret.w = _CARET_H   # horizontal extent = base length
+			_caret.h = _CARET_W   # vertical extent   = depth
+			var cx := clampf(
+				tile_ctr.x - _CARET_H * 0.5,
+				panel_pos.x, maxf(panel_pos.x, panel_pos.x + panel_size.x - _CARET_H)
+			)
+			_caret.position = Vector2(cx, panel_pos.y + panel_size.y)
+		_Side.BELOW:
+			# Panel is below tile → caret on panel's top edge, tip up.
+			_caret.direction = _CaretNode.DIR_UP
+			_caret.w = _CARET_H
+			_caret.h = _CARET_W
+			var cx := clampf(
+				tile_ctr.x - _CARET_H * 0.5,
+				panel_pos.x, maxf(panel_pos.x, panel_pos.x + panel_size.x - _CARET_H)
+			)
+			_caret.position = Vector2(cx, panel_pos.y - _CARET_W)
+	_caret.queue_redraw()
