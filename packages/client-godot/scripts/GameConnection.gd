@@ -63,7 +63,7 @@ func send_join(save: String, turn_mode: String = "") -> void:
 ## Send a `submit-plan` message with a list of typed PlayerActions.
 func send_plan(actions: Array[PlayerAction]) -> void:
 	var serialized: Array = []
-	for action in actions:
+	for action: PlayerAction in actions:
 		serialized.append(action.to_dict())
 	send({"type": "submit-plan", "actions": serialized})
 

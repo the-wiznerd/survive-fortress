@@ -10,12 +10,8 @@ extends CanvasLayer
 ## If the preferred side is clipped by the viewport edge the inspector tries
 ## the opposite side, then above, then below. Within the chosen side the panel
 ## is vertically (side placement) or horizontally (above/below placement)
-## centred on the tile and clamped so it never leaves the screen.
+## centered on the tile and clamped so it never leaves the screen.
 ## A small triangular caret drawn behind the panel points back at the tile.
-##
-## One-frame layout-lag fix: panel size is read via get_combined_minimum_size()
-## rather than size, so the correct dimensions are available on the very first
-## frame after content is rebuilt without waiting for a deferred layout pass.
 
 const LAYER: int = 5
 const _PANEL_MIN_WIDTH: int = 200
@@ -210,12 +206,12 @@ func _rebuild_entity_list() -> void:
 	# Detach synchronously (queue_free is deferred — without remove_child the
 	# old rows would still be in the tree when we add new ones, causing the
 	# panel to grow with every refresh).
-	for child in _entity_list.get_children():
+	for child: Node in _entity_list.get_children():
 		_entity_list.remove_child(child)
 		child.queue_free()
 	var entities: Array[ViewEntity] = _entities_in_column()
 	_empty_label.visible = entities.is_empty()
-	for i in entities.size():
+	for i: int in entities.size():
 		if i > 0:
 			_entity_list.add_child(_make_divider())
 		_entity_list.add_child(_make_entity_card(entities[i]))
@@ -253,7 +249,7 @@ func _make_entity_card(entity: ViewEntity) -> Control:
 	title.add_theme_color_override("font_color", _TITLE_COLOR)
 	Fonts.apply_base(title)
 	card.add_child(title)
-	for row in _body_rows_for(entity):
+	for row: Control in _body_rows_for(entity):
 		card.add_child(row)
 	return card
 
@@ -303,7 +299,7 @@ func _bush_rows(entity: ViewEntity) -> Array[Control]:
 		return rows
 	var cost: int = SdkUtil.to_int(harvestable.get("cost", 0))
 	rows.append(_make_action_button(
-		"Harvest (costs %d)" % cost,
+		"harvest %d%s" % [cost, Fonts.ICON_AP],
 		PlayerAction.harvest(entity.id),
 	))
 	return rows
@@ -342,19 +338,19 @@ func _make_action_button(label_text: String, action: PlayerAction) -> Control:
 func _make_divider() -> Control:
 	# Vertical padding above + UI-pixel line + vertical padding below, so
 	# adjacent cards aren't crammed against the divider.
-	var wrap: VBoxContainer = VBoxContainer.new()
-	wrap.add_theme_constant_override("separation", 0)
+	var wrapper: VBoxContainer = VBoxContainer.new()
+	wrapper.add_theme_constant_override("separation", 0)
 	var pad_top: Control = Control.new()
 	pad_top.custom_minimum_size = Vector2(0, _DIVIDER_PAD)
-	wrap.add_child(pad_top)
+	wrapper.add_child(pad_top)
 	var line: ColorRect = ColorRect.new()
 	line.color = _DIVIDER_COLOR
 	line.custom_minimum_size = Vector2(0, Constants.UI_PIXEL)
-	wrap.add_child(line)
+	wrapper.add_child(line)
 	var pad_bot: Control = Control.new()
 	pad_bot.custom_minimum_size = Vector2(0, _DIVIDER_PAD)
-	wrap.add_child(pad_bot)
-	return wrap
+	wrapper.add_child(pad_bot)
+	return wrapper
 
 func _label_for(entity: ViewEntity) -> String:
 	if entity.entity_name != "":
@@ -380,7 +376,7 @@ func _get_player_screen_pos() -> Vector2:
 	var xform := get_viewport().get_canvas_transform()
 	for e: ViewEntity in _view.entities:
 		if e.id == player_id:
-			return xform * Constants.project(e.x, e.y, e.z)
+			return xform * Utils.project(e.x, e.y, e.z)
 	return fallback
 
 ## Reposition the panel (and caret) each frame using a side-preference
@@ -388,7 +384,7 @@ func _get_player_screen_pos() -> Vector2:
 ##   1. Project the anchored tile to screen space.
 ##   2. Pick preferred side = opposite of player (panel stays out of the way).
 ##   3. Try preferred → opposite → above → below; pick first that fits.
-##   4. Within the chosen side, centre the panel on the tile and clamp to the
+##   4. Within the chosen side, center the panel on the tile and clamp to the
 ##      viewport margins.
 ##
 ## Panel size is read via get_combined_minimum_size() so the correct
@@ -399,15 +395,12 @@ func _update_anchor_position() -> void:
 	var vp_size  := Vector2(get_viewport().get_visible_rect().size)
 
 	# Tile screen bounds.
-	var tile_tl  := xform * Constants.project(_column_x, _column_y, _column_z)
+	var tile_tl  := xform * Utils.project(_column_x, _column_y, _column_z)
 	var zoom     := xform.get_scale()
 	var tile_w   := Constants.TILE_W * zoom.x
 	var tile_h   := Constants.TOP_FACE_H * zoom.y
 	var tile_ctr := tile_tl + Vector2(tile_w * 0.5, tile_h * 0.5)
 
-	# Use get_combined_minimum_size() to avoid one-frame layout lag after
-	# _rebuild_entity_list(). For an auto-sized panel (no external stretch)
-	# this equals the actual rendered size.
 	var ps := _panel.get_combined_minimum_size()
 	if ps == Vector2.ZERO:
 		ps = _panel.size
@@ -458,8 +451,8 @@ func _update_anchor_position() -> void:
 	_update_caret(side, pos, ps, tile_ctr)
 
 ## Position and orient the caret triangle so its tip points toward the tile.
-## The caret is centred on the tile's screen centre and clamped inside the
-## panel bounds so it never overhangs the panel edge.
+## Centered on the tile's screen center and clamped inside the panel bounds
+## so it never overhangs the panel edge.
 func _update_caret(side: int, panel_pos: Vector2, panel_size: Vector2, tile_ctr: Vector2) -> void:
 	match side:
 		_Side.RIGHT:

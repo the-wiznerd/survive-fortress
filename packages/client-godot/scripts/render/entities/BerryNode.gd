@@ -13,7 +13,7 @@ func setup(_resources: RenderResources) -> void:
 	rect.size = Vector2(SIZE_PX, SIZE_PX)
 	# Sit on the bottom of the front face, horizontally centered.
 	rect.position = Vector2(
-		(Constants.TILE_W - SIZE_PX) / 2,
+		Utils.divi(Constants.TILE_W - SIZE_PX, 2),
 		Constants.TOP_FACE_H + Constants.FRONT_FACE_H - SIZE_PX,
 	)
 	visual.add_child(rect)

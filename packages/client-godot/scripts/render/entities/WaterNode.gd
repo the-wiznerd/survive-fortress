@@ -67,7 +67,7 @@ func _apply_frame() -> void:
 	if _sheet == null:
 		return
 	var ticks: int = Time.get_ticks_msec()
-	var frame_idx: int = posmod(int(ticks / FRAME_INTERVAL_MS) + _phase,
+	var frame_idx: int = posmod(Utils.divi(ticks, FRAME_INTERVAL_MS) + _phase,
 		TerrainSheet.WATER_FRAME_COUNT)
 	if frame_idx == _last_frame:
 		return

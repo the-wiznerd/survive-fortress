@@ -124,6 +124,6 @@ func _center_camera_on_player(view: GameView) -> void:
 	for entity: ViewEntity in view.entities:
 		if entity.id == player_id_int:
 			var half_tile: Vector2 = Vector2(Constants.TILE_W, Constants.TOP_FACE_H) * 0.5
-			_camera.position = Constants.project(entity.x, entity.y, entity.z) + half_tile
+			_camera.position = Utils.project(entity.x, entity.y, entity.z) + half_tile
 			return
 	push_warning("[Main] Player entity (id=%d) not found in view; camera not centered." % player_id_int)
