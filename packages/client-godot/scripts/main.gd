@@ -13,6 +13,12 @@ var _sidebar: Sidebar
 var _column_inspector: ColumnInspector
 var _selected_highlight: ColumnHighlight
 var _hover_highlight: ColumnHighlight
+var _move_plan_overlay: MovePlanOverlay
+var _action_plan_overlay: ActionPlanOverlay
+var _plan_store: PlanStore
+## Latest GameView from `joined` or `round-resolve`. Cached so input handlers
+## (right-click path planning) don't need to ask the connection for it.
+var _last_view: GameView = null
 
 func _ready() -> void:
 	_world_renderer = WorldRenderer.new()
@@ -35,6 +41,23 @@ func _ready() -> void:
 	_world_renderer.add_child(_selected_highlight)
 	_selected_highlight.setup(_world_renderer.get_resources(), ColumnHighlight.SELECTED_COL)
 
+	_plan_store = PlanStore.new()
+	_plan_store.name = "PlanStore"
+	add_child(_plan_store)
+
+	# MovePlanOverlay sits inside WorldRenderer like the highlights so its
+	# step sprites Y-sort with terrain and entities. It rebuilds whenever the
+	# plan changes or a new view arrives.
+	_move_plan_overlay = MovePlanOverlay.new()
+	_move_plan_overlay.name = "MovePlanOverlay"
+	_world_renderer.add_child(_move_plan_overlay)
+	_move_plan_overlay.setup(_world_renderer.get_resources(), _world_renderer, _plan_store)
+
+	_action_plan_overlay = ActionPlanOverlay.new()
+	_action_plan_overlay.name = "ActionPlanOverlay"
+	_world_renderer.add_child(_action_plan_overlay)
+	_action_plan_overlay.setup(_world_renderer.get_resources(), _world_renderer, _plan_store)
+
 	_camera = Camera2D.new()
 	_camera.name = "Camera"
 	# Pixel-art friendly defaults: integer snapping + nearest-neighbor scaling.
@@ -55,6 +78,7 @@ func _ready() -> void:
 	_column_inspector = ColumnInspector.new()
 	_column_inspector.name = "ColumnInspector"
 	_column_inspector.closed.connect(_on_inspector_closed)
+	_column_inspector.action_requested.connect(_on_inspector_action_requested)
 	add_child(_column_inspector)
 
 	_connection = GameConnection.new()
@@ -90,9 +114,13 @@ func _on_joined(msg: ServerMessage) -> void:
 		msg.turn_mode,
 	])
 	print("[Main] Action costs: ", msg.action_costs)
+	_last_view = view
+	_plan_store.configure(msg.action_points_per_round, msg.action_costs)
 	_world_renderer.render_view(view)
 	_sidebar.update_view(view)
 	_column_inspector.set_view(view)
+	_move_plan_overlay.set_view(view)
+	_action_plan_overlay.set_view(view)
 	_center_camera_on_player(view)
 
 func _on_round_resolve(msg: ServerMessage) -> void:
@@ -100,9 +128,17 @@ func _on_round_resolve(msg: ServerMessage) -> void:
 	if msg.frames.size() > 0:
 		var last: GameView = msg.frames[msg.frames.size() - 1]
 		print("[Main]   final tick=%d entities=%d" % [last.tick, last.entities.size()])
+		_last_view = last
+		# Server has executed the plan \u2014 reset to a fresh planning phase
+		# and clear the in-progress plan before the overlay rebuilds against
+		# the new player position.
+		_plan_store.phase = PlanStore.PHASE_PLANNING
+		_plan_store.clear()
 		_world_renderer.render_view(last)
 		_sidebar.update_view(last)
 		_column_inspector.set_view(last)
+		_move_plan_overlay.set_view(last)
+		_action_plan_overlay.set_view(last)
 		_center_camera_on_player(last)
 
 func _on_server_error(message: String) -> void:
@@ -118,10 +154,11 @@ func _on_settings_clicked() -> void:
 	print("[Main] Settings clicked (settings popup not implemented yet).")
 
 ## Left-click on the world opens (or toggles closed) the column inspector.
+## Right-click extends the planned movement path to the clicked column.
 ## Mouse motion updates the hover highlight. _unhandled_input fires only for
 ## events not consumed by Control nodes (sidebar, inspector chrome), so input
-## over UI never reaches this handler — hover/select naturally stop at the
-## panel edge.
+## over UI never reaches this handler \u2014 hover/select/path naturally stop
+## at the panel edge.
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		var mm: InputEventMouseMotion = event
@@ -129,8 +166,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event is InputEventMouseButton:
 		var mb: InputEventMouseButton = event
-		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+		if not mb.pressed:
+			return
+		if mb.button_index == MOUSE_BUTTON_LEFT:
 			_handle_click_at(mb.position)
+		elif mb.button_index == MOUSE_BUTTON_RIGHT:
+			_handle_right_click_at(mb.position)
 
 ## Convert a screen-space mouse position to a world column (col_x, col_y).
 ## The screen → world transform is the inverse of the viewport's canvas
@@ -154,6 +195,27 @@ func _handle_click_at(screen_pos: Vector2) -> void:
 	var top_z: int = _world_renderer.top_z_at(col.x, col.y)
 	_column_inspector.show_column(col.x, col.y, top_z)
 	_selected_highlight.show_at(col.x, col.y, maxi(top_z, 0))
+
+## Right-click extends the planned movement path from the plan cursor (the
+## position the player will occupy after all currently-planned moves resolve)
+## to the clicked column, using a cardinal-only walk that hugs the straight
+## line between them. Truncated silently when the AP budget runs out. The
+## arrow chain re-renders via PlanStore.plan_changed.
+func _handle_right_click_at(screen_pos: Vector2) -> void:
+	if _last_view == null:
+		return
+	var player: ViewEntity = _find_player(_last_view)
+	if player == null:
+		return
+	var col: Vector2i = _column_at_screen(screen_pos)
+	_plan_store.append_path_to(col.x, col.y, player.x, player.y)
+
+static func _find_player(view: GameView) -> ViewEntity:
+	var pid: int = view.player_id.to_int()
+	for e: ViewEntity in view.entities:
+		if e.id == pid:
+			return e
+	return null
 
 ## Reposition the hover highlight under the cursor. Hides it when the cursor
 ## isn't over a known terrain column so we don't paint a stray overlay over
@@ -186,6 +248,12 @@ func _process(_delta: float) -> void:
 
 func _on_inspector_closed() -> void:
 	_selected_highlight.hide_highlight()
+
+## Inspector emitted an action button click (e.g. bush "Harvest"). Forward to
+## the plan store, which de-dups + AP-checks before appending. The action
+## overlay rebuilds via PlanStore.plan_changed.
+func _on_inspector_action_requested(action: PlayerAction) -> void:
+	_plan_store.append_action(action)
 
 ## Move the camera to the player's projected screen position, offset to the
 ## center of the tile so the player sprite sits in the middle of the viewport.
