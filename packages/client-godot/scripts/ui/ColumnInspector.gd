@@ -178,6 +178,14 @@ func close() -> void:
 func is_open() -> bool:
 	return _anchored
 
+## World column the inspector is currently anchored to. Only meaningful when
+## is_open() is true; returns the last-anchored column otherwise.
+func column_x() -> int:
+	return _column_x
+
+func column_y() -> int:
+	return _column_y
+
 func anchored_column() -> Vector2i:
 	return Vector2i(_column_x, _column_y)
 

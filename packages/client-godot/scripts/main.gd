@@ -11,21 +11,29 @@ var _world_renderer: WorldRenderer
 var _camera: Camera2D
 var _sidebar: Sidebar
 var _column_inspector: ColumnInspector
-var _column_highlight: ColumnHighlight
+var _selected_highlight: ColumnHighlight
+var _hover_highlight: ColumnHighlight
 
 func _ready() -> void:
 	_world_renderer = WorldRenderer.new()
 	_world_renderer.name = "WorldRenderer"
 	add_child(_world_renderer)
 
-	# Highlight is mounted *inside* WorldRenderer so it participates in the
-	# same Y-sort tree as terrain and entities — that lets entities standing
-	# on the inspected column render over the highlight, while the highlight
-	# still paints over the terrain top face beneath them.
-	_column_highlight = ColumnHighlight.new()
-	_column_highlight.name = "ColumnHighlight"
-	_world_renderer.add_child(_column_highlight)
-	_column_highlight.setup(_world_renderer.get_resources())
+	# Highlights are mounted *inside* WorldRenderer so they participate in
+	# the same Y-sort tree as terrain and entities — that lets entities
+	# standing on the inspected column render over the highlight, while the
+	# highlight still paints over the terrain top face beneath them.
+	# Hover is added before selected so that when both land on the same
+	# column, selected wins the same-z, same-y tree-order tiebreak.
+	_hover_highlight = ColumnHighlight.new()
+	_hover_highlight.name = "HoverHighlight"
+	_world_renderer.add_child(_hover_highlight)
+	_hover_highlight.setup(_world_renderer.get_resources(), ColumnHighlight.HOVER_COL)
+
+	_selected_highlight = ColumnHighlight.new()
+	_selected_highlight.name = "SelectedHighlight"
+	_world_renderer.add_child(_selected_highlight)
+	_selected_highlight.setup(_world_renderer.get_resources(), ColumnHighlight.SELECTED_COL)
 
 	_camera = Camera2D.new()
 	_camera.name = "Camera"
@@ -109,28 +117,75 @@ func _on_bag_clicked() -> void:
 func _on_settings_clicked() -> void:
 	print("[Main] Settings clicked (settings popup not implemented yet).")
 
-## Left-click on the world opens the column inspector. _unhandled_input fires
-## only for events not consumed by Control nodes (sidebar, inspector chrome),
-## so clicks on UI never reach this handler.
+## Left-click on the world opens (or toggles closed) the column inspector.
+## Mouse motion updates the hover highlight. _unhandled_input fires only for
+## events not consumed by Control nodes (sidebar, inspector chrome), so input
+## over UI never reaches this handler — hover/select naturally stop at the
+## panel edge.
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		var mm: InputEventMouseMotion = event
+		_update_hover_at(mm.position)
+		return
 	if event is InputEventMouseButton:
 		var mb: InputEventMouseButton = event
 		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
-			_open_inspector_at(mb.position)
+			_handle_click_at(mb.position)
 
-## Convert a screen-space mouse position to a world column (x, y) and open
-## the inspector there. The screen → world transform is the inverse of the
-## viewport's canvas transform (which encodes the active Camera2D).
-func _open_inspector_at(screen_pos: Vector2) -> void:
+## Convert a screen-space mouse position to a world column (col_x, col_y).
+## The screen → world transform is the inverse of the viewport's canvas
+## transform (which encodes the active Camera2D).
+func _column_at_screen(screen_pos: Vector2) -> Vector2i:
 	var world_pos: Vector2 = get_viewport().get_canvas_transform().affine_inverse() * screen_pos
-	var col_x: int = floori(world_pos.x / float(Constants.TILE_W))
-	var col_y: int = floori(world_pos.y / float(Constants.TOP_FACE_H))
-	var top_z: int = _world_renderer.top_z_at(col_x, col_y)
-	_column_inspector.show_column(col_x, col_y, top_z)
-	_column_highlight.show_at(col_x, col_y, maxi(top_z, 0))
+	return Vector2i(
+		floori(world_pos.x / float(Constants.TILE_W)),
+		floori(world_pos.y / float(Constants.TOP_FACE_H)),
+	)
+
+## Open the inspector at the clicked column, or close it if the same column
+## is clicked again (toggle behavior).
+func _handle_click_at(screen_pos: Vector2) -> void:
+	var col: Vector2i = _column_at_screen(screen_pos)
+	if _column_inspector.is_open() \
+			and _column_inspector.column_x() == col.x \
+			and _column_inspector.column_y() == col.y:
+		_column_inspector.close()
+		return
+	var top_z: int = _world_renderer.top_z_at(col.x, col.y)
+	_column_inspector.show_column(col.x, col.y, top_z)
+	_selected_highlight.show_at(col.x, col.y, maxi(top_z, 0))
+
+## Reposition the hover highlight under the cursor. Hides it when the cursor
+## isn't over a known terrain column so we don't paint a stray overlay over
+## empty space.
+func _update_hover_at(screen_pos: Vector2) -> void:
+	var col: Vector2i = _column_at_screen(screen_pos)
+	var top_z: int = _world_renderer.top_z_at(col.x, col.y)
+	if top_z < 0:
+		_hover_highlight.hide_highlight()
+		return
+	_hover_highlight.show_at(col.x, col.y, top_z)
+
+## Mouse motion is consumed by Controls with mouse_filter = STOP (sidebar,
+## inspector chrome), so _unhandled_input doesn't fire while the cursor is
+## over UI \u2014 the hover indicator would otherwise stick at its last world
+## position. Each frame, hide it whenever a UI Control is hovered or the OS
+## cursor has left the window. Cheap: gui_get_hovered_control() is O(1) and
+## we early-out when nothing is showing.
+func _process(_delta: float) -> void:
+	if not _hover_highlight.visible:
+		return
+	var vp: Viewport = get_viewport()
+	if vp.gui_get_hovered_control() != null:
+		_hover_highlight.hide_highlight()
+		return
+	var mouse: Vector2 = vp.get_mouse_position()
+	var size: Vector2 = vp.get_visible_rect().size
+	if mouse.x < 0 or mouse.y < 0 or mouse.x >= size.x or mouse.y >= size.y:
+		_hover_highlight.hide_highlight()
 
 func _on_inspector_closed() -> void:
-	_column_highlight.hide_highlight()
+	_selected_highlight.hide_highlight()
 
 ## Move the camera to the player's projected screen position, offset to the
 ## center of the tile so the player sprite sits in the middle of the viewport.

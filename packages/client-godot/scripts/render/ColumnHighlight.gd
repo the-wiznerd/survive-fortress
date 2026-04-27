@@ -14,9 +14,11 @@ extends Node2D
 ## ordering.
 
 ## Sprite sheet row holding hover/selected/arrow/action overlays.
-const _OVERLAY_ROW: int = 14
+const OVERLAY_ROW: int = 14
+## Column index for the "hover" highlight sprite.
+const HOVER_COL: int = 0
 ## Column index for the "selected" highlight sprite.
-const _SELECTED_COL: int = 1
+const SELECTED_COL: int = 1
 
 var _sprite: Sprite2D = null
 
@@ -34,9 +36,10 @@ func _init() -> void:
 	add_child(_sprite)
 	visible = false
 
-## Bind the sprite atlas. Called by the owner (WorldRenderer) after construction.
-func setup(resources: RenderResources) -> void:
-	_sprite.texture = resources.sheet.region(_SELECTED_COL, _OVERLAY_ROW)
+## Bind the sprite atlas to one of the OVERLAY_ROW columns (HOVER_COL,
+## SELECTED_COL, etc). Called by the owner once after construction.
+func setup(resources: RenderResources, sprite_col: int) -> void:
+	_sprite.texture = resources.sheet.region(sprite_col, OVERLAY_ROW)
 
 ## Show the highlight at the given column. `z` should be the topmost terrain z.
 ## Position is the row sort key (no elevation); the visual child carries the
