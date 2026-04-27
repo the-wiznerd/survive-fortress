@@ -11,11 +11,21 @@ var _world_renderer: WorldRenderer
 var _camera: Camera2D
 var _sidebar: Sidebar
 var _column_inspector: ColumnInspector
+var _column_highlight: ColumnHighlight
 
 func _ready() -> void:
 	_world_renderer = WorldRenderer.new()
 	_world_renderer.name = "WorldRenderer"
 	add_child(_world_renderer)
+
+	# Highlight is mounted *inside* WorldRenderer so it participates in the
+	# same Y-sort tree as terrain and entities — that lets entities standing
+	# on the inspected column render over the highlight, while the highlight
+	# still paints over the terrain top face beneath them.
+	_column_highlight = ColumnHighlight.new()
+	_column_highlight.name = "ColumnHighlight"
+	_world_renderer.add_child(_column_highlight)
+	_column_highlight.setup(_world_renderer.get_resources())
 
 	_camera = Camera2D.new()
 	_camera.name = "Camera"
@@ -36,6 +46,7 @@ func _ready() -> void:
 
 	_column_inspector = ColumnInspector.new()
 	_column_inspector.name = "ColumnInspector"
+	_column_inspector.closed.connect(_on_inspector_closed)
 	add_child(_column_inspector)
 
 	_connection = GameConnection.new()
@@ -116,6 +127,10 @@ func _open_inspector_at(screen_pos: Vector2) -> void:
 	var col_y: int = floori(world_pos.y / float(Constants.TOP_FACE_H))
 	var top_z: int = _world_renderer.top_z_at(col_x, col_y)
 	_column_inspector.show_column(col_x, col_y, top_z)
+	_column_highlight.show_at(col_x, col_y, maxi(top_z, 0))
+
+func _on_inspector_closed() -> void:
+	_column_highlight.hide_highlight()
 
 ## Move the camera to the player's projected screen position, offset to the
 ## center of the tile so the player sprite sits in the middle of the viewport.

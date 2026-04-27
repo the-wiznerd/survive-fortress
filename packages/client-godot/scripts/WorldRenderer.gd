@@ -69,3 +69,9 @@ func top_z_at(x: int, y: int) -> int:
 	if _last_index == null:
 		return -1
 	return _last_index.max_z_at(x, y)
+
+## Shared rendering resources (sprite sheets, atlases). Exposed so overlay
+## nodes mounted under us — e.g. ColumnHighlight — can grab the same atlas
+## without owning their own copy.
+func get_resources() -> RenderResources:
+	return _resources
