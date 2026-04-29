@@ -16,12 +16,9 @@ Dependency direction flows one way: lower layers don't import from higher ones.
 
 - **`packages/client-godot/`** — Godot project (GDScript). Talks to `@repo/server` over its network protocol; never imports TypeScript packages directly.
 
-### Inactive
+### Dormant
 
-- **`@repo/client`** — *Legacy.* Vue + canvas client. Slated for removal.
-- **`@repo/editor`** — *Legacy.* Vue + canvas level editor. Slated for removal.
-- **`@repo/rendering`** — *Legacy.* Rendering abstractions (e.g. drawing a terrain tile from a spritesheet at a given world position) shared by the Vue client and editor. Slated for removal — Godot handles its own rendering.
-- **`@repo/editor-server`** — *Dormant.* Exposes engine/storage APIs that the normal client SDK doesn't surface; was used to build test worlds via the Vue editor. Kept for a possible future Godot-based map editor.
+- **`@repo/editor-server`** — Exposes engine/storage APIs that the normal client SDK doesn't surface; was used to build test worlds via the (now-removed) Vue editor. Kept for a possible future Godot-based map editor.
 
 ## The SDK as a boundary
 

@@ -16,7 +16,6 @@
   "references": [
     { "path": "packages/state" },
     { "path": "packages/engine" },
-    { "path": "packages/server" },
-    { "path": "packages/client" }
+    { "path": "packages/server" }
   ]
 }

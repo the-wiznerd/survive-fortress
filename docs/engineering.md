@@ -26,6 +26,6 @@ For shared behavior between handlers, prefer helper functions over base classes.
 
 See [concepts/entities.md](concepts/entities.md) and [concepts/actions.md](concepts/actions.md) for how this plays out in practice.
 
-## Collaboration
+## Local environment
 
-For multi-file changes, do one file at a time and pause for review between each.
+Node version is pinned in `.nvmrc` (currently 22). The shell does **not** auto-switch. Before running `yarn`, `node`, or any script that shells out to them, run `nvm use` so the right version is active. Yarn 4 fails on older Node with a `fetch is not defined` crash.
