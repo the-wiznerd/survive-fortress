@@ -17,5 +17,6 @@ The two docs imported below load with every session — they're the engineering 
 - [docs/concepts/world-space.md](docs/concepts/world-space.md) — coordinate system, columns, screen mapping, painter's order. Consult when touching positioning, rendering, or anything spatial.
 - [docs/concepts/turns.md](docs/concepts/turns.md) — simultaneous planning rounds, AP, plan/resolve phases. Consult when working on the planner, action submission, or tick orchestration.
 - [docs/concepts/actions.md](docs/concepts/actions.md) — action handler shape and lifecycle. Consult when authoring a new action or changing dispatch.
-- [docs/concepts/entities.md](docs/concepts/entities.md) — three-layer architecture (systems, traits, entity types). Consult when adding or modifying a trait, system, or entity type.
+- [docs/concepts/entities.md](docs/concepts/entities.md) — composition pattern, three-layer architecture, entity types, registration, serialization. Consult when adding or modifying a system or entity type.
+- [docs/concepts/traits.md](docs/concepts/traits.md) — trait class shape, benefits, and authoring. Consult when adding or modifying a trait.
 - [docs/concepts/vision.md](docs/concepts/vision.md) — per-entity visibility rules. Consult when touching what the client sees, occlusion, or the column-walk algorithm.

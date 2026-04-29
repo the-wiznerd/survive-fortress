@@ -1,12 +1,12 @@
-# Design Philosophy & Concept
+# Game design
 
-## The Core Fantasy
+## The core fantasy
 
 You are one person in a world that does not revolve around you. The land was here before you arrived, and it will continue without you. Rain falls, rivers flow, grass grows, animals hunt and graze, seasons turn. You are shipwrecked into this — a newcomer in a place that is already alive. Your goal is not to conquer or complete it. Your goal is to *survive in it*, and over time, to leave your mark on it.
 
 The fundamental pleasure is **belonging to a living place**. Not managing it. Not optimizing it. *Being in it.*
 
-## Values (Priority Order)
+## Values (priority order)
 
 1. **The world feels alive without you.** Things happen whether you're watching or not. Animals migrate. Water erodes. Plants spread. Weather changes. The player should regularly stumble onto things that happened on their own — a pond that dried up, a predator that cleared out a rabbit warren, moss creeping over a ruin. This is the single most important quality of the game.
 
@@ -30,7 +30,7 @@ The deliberate sparseness is the point: **your real eyes are the graphics card.*
 
 Two pixel fonts. A muted, naturalistic palette with moments of color — wildflowers in a meadow, lava in a cavern, the glow of magic. The sidebar shows you data about what you're looking at, like reading the stats of a place you're standing in. It's almost scientific — you're an observer-participant in an ecosystem.
 
-## The World
+## The world
 
 A vast, continuous landscape that wraps at the edges — walk far enough east and you come back from the west. The surface is a 2D grid, but terrain stacks vertically: cliffs, caves, riverbeds, hilltops. You see the world from above, but elevation matters — you need a way up a cliff, a way down into a cavern.
 
@@ -40,7 +40,7 @@ From there: sandy shore, grassland interior, a river, a pond, trees, dense fores
 
 Over time, the world opens up. The coast gives way to plains, hills, marshes, mountains, deserts, tundra. Underground caverns. Ruins. Places where the rules are different — magical biomes, strange creatures, unexplained phenomena. The world is *mostly* naturalistic, but not entirely. There are things out there that don't follow the normal rules, and discovering them is part of the draw.
 
-## What "Fun" Means Here
+## What "fun" means here
 
 The game is not fast. It's not twitchy. It's not about power curves or dopamine loops. The fun is:
 
@@ -50,7 +50,7 @@ The game is not fast. It's not twitchy. It's not about power curves or dopamine 
 - **Accumulation of place.** Over many sessions, you develop a home, a territory, a relationship with the land around you. You know where the berry bushes are, where the wolves den, which cave floods in the rain. The world becomes *yours* not because you own it, but because you *know* it.
 - **Surprise.** The world is complex enough that it still surprises you. A combination of conditions you've never seen. A creature behaving in a way you didn't expect. A cascade of consequences from something you did three days ago.
 
-## What It Is Not
+## What it is not
 
 - Not a crafting game. You can make things, but the crafting is not the point.
 - Not a building game. You can change the world, but construction is not the core loop.
@@ -58,7 +58,7 @@ The game is not fast. It's not twitchy. It's not about power curves or dopamine 
 - Not a combat game. There is danger, and you can fight, but combat is situational, not central.
 - Not a progression game. There are no levels, no skill trees, no unlocks. *You* get better at the game by understanding the world better — the game itself is the skill tree.
 
-## The Game Arc
+## The game arc
 
 **Early game:** Pure survival. You're hungry, exposed, and ignorant. Every discovery matters — a berry bush, a freshwater source, a sheltered overhang. The world is small because you can't afford to go far.
 
@@ -68,7 +68,7 @@ The game is not fast. It's not twitchy. It's not about power curves or dopamine 
 
 **Endgame:** Your character ages and eventually dies. Or perhaps you find a way off the island. When you replay, the world carries traces of your previous life — your shelter now occupied by an NPC, your farm overgrown but still partially there. The world moved on. It always does.
 
-## Input Model — Simultaneous Planning Rounds
+## Input model — simultaneous planning rounds
 
 The game plays like an animated board game. Each round has two phases:
 
@@ -91,6 +91,8 @@ The game plays like an animated board game. Each round has two phases:
 
 **Multiplayer pacing options:** Timed rounds (15–30s planning, adjustable) for active sessions. Untimed rounds (resolve when all players confirm) for relaxed or asynchronous play.
 
-## The Non-Realistic Elements
+See [concepts/turns.md](concepts/turns.md) for the technical mechanics of the planning/resolve flow.
+
+## The non-realistic elements
 
 The world is grounded in naturalism — weather, ecology, geology, biology — but it is not Earth. There is magic. There are creatures that don't exist. There are places where physics bends. These elements follow their *own* consistent rules, discoverable the same way you discover natural ones. Magic is not a system you level up in; it's a phenomenon you encounter, study, and learn to work with — or avoid. It should feel like finding something *genuinely strange* in an otherwise comprehensible world, not like entering a magic shop.
