@@ -38,26 +38,13 @@ The client interacts with the game exclusively through `@repo/server/sdk`:
 - `createLocalGame(loadSave)` accepts raw JSON `{ manifest, chunks }`, handles engine internals
 - The client never imports from `@repo/state` or `@repo/engine` directly
 
-## Key Commands
-
-- `nvm use` before any yarn/node commands to use the correct Node version
-- `yarn dev`  builds deps + starts client dev server (Turborepo)
-- `yarn build` full production build all packages
-- `yarn test` engine tests (vitest, 20 tests)
-- `yarn typecheck` tsc --noEmit all packages
-- `yarn dev:kill` kill dev servers on ports 5173-5175
-
-## Style
-
-- No trailing semicolons in `.ts` files.
-
 ### File & Directory Organization
 
 - **Split unrelated but similar code into separate files** in a single directory. One class/system/trait per file.
 - **Directory names use camelCase or PascalCase**, matching JS naming conventions. No snake_case: `entityTypes/`, `traits/`, not `entity_types/`, `trait_files/`.
 - **File names match the class they contain**, including capitalization. `Dirt.ts` exports `class Dirt`, `MoistureTrait.ts` exports `class MoistureTrait`. Files that export only non-class values (functions, constants) use camelCase: `moisture.ts`, `movement.ts`.
 
-### Functions
+### Typescript Functions
 
 - **Prefer `function` declarations** over arrow-const at the top scope: `export function foo()` not `export const foo = () =>`.
 - Arrow functions are fine for anonymous callbacks, inline lambdas, and functions defined inside another function.
@@ -70,3 +57,30 @@ The client interacts with the game exclusively through `@repo/server/sdk`:
 
 - **Discuss before implementing** when the user asks exploratory questions like "is there a way", "how should we", "what do you think", or "ideas?". Present options and tradeoffs, then wait for the user's go-ahead before writing code.
 - The user is an integral part of the software architecture. Treat design decisions as collaborative — don't pick an approach and implement it unilaterally.
+
+## Class vs. handler — the rule of thumb
+
+> **If the thing has identity and per-instance state, use a class.**
+> **If it's a pure transformation keyed by a discriminator, use a registered
+> handler object.**
+
+Actions land squarely in the second bucket:
+
+- The payload (`{ type, ...args }`) already carries all the data.
+- A handler holds no state between calls — `cost`/`validate`/`execute` are pure
+  over `(world, actorId, action)`.
+- Dispatch is a single `Map.get(action.type)` lookup; classes would force a
+  parallel `type → ctor` registry plus per-tick `new` allocations for what is
+  effectively a function call.
+- Side-effect registration (`import './pickup.js'`) composes cleanly without
+  base-class boilerplate.
+
+Traits and entity types stay classes for the opposite reason: each entity needs
+its **own** instance with its **own** fields and lifecycle (`init`, `save`,
+`tick`).
+
+### Sharing behavior between handlers
+
+Prefer **helper functions** over a base class. If two actions both need an
+"adjacency + line-of-sight" check, factor it into a function the handlers call.
+Inheritance for stateless behavior tends to add more friction than reuse.

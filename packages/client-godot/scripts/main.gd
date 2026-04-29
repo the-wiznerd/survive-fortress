@@ -116,6 +116,7 @@ func _on_joined(msg: ServerMessage) -> void:
 	print("[Main] Action costs: ", msg.action_costs)
 	_last_view = view
 	_plan_store.configure(msg.action_points_per_round, msg.action_costs)
+	_plan_store.set_view(view)
 	_world_renderer.render_view(view)
 	_sidebar.update_view(view)
 	_column_inspector.set_view(view)
@@ -134,6 +135,7 @@ func _on_round_resolve(msg: ServerMessage) -> void:
 		# the new player position.
 		_plan_store.phase = PlanStore.PHASE_PLANNING
 		_plan_store.clear()
+		_plan_store.set_view(last)
 		_world_renderer.render_view(last)
 		_sidebar.update_view(last)
 		_column_inspector.set_view(last)

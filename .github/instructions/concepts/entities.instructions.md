@@ -1,8 +1,3 @@
----
-applyTo: "packages/engine/src/entityTypes/**"
-description: "Entity type and trait patterns — how to create entity types, traits, and systems. Per-entity instances, trait-is-component architecture, and registration."
----
-
 # Entity Types, Traits & Systems
 
 ## Architecture Overview

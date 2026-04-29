@@ -22,14 +22,21 @@ const PHASE_RESOLVING: String = "resolving"
 var phase: String = PHASE_PLANNING
 var plan: Array[PlayerAction] = []
 var action_points_per_round: int = 0
-## Map of action type (String) \u2192 base AP cost (int). Per-target overrides
-## (e.g. harvestable.cost) aren't read here yet \u2014 add when needed.
+## Map of action type (String) → base AP cost (int).
 var action_costs: Dictionary = {}
+## Latest world view, used to look up per-target action costs (e.g. a bush's
+## `harvestable.cost`). Pushed by main.gd whenever the view advances.
+var _view: GameView = null
 
 ## Bind AP budget + cost table from the server's `joined` message.
 func configure(ap_per_round: int, costs: Dictionary) -> void:
 	action_points_per_round = ap_per_round
 	action_costs = costs
+
+## Push the latest GameView in. Used by action_cost() to resolve per-target
+## costs from trait data; otherwise the store has no opinion on the view.
+func set_view(view: GameView) -> void:
+	_view = view
 
 func plan_cost() -> int:
 	var total: int = 0
@@ -38,14 +45,43 @@ func plan_cost() -> int:
 	return total
 
 func action_cost(a: PlayerAction) -> int:
-	var cost: Variant = action_costs.get(a.type, 1)
-	if cost is int:
-		var i: int = cost
+	# Per-target trait costs (e.g. harvestable.cost) take priority when the
+	# trait carries one. Falls back to the base table from the server's
+	# `joined` message, then to 1 if neither is known.
+	var override: int = _per_target_cost(a)
+	if override > 0:
+		return override
+	return _coerce_int(action_costs.get(a.type, 1), 1)
+
+## Look up a target-trait cost for the action, or -1 if none applies. Returns
+## an int so action_cost() can distinguish "no override" from "cost is 0".
+func _per_target_cost(a: PlayerAction) -> int:
+	if a.target_id == 0 or _view == null:
+		return -1
+	var target: ViewEntity = _find_entity(a.target_id)
+	if target == null:
+		return -1
+	match a.type:
+		PlayerAction.TYPE_HARVEST:
+			var h: Dictionary = target.get_trait("harvestable")
+			if h.has("cost"):
+				return _coerce_int(h.get("cost"), -1)
+	return -1
+
+func _find_entity(id: int) -> ViewEntity:
+	for e: ViewEntity in _view.entities:
+		if e.id == id:
+			return e
+	return null
+
+static func _coerce_int(v: Variant, fallback: int) -> int:
+	if v is int:
+		var i: int = v
 		return i
-	if cost is float:
-		var f: float = cost
+	if v is float:
+		var f: float = v
 		return int(f)
-	return 1
+	return fallback
 
 func can_afford(a: PlayerAction) -> bool:
 	return plan_cost() + action_cost(a) <= action_points_per_round
