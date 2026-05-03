@@ -138,28 +138,22 @@ func append_path_to(tx: int, ty: int, player_x: int, player_y: int) -> void:
 	if added:
 		plan_changed.emit()
 
-## Append a non-move targeted action (harvest, pickup, eat). De-dups by
-## (type, target_id) so clicking the same button twice doesn't queue twice.
+## Append a non-move action (harvest, pickup, eat, wait). Targeted actions
+## de-dup by (type, target_id) so clicking the same button twice doesn't
+## queue twice. Target-less actions (wait) skip dedupe \u2014 clicking N times
+## queues N waits.
 ## (Eat-stacks etc. aren't modeled here yet \u2014 add when needed.)
 func append_action(action: PlayerAction) -> void:
 	if phase != PHASE_PLANNING:
 		return
 	if not can_afford(action):
 		return
-	for existing: PlayerAction in plan:
-		if existing.type == action.type and existing.target_id == action.target_id:
-			return
+	if action.target_id != 0:
+		for existing: PlayerAction in plan:
+			if existing.type == action.type and existing.target_id == action.target_id:
+				return
 	plan.append(action)
 	plan_changed.emit()
-
-## All target entity ids currently queued for any action, in plan order.
-## Used by the action overlay to draw an indicator on each one's tile.
-func planned_action_target_ids() -> Array[int]:
-	var ids: Array[int] = []
-	for a: PlayerAction in plan:
-		if a.target_id != 0:
-			ids.append(a.target_id)
-	return ids
 
 ## Cardinal direction string \u2192 (dx, dy). Public so overlay code can walk
 ## the plan without depending on PlayerAction internals.

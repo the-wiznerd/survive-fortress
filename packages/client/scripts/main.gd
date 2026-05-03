@@ -6,6 +6,11 @@ extends Node
 const SERVER_URL: String = "ws://localhost:5174"
 const DEFAULT_SAVE: String = "test-world"
 
+## Minimum horizontal pointer travel (screen px) to count a right-button drag
+## as a swipe gesture. Below this, the press+release is treated as a click and
+## extends the planned path at the release position.
+const _SWIPE_THRESHOLD_PX: float = 50.0
+
 var _connection: GameConnection
 var _world_renderer: WorldRenderer
 var _camera: Camera2D
@@ -19,6 +24,12 @@ var _plan_store: PlanStore
 ## Latest GameView from `joined` or `round-resolve`. Cached so input handlers
 ## (right-click path planning) don't need to ask the connection for it.
 var _last_view: GameView = null
+
+## Right-button drag tracking. Press is recorded in _unhandled_input (only
+## fires over the world), release is read in _input (sees events even over
+## the sidebar) so a swipe that ends on the sidebar isn't lost.
+var _right_press_active: bool = false
+var _right_press_pos: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	_world_renderer = WorldRenderer.new()
@@ -156,11 +167,13 @@ func _on_settings_clicked() -> void:
 	print("[Main] Settings clicked (settings popup not implemented yet).")
 
 ## Left-click on the world opens (or toggles closed) the column inspector.
-## Right-click extends the planned movement path to the clicked column.
-## Mouse motion updates the hover highlight. _unhandled_input fires only for
-## events not consumed by Control nodes (sidebar, inspector chrome), so input
-## over UI never reaches this handler \u2014 hover/select/path naturally stop
-## at the panel edge.
+## Right-button press over the world arms a drag: on release, a horizontal
+## swipe past `_SWIPE_THRESHOLD_PX` becomes a submit (right) or clear (left)
+## gesture; otherwise it extends the planned movement path at the release
+## position. _unhandled_input fires only for events not consumed by Control
+## nodes (sidebar, inspector chrome), so the press is naturally scoped to the
+## world; the release is read in _input so a swipe that ends on the sidebar
+## isn't lost when the sidebar consumes the event.
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		var mm: InputEventMouseMotion = event
@@ -168,12 +181,60 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event is InputEventMouseButton:
 		var mb: InputEventMouseButton = event
-		if not mb.pressed:
-			return
-		if mb.button_index == MOUSE_BUTTON_LEFT:
+		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed:
 			_handle_click_at(mb.position)
-		elif mb.button_index == MOUSE_BUTTON_RIGHT:
-			_handle_right_click_at(mb.position)
+		elif mb.button_index == MOUSE_BUTTON_RIGHT and mb.pressed:
+			_right_press_active = true
+			_right_press_pos = mb.position
+
+## Catches right-button release events even when they happen over UI Controls
+## (which would otherwise consume them before _unhandled_input sees them).
+## Only acts when a press was previously registered over the world.
+func _input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb: InputEventMouseButton = event
+	if mb.button_index != MOUSE_BUTTON_RIGHT or mb.pressed:
+		return
+	if not _right_press_active:
+		return
+	_right_press_active = false
+	_classify_right_release(_right_press_pos, mb.position)
+
+## Decide whether a press\u2192release pair is a swipe or a click and dispatch.
+## Horizontal-dominant motion past the threshold is a gesture; anything
+## smaller falls through to the existing path-extend behaviour.
+func _classify_right_release(press_pos: Vector2, release_pos: Vector2) -> void:
+	var dx: float = release_pos.x - press_pos.x
+	var dy: float = release_pos.y - press_pos.y
+	if absf(dx) >= _SWIPE_THRESHOLD_PX and absf(dx) > absf(dy):
+		if dx > 0.0:
+			_handle_swipe_submit()
+		else:
+			_handle_swipe_clear()
+		return
+	_handle_right_click_at(release_pos)
+
+## Swipe-right gesture: submit the current plan to the server and lock the
+## phase to SUBMITTED. Round-resolve resets back to PLANNING and clears the
+## plan. No-op outside the planning phase so a stray swipe during resolution
+## can't double-submit.
+func _handle_swipe_submit() -> void:
+	if _plan_store.phase != PlanStore.PHASE_PLANNING:
+		print("[Main] Swipe submit ignored \u2014 phase=", _plan_store.phase)
+		return
+	print("[Main] Swipe submit \u2014 sending %d action(s)." % _plan_store.plan.size())
+	_connection.send_plan(_plan_store.plan)
+	_plan_store.phase = PlanStore.PHASE_SUBMITTED
+
+## Swipe-left gesture: drop the current in-progress plan. No-op outside
+## planning so we can't wipe a plan the engine is already running.
+func _handle_swipe_clear() -> void:
+	if _plan_store.phase != PlanStore.PHASE_PLANNING:
+		print("[Main] Swipe clear ignored \u2014 phase=", _plan_store.phase)
+		return
+	print("[Main] Swipe clear \u2014 dropping %d action(s)." % _plan_store.plan.size())
+	_plan_store.clear()
 
 ## Convert a screen-space mouse position to a world column (col_x, col_y).
 ## The screen → world transform is the inverse of the viewport's canvas

@@ -45,7 +45,6 @@ var _view: GameView = null
 # --- Widgets ---
 var _panel: PanelContainer = null
 var _entity_list: VBoxContainer = null
-var _empty_label: Label = null
 var _close_btn: Button = null
 var _caret: _CaretNode = null
 
@@ -139,8 +138,6 @@ func _build() -> void:
 	_entity_list = VBoxContainer.new()
 	_entity_list.add_theme_constant_override("separation", 0)
 	col.add_child(_entity_list)
-	_empty_label = Text.value("Empty", Text.Ctx.ON_LIGHT)
-	col.add_child(_empty_label)
 
 	# Close button floats over the panel's top-right corner. Added as a sibling
 	# of the panel (last child of self) so it renders above the panel content,
@@ -205,11 +202,15 @@ func _rebuild_entity_list() -> void:
 		_entity_list.remove_child(child)
 		child.queue_free()
 	var entities: Array[ViewEntity] = _entities_in_column()
-	_empty_label.visible = entities.is_empty()
 	for i: int in entities.size():
 		if i > 0:
 			_entity_list.add_child(_make_divider())
 		_entity_list.add_child(_make_entity_card(entities[i]))
+	# Universal "wait" action — always available regardless of column contents.
+	# A divider above separates it from any entity-specific actions.
+	if not entities.is_empty():
+		_entity_list.add_child(_make_divider())
+	_entity_list.add_child(_make_wait_row())
 	# Containers remember their previous size; without a reset the panel only
 	# ever grows. reset_size() snaps it back to the new combined min size.
 	_panel.reset_size()
@@ -316,6 +317,19 @@ func _make_action_button(label_text: String, action: PlayerAction) -> Control:
 	var btn: Button = Link.make(label_text, Text.Ctx.ON_LIGHT)
 	btn.pressed.connect(func() -> void: action_requested.emit(action))
 	# Wrap in an HBox so the link sits left-aligned instead of stretching.
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_child(btn)
+	var spacer: Control = Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(spacer)
+	return row
+
+## The universal "wait" action row. Unlike _make_action_button, builds a fresh
+## PlayerAction on every click so PlanStore ends up with distinct instances
+## when the player queues multiple waits in a row.
+func _make_wait_row() -> Control:
+	var btn: Button = Link.make("wait 1%s" % Fonts.ICON_AP, Text.Ctx.ON_LIGHT)
+	btn.pressed.connect(func() -> void: action_requested.emit(PlayerAction.wait()))
 	var row: HBoxContainer = HBoxContainer.new()
 	row.add_child(btn)
 	var spacer: Control = Control.new()

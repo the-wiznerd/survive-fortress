@@ -1,10 +1,15 @@
 class_name ActionPlanOverlay
 extends Node2D
 
-## Renders the player's planned non-move actions (harvest, pickup, eat) as
-## an "action" sprite overlay on each target entity's tile. Companion to
-## MovePlanOverlay \u2014 they share the same row-14 sprite scheme via
-## ColumnHighlight, just at a different column.
+## Renders the player's planned non-move actions as overlay sprites on tiles:
+##   - Targeted actions (harvest, pickup, eat) sit on the target entity's
+##     tile, sourced from the live view so a target that wandered moves with
+##     the indicator.
+##   - Wait sits on the projected player position at that point in the plan
+##     (i.e. the cursor walked through preceding moves).
+##
+## Companion to MovePlanOverlay \u2014 they share the same row-14 sprite scheme via
+## ColumnHighlight, just at different columns.
 ##
 ## Driven by the same two inputs as MovePlanOverlay:
 ##   1. PlanStore.plan_changed
@@ -43,22 +48,38 @@ func _rebuild() -> void:
 	if _plan_store == null or _current_view == null:
 		_hide_all()
 		return
+	var player: ViewEntity = _find_player(_current_view)
+	if player == null:
+		_hide_all()
+		return
 
+	# Walk the plan, advancing the cursor on moves so wait indicators land
+	# at the position the player will actually be when the wait happens.
+	var x: int = player.x
+	var y: int = player.y
 	var index: int = 0
-	for target_id: int in _plan_store.planned_action_target_ids():
-		var target: ViewEntity = _find_entity(_current_view, target_id)
-		if target == null:
+	for a: PlayerAction in _plan_store.plan:
+		if a.type == PlayerAction.TYPE_MOVE:
+			var d: Vector2i = PlanStore.direction_delta(a.direction)
+			x += d.x
+			y += d.y
 			continue
-		# Use the topmost terrain z at the target's column so the indicator
-		# sits on the visible top face rather than the entity's own z (which
-		# may be the same, but for floating/stacked entities it's the
-		# terrain we care about visually). Falls back to the entity's z when
-		# the column has no known terrain.
-		var top_z: int = _world_renderer.top_z_at(target.x, target.y)
-		var z: int = top_z if top_z >= 0 else target.z
+		var tx: int
+		var ty: int
+		if a.type == PlayerAction.TYPE_WAIT:
+			tx = x
+			ty = y
+		else:
+			var target: ViewEntity = _find_entity(_current_view, a.target_id)
+			if target == null:
+				continue
+			tx = target.x
+			ty = target.y
+		var top_z: int = _world_renderer.top_z_at(tx, ty)
+		var z: int = maxi(top_z, 0)
 		var node: ColumnHighlight = _ensure_step(index)
 		node.setup(_resources, _ACTION_COL)
-		node.show_at(target.x, target.y, z)
+		node.show_at(tx, ty, z)
 		index += 1
 
 	for i in range(index, _pool.size()):
@@ -79,5 +100,12 @@ func _hide_all() -> void:
 static func _find_entity(view: GameView, id: int) -> ViewEntity:
 	for e: ViewEntity in view.entities:
 		if e.id == id:
+			return e
+	return null
+
+static func _find_player(view: GameView) -> ViewEntity:
+	var pid: int = view.player_id.to_int()
+	for e: ViewEntity in view.entities:
+		if e.id == pid:
 			return e
 	return null
