@@ -142,4 +142,4 @@ vite.config.ts.timestamp-*
 .turbo
 
 # Godot client
-packages/client-godot/.godot/
+packages/client/.godot/

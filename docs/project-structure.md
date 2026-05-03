@@ -14,7 +14,7 @@ Dependency direction flows one way: lower layers don't import from higher ones.
 
 ### Active client
 
-- **`packages/client-godot/`** — Godot project (GDScript). Talks to `@repo/server` over its network protocol; never imports TypeScript packages directly.
+- **`packages/client/`** — Godot project (GDScript). Talks to `@repo/server` over its network protocol; never imports TypeScript packages directly.
 
 ### Dormant
 
