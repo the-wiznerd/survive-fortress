@@ -30,7 +30,7 @@ var _hunger_value: Label = null
 var _left_hand_value: Label = null
 var _right_hand_value: Label = null
 var _back_button: Button = null
-var _feed_container: VBoxContainer = null
+var _feed: Feed = null
 
 func _ready() -> void:
 	# CanvasLayer above the world (default world is layer 0).
@@ -112,10 +112,25 @@ func _build_feed_section(parent: VBoxContainer) -> void:
 	box.add_theme_constant_override("separation", Spacing.XS)
 	parent.add_child(box)
 	box.add_child(Text.heading("Feed"))
-	_feed_container = VBoxContainer.new()
-	_feed_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_feed_container.add_theme_constant_override("separation", Spacing.XS)
-	box.add_child(_feed_container)
+	# Wrapping the chip stack in a ScrollContainer prevents history overflow
+	# from pushing the settings section out of the sidebar. Scrollbars are
+	# hidden — the natural reading order (current at top, oldest at bottom)
+	# means clipping at the bottom drops the least-relevant entries first.
+	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	box.add_child(scroll)
+	_feed = Feed.new()
+	_feed.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(_feed)
+
+## Wire the feed to its data source. Called by main.gd after the plan store
+## exists. Must run before the first GameView arrives so the feed is ready
+## to render queued actions on first view.
+func setup_feed(plan_store: PlanStore) -> void:
+	_feed.setup(plan_store)
 
 func _build_settings_section(parent: VBoxContainer) -> void:
 	var box: HBoxContainer = HBoxContainer.new()
@@ -135,6 +150,9 @@ func update_view(view: GameView) -> void:
 	var day: int = Utils.divi(view.tick, Constants.TICKS_PER_DAY) + 1
 	var tick_in_day: int = Utils.modi(view.tick, Constants.TICKS_PER_DAY)
 	Text.set_text(_day_label, "Day %d.%02d" % [day, tick_in_day])
+
+	# Feed needs the view to label targeted action chips by entity name.
+	_feed.set_view(view)
 
 	var player: ViewEntity = _find_player(view)
 	if player == null:

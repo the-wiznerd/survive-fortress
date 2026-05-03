@@ -21,6 +21,7 @@ var _hover_highlight: ColumnHighlight
 var _move_plan_overlay: MovePlanOverlay
 var _action_plan_overlay: ActionPlanOverlay
 var _plan_store: PlanStore
+var _resolution_player: ResolutionPlayer
 ## Latest GameView from `joined` or `round-resolve`. Cached so input handlers
 ## (right-click path planning) don't need to ask the connection for it.
 var _last_view: GameView = null
@@ -69,6 +70,11 @@ func _ready() -> void:
 	_world_renderer.add_child(_action_plan_overlay)
 	_action_plan_overlay.setup(_world_renderer.get_resources(), _world_renderer, _plan_store)
 
+	_resolution_player = ResolutionPlayer.new()
+	_resolution_player.name = "ResolutionPlayer"
+	add_child(_resolution_player)
+	_resolution_player.tick_advanced.connect(_on_resolution_tick)
+
 	_camera = Camera2D.new()
 	_camera.name = "Camera"
 	# Pixel-art friendly defaults: integer snapping + nearest-neighbor scaling.
@@ -85,6 +91,7 @@ func _ready() -> void:
 	_sidebar.bag_clicked.connect(_on_bag_clicked)
 	_sidebar.settings_clicked.connect(_on_settings_clicked)
 	add_child(_sidebar)
+	_sidebar.setup_feed(_plan_store)
 
 	_column_inspector = ColumnInspector.new()
 	_column_inspector.name = "ColumnInspector"
@@ -135,24 +142,37 @@ func _on_joined(msg: ServerMessage) -> void:
 	_action_plan_overlay.set_view(view)
 	_center_camera_on_player(view)
 
+## Frames arrive in one batch from the server. Hand them off to the
+## ResolutionPlayer for paced playback so the player sees each tick advance
+## in turn \u2014 the feed transitions slot-by-slot, the world updates per tick,
+## and the inspector / overlays follow along. Plan store is cleared on entry
+## so the planning overlays (move arrows, action indicators) disappear while
+## the engine runs; the feed switches its source to per-frame player_plan.
 func _on_round_resolve(msg: ServerMessage) -> void:
 	print("[Main] Round resolved with %d frames." % msg.frames.size())
-	if msg.frames.size() > 0:
-		var last: GameView = msg.frames[msg.frames.size() - 1]
-		print("[Main]   final tick=%d entities=%d" % [last.tick, last.entities.size()])
-		_last_view = last
-		# Server has executed the plan \u2014 reset to a fresh planning phase
-		# and clear the in-progress plan before the overlay rebuilds against
-		# the new player position.
+	if msg.frames.is_empty():
+		# Nothing to play back \u2014 return straight to planning so the player
+		# isn't stuck in SUBMITTED.
 		_plan_store.phase = PlanStore.PHASE_PLANNING
-		_plan_store.clear()
-		_plan_store.set_view(last)
-		_world_renderer.render_view(last)
-		_sidebar.update_view(last)
-		_column_inspector.set_view(last)
-		_move_plan_overlay.set_view(last)
-		_action_plan_overlay.set_view(last)
-		_center_camera_on_player(last)
+		return
+	_plan_store.phase = PlanStore.PHASE_RESOLVING
+	_plan_store.clear()
+	_resolution_player.play(msg.frames)
+
+## One frame of the resolving round: push it through every consumer so the
+## world, sidebar, feed, and overlays all reflect the same tick. On the last
+## frame, drop back to PLANNING so the player can build the next round.
+func _on_resolution_tick(view: GameView, is_last: bool) -> void:
+	_last_view = view
+	_plan_store.set_view(view)
+	_world_renderer.render_view(view)
+	_sidebar.update_view(view)
+	_column_inspector.set_view(view)
+	_move_plan_overlay.set_view(view)
+	_action_plan_overlay.set_view(view)
+	_center_camera_on_player(view)
+	if is_last:
+		_plan_store.phase = PlanStore.PHASE_PLANNING
 
 func _on_server_error(message: String) -> void:
 	push_error("[Main] Server error: " + message)
@@ -208,7 +228,7 @@ func _classify_right_release(press_pos: Vector2, release_pos: Vector2) -> void:
 	var dx: float = release_pos.x - press_pos.x
 	var dy: float = release_pos.y - press_pos.y
 	if absf(dx) >= _SWIPE_THRESHOLD_PX and absf(dx) > absf(dy):
-		if dx > 0.0:
+		if dx < 0.0:
 			_handle_swipe_submit()
 		else:
 			_handle_swipe_clear()

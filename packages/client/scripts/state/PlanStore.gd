@@ -14,12 +14,18 @@ extends Node
 ## emission \u2014 this isn't a hot path.
 
 signal plan_changed
+signal phase_changed
 
 const PHASE_PLANNING: String = "planning"
 const PHASE_SUBMITTED: String = "submitted"
 const PHASE_RESOLVING: String = "resolving"
 
-var phase: String = PHASE_PLANNING
+var phase: String = PHASE_PLANNING:
+	set(value):
+		if value == phase:
+			return
+		phase = value
+		phase_changed.emit()
 var plan: Array[PlayerAction] = []
 var action_points_per_round: int = 0
 ## Map of action type (String) → base AP cost (int).
