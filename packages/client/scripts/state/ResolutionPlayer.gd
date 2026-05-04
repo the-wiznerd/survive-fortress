@@ -8,9 +8,8 @@ extends Node
 ##
 ## Idle when no frames are queued. play() restarts playback from frame 0.
 
-## Real-time delay between consecutive frame emissions. Tunable; 200ms is a
-## good balance between watchable and snappy for the current per-round size.
-const TICK_INTERVAL_S: float = 0.2
+## Real-time delay between consecutive frame emissions. Tunable.
+const TICK_INTERVAL_S: float = 0.5
 
 ## Fired for each frame in playback order. `is_last` lets subscribers run
 ## end-of-resolution work (clearing the plan, restoring planning input)

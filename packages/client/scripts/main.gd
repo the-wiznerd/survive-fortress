@@ -145,23 +145,33 @@ func _on_joined(msg: ServerMessage) -> void:
 ## Frames arrive in one batch from the server. Hand them off to the
 ## ResolutionPlayer for paced playback so the player sees each tick advance
 ## in turn \u2014 the feed transitions slot-by-slot, the world updates per tick,
-## and the inspector / overlays follow along. Plan store is cleared on entry
-## so the planning overlays (move arrows, action indicators) disappear while
-## the engine runs; the feed switches its source to per-frame player_plan.
+## and the inspector / overlays follow along. The plan store keeps the
+## submitted plan during resolution; per-tick trimming drops resolved
+## actions off the front so the world overlays show only what's left to do.
+##
+## We deliberately do *not* flip to RESOLVING here. The first tick is ~500ms
+## away (ResolutionPlayer.TICK_INTERVAL_S), and during that gap _view is
+## still the previous round's last frame. Switching phase early would push
+## the feed into its resolving-render path with stale player_plan data,
+## briefly blanking out the chips the player just submitted. Instead, the
+## first call to _on_resolution_tick performs the transition with the fresh
+## frame already in hand.
 func _on_round_resolve(msg: ServerMessage) -> void:
 	print("[Main] Round resolved with %d frames." % msg.frames.size())
 	if msg.frames.is_empty():
 		# Nothing to play back \u2014 return straight to planning so the player
 		# isn't stuck in SUBMITTED.
 		_plan_store.phase = PlanStore.PHASE_PLANNING
+		_plan_store.clear()
 		return
-	_plan_store.phase = PlanStore.PHASE_RESOLVING
-	_plan_store.clear()
 	_resolution_player.play(msg.frames)
 
 ## One frame of the resolving round: push it through every consumer so the
-## world, sidebar, feed, and overlays all reflect the same tick. On the last
-## frame, drop back to PLANNING so the player can build the next round.
+## world, sidebar, feed, inspector, and overlays all reflect the same tick.
+## Phase transitions and plan trimming run *after* the view propagation, so
+## any rebuilds triggered by them see the fresh frame \u2014 never a stale one.
+## On the last frame, drop back to PLANNING and clear the plan so the next
+## round opens fresh.
 func _on_resolution_tick(view: GameView, is_last: bool) -> void:
 	_last_view = view
 	_plan_store.set_view(view)
@@ -171,8 +181,15 @@ func _on_resolution_tick(view: GameView, is_last: bool) -> void:
 	_move_plan_overlay.set_view(view)
 	_action_plan_overlay.set_view(view)
 	_center_camera_on_player(view)
+	# First tick of the round: SUBMITTED \u2192 RESOLVING transition happens here
+	# (rather than in _on_round_resolve) so the feed switches to its
+	# resolving-render path only once it has a real frame to read from.
+	if _plan_store.phase != PlanStore.PHASE_RESOLVING:
+		_plan_store.phase = PlanStore.PHASE_RESOLVING
+	_plan_store.sync_to_resolution_progress(view)
 	if is_last:
 		_plan_store.phase = PlanStore.PHASE_PLANNING
+		_plan_store.clear()
 
 func _on_server_error(message: String) -> void:
 	push_error("[Main] Server error: " + message)
@@ -235,14 +252,15 @@ func _classify_right_release(press_pos: Vector2, release_pos: Vector2) -> void:
 		return
 	_handle_right_click_at(release_pos)
 
-## Swipe-right gesture: submit the current plan to the server and lock the
-## phase to SUBMITTED. Round-resolve resets back to PLANNING and clears the
-## plan. No-op outside the planning phase so a stray swipe during resolution
-## can't double-submit.
+## Submit gesture: pad the plan to the AP budget with implicit waits, send
+## it, then lock the phase to SUBMITTED. Round-resolve resets back to
+## PLANNING. No-op outside the planning phase so a stray swipe during
+## resolution can't double-submit.
 func _handle_swipe_submit() -> void:
 	if _plan_store.phase != PlanStore.PHASE_PLANNING:
 		print("[Main] Swipe submit ignored \u2014 phase=", _plan_store.phase)
 		return
+	_plan_store.pad_with_waits()
 	print("[Main] Swipe submit \u2014 sending %d action(s)." % _plan_store.plan.size())
 	_connection.send_plan(_plan_store.plan)
 	_plan_store.phase = PlanStore.PHASE_SUBMITTED

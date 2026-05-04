@@ -99,6 +99,37 @@ func clear() -> void:
 	plan.clear()
 	plan_changed.emit()
 
+## Trim the plan to its unresolved tail given the engine's cursor on a
+## per-tick resolution frame. Used during RESOLVING so the move and action
+## overlays paint only the steps the player hasn't taken yet — each one
+## ticks off the map as the engine completes it. A terminated plan empties
+## the tail outright since every action past the failing one is dead.
+func sync_to_resolution_progress(view: GameView) -> void:
+	var pp: PlayerPlanView = view.player_plan
+	if pp.terminated:
+		clear()
+		return
+	var target_size: int = pp.actions.size() - pp.index
+	if plan.size() <= target_size:
+		return
+	while plan.size() > target_size:
+		plan.pop_front()
+	plan_changed.emit()
+
+## Append wait actions until the plan exactly fills the AP budget. Idempotent
+## once the budget is full. The engine treats unspent AP at the end of a plan
+## as idle ticks anyway — making them explicit lets the resolution feed show
+## every tick the player will actually sit through, and keeps them in the
+## history snapshot so a finished round reads "I did X then waited out the
+## rest" rather than "I did X" with three vanished slots.
+func pad_with_waits() -> void:
+	var remaining: int = action_points_per_round - plan_cost()
+	if remaining <= 0:
+		return
+	for i: int in range(remaining):
+		plan.append(PlayerAction.wait())
+	plan_changed.emit()
+
 ## World column the player will occupy after every currently-planned move
 ## resolves. Non-move actions don't shift position.
 func plan_cursor(player_x: int, player_y: int) -> Vector2i:
