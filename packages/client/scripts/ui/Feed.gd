@@ -15,6 +15,14 @@ extends VBoxContainer
 ## inter-slot separation gap, so they read as taking up exactly N rows.
 const _ROW_H: int = 24
 
+## Per-item duration and stagger of the round-completion animation: when a
+## round wraps and the just-resolved chips fall into history, the new top
+## section (planning empty slots + day.tick header) grows in from height 0
+## so the chips below appear to slide down into their history position
+## rather than jumping there.
+const _ROUND_TRANSITION_S: float = 0.25
+const _ROUND_TRANSITION_STAGGER_S: float = 0.025
+
 ## Slot status. Drives chip border + text color via a single palette pick.
 ## Queued and in-flight actions share the same PENDING styling — a chip
 ## looks the same whether the player is still building the round or the
@@ -70,7 +78,8 @@ func _rebuild() -> void:
 	# Capture history *before* re-rendering: when the engine finishes a round
 	# the phase flips RESOLVING → PLANNING, and we want the just-resolved
 	# slots to flow into history rather than be erased by the planning render.
-	if _prev_phase == PlanStore.PHASE_RESOLVING and _plan_store.phase != PlanStore.PHASE_RESOLVING:
+	var entering_planning_from_resolving: bool = _prev_phase == PlanStore.PHASE_RESOLVING and _plan_store.phase != PlanStore.PHASE_RESOLVING
+	if entering_planning_from_resolving:
 		_snapshot_round_to_history()
 	# Stamp the round's start tick on PLANNING → SUBMITTED. _view is still the
 	# last planning frame here, whose tick is the tick *before* this round's
@@ -85,6 +94,37 @@ func _rebuild() -> void:
 	else:
 		_render_planning_or_submitted()
 	_render_history()
+
+	# Round just wrapped: animate the new top section growing in from 0,
+	# which shoves the just-resolved chips into their new history position
+	# rather than letting them jump there.
+	if entering_planning_from_resolving:
+		_animate_round_completion()
+
+## Slide the new top section (planning empty slots + the just-snapshotted
+## round's day.tick header) in from height 0 to natural. The chips below —
+## the just-resolved round and any older history — get pushed down smoothly
+## as the section grows. Only fires on RESOLVING → PLANNING; other rebuilds
+## (queueing actions, ticks during resolution) snap into place as before.
+func _animate_round_completion() -> void:
+	var animate_count: int = _plan_store.action_points_per_round + 1
+	var i: int = 0
+	for child: Node in get_children():
+		if i >= animate_count:
+			break
+		var ctrl: Control = child as Control
+		if ctrl == null:
+			continue
+		# Each item's natural target is whatever was just baked in via
+		# custom_minimum_size at construction; collapse to 0 then tween back.
+		var target_h: float = ctrl.custom_minimum_size.y
+		ctrl.custom_minimum_size = Vector2(ctrl.custom_minimum_size.x, 0.0)
+		var tween: Tween = create_tween()
+		tween.set_trans(Tween.TRANS_CUBIC)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_interval(i * _ROUND_TRANSITION_STAGGER_S)
+		tween.tween_property(ctrl, "custom_minimum_size:y", target_h, _ROUND_TRANSITION_S)
+		i += 1
 
 ## During PLANNING the source of truth is PlanStore.plan — actions the player
 ## is currently arranging. SUBMITTED reads from the same place. Both render
@@ -238,13 +278,20 @@ func _render_history() -> void:
 
 ## Day X.YY marker placed before each historical round. Same format as the
 ## sidebar's game-state heading; rendered as plain DARKEST_GRAY text with
-## no border or panel so it reads as a separator rather than a chip.
+## no border or panel so it reads as a separator rather than a chip. The
+## label is wrapped in a ShrinkableWrapper so the round-completion animation
+## can tween its height from 0 to natural like the chips do.
 func _make_round_header(start_tick: int) -> Control:
 	var day: int = Utils.divi(start_tick, Constants.TICKS_PER_DAY) + 1
 	var tick_in_day: int = Utils.modi(start_tick, Constants.TICKS_PER_DAY)
 	var label: Label = Text.label("Day %d.%02d" % [day, tick_in_day], Text.Ctx.ON_DARK)
 	label.add_theme_color_override("font_color", Palette.DARKEST_GRAY)
-	return label
+	var wrapper: ShrinkableWrapper = ShrinkableWrapper.new()
+	wrapper.add_child(label)
+	# Capture the label's natural height as the wrapper's target so the
+	# animator has something to tween back to.
+	wrapper.custom_minimum_size = Vector2(0, label.get_combined_minimum_size().y)
+	return wrapper
 
 # --- chip builder (single path for every slot status) ---
 
@@ -252,6 +299,13 @@ func _make_round_header(start_tick: int) -> Control:
 ## builder so dimensions stay byte-identical and there's no layout shift as
 ## a chip transitions between statuses. Status drives only the color used
 ## for both the notched border and the label text.
+##
+## The visible chip is a plain PanelContainer + Label. We then wrap that in
+## a ShrinkableWrapper so the round-completion animation can tween the
+## chip's height from 0 to natural; the wrapper's `_get_minimum_size`
+## override is what lets it shrink past the inner panel's natural minimum
+## (subclassing PanelContainer doesn't work for this trick — its C++
+## get_minimum_size shadows the GDScript virtual).
 func _make_chip(label_text: String, ap_cost: int, status: int) -> Control:
 	var color: Color = _color_for(status)
 	var panel: PanelContainer = PanelContainer.new()
@@ -264,13 +318,17 @@ func _make_chip(label_text: String, ap_cost: int, status: int) -> Control:
 	sb.content_margin_top = Spacing.XS
 	sb.content_margin_bottom = Spacing.XS
 	panel.add_theme_stylebox_override("panel", sb)
-	# A multi-AP chip is taller by N rows + the (N-1) separation gaps it
-	# absorbs by sitting where N single-AP chips would have stacked.
-	panel.custom_minimum_size = Vector2(0, _ROW_H * ap_cost + Spacing.XS * (ap_cost - 1))
 	var label: Label = Text.label(label_text, Text.Ctx.ON_DARK)
 	label.add_theme_color_override("font_color", color)
 	panel.add_child(label)
-	return panel
+
+	# A multi-AP chip is taller by N rows + the (N-1) separation gaps it
+	# absorbs by sitting where N single-AP chips would have stacked.
+	var target_h: int = _ROW_H * ap_cost + Spacing.XS * (ap_cost - 1)
+	var wrapper: ShrinkableWrapper = ShrinkableWrapper.new()
+	wrapper.add_child(panel)
+	wrapper.custom_minimum_size = Vector2(0, target_h)
+	return wrapper
 
 func _color_for(status: int) -> Color:
 	match status:
