@@ -28,8 +28,15 @@ var _plan_store: PlanStore = null
 var _view: GameView = null
 ## Last phase observed by _rebuild. Used to detect the RESOLVING → PLANNING
 ## transition so the just-finished round can be snapshotted into history
-## before the resolving plan disappears from view.
+## before the resolving plan disappears from view, *and* the PLANNING →
+## SUBMITTED transition so we can stamp the round's start tick.
 var _prev_phase: String = ""
+## World tick at which the current round began (= view.tick of the last
+## planning frame, captured on the PLANNING → SUBMITTED transition). During
+## RESOLVING this lets us compute `ticks_into_round = view.tick -
+## _round_start_tick`, which drives the per-action timing for success and
+## failure chip transitions.
+var _round_start_tick: int = 0
 ## Past rounds, newest first. Each round is { "start_tick": int,
 ## "entries": Array of {label, cost, status, type} dictionaries }.
 ## Snapshotted at the RESOLVING → PLANNING transition so values are frozen
@@ -65,6 +72,12 @@ func _rebuild() -> void:
 	# slots to flow into history rather than be erased by the planning render.
 	if _prev_phase == PlanStore.PHASE_RESOLVING and _plan_store.phase != PlanStore.PHASE_RESOLVING:
 		_snapshot_round_to_history()
+	# Stamp the round's start tick on PLANNING → SUBMITTED. _view is still the
+	# last planning frame here, whose tick is the tick *before* this round's
+	# first action runs — exactly what we want as the zero-point for the
+	# per-action completion timing during resolution.
+	if _prev_phase == PlanStore.PHASE_PLANNING and _plan_store.phase == PlanStore.PHASE_SUBMITTED and _view != null:
+		_round_start_tick = _view.tick
 	_prev_phase = _plan_store.phase
 
 	if _plan_store.phase == PlanStore.PHASE_RESOLVING:
@@ -94,31 +107,55 @@ func _render_planning_or_submitted() -> void:
 ## During RESOLVING the per-tick GameView's player_plan is authoritative
 ## (PlanStore.plan is being trimmed to the unresolved tail). The engine's
 ## cursor (player_plan.index) tells us how far through the plan the actor
-## has advanced; combined with `terminated`, that gives each chip its
-## status.
+## has advanced; combined with `terminated` and per-action completion ticks,
+## that staggers chip transitions across the playback so each failed/skipped
+## action flips on the tick *it* would have completed, not all at once when
+## the chain breaks.
 func _render_resolving() -> void:
 	if _view == null:
 		return
 	var plan: Array[PlayerAction] = _view.player_plan.actions
 	var cursor: int = _view.player_plan.index
 	var terminated: bool = _view.player_plan.terminated
+	var ticks_in: int = _view.tick - _round_start_tick
+	var cum: Array[int] = _cumulative_completion_ticks(plan)
 	for i: int in range(plan.size()):
 		var action: PlayerAction = plan[i]
 		var cost: int = _plan_store.action_cost(action)
-		add_child(_make_chip(_label_for(action), cost, _resolving_status(i, cursor, terminated)))
+		add_child(_make_chip(_label_for(action), cost, _resolving_status(i, cursor, terminated, cum[i], ticks_in)))
 
-## Map an action's index in the plan to a chip status given the engine's
-## current cursor. The cursor stays on an in-progress multi-AP action until
-## it completes; on plan termination, it points at the action that failed.
-func _resolving_status(action_idx: int, cursor: int, terminated: bool) -> int:
-	if action_idx < cursor:
+## Cumulative completion tick (1-based, within the round) for each action.
+## Action i would naturally complete at tick `sum(cost[0..i+1])`. We compare
+## this against the playback's elapsed-in-round tick to decide whether a
+## chip should still read as PENDING or has reached its completion moment.
+func _cumulative_completion_ticks(plan: Array[PlayerAction]) -> Array[int]:
+	var result: Array[int] = []
+	var running: int = 0
+	for action: PlayerAction in plan:
+		running += _plan_store.action_cost(action)
+		result.append(running)
+	return result
+
+## Status of action `idx` given the engine's cursor, termination flag, and
+## the action's own would-complete tick relative to the playback's elapsed
+## ticks in the round.
+##
+## Until ticks_in reaches cum_complete the chip is still PENDING — even if
+## the engine already terminated, we hold the dramatic flip until the chip
+## reaches the moment it *would have* finished. From there:
+##   • idx < cursor       → SUCCESS (the engine actually completed it)
+##   • terminated         → FAILURE (the failing action, or one skipped past)
+##   • else (rare)        → SUCCESS (defensive fallthrough; in non-terminated
+##                          rounds the cursor advances in lockstep with
+##                          ticks_in, so this branch isn't reached)
+func _resolving_status(idx: int, cursor: int, terminated: bool, cum_complete: int, ticks_in: int) -> int:
+	if ticks_in < cum_complete:
+		return _STATUS_PENDING
+	if idx < cursor:
 		return _STATUS_SUCCESS
 	if terminated:
-		# Failing action sits at the cursor; everything past it never ran.
-		# A dedicated "skipped" style can come later — for now both render as
-		# failure so the player sees where the plan went off the rails.
 		return _STATUS_FAILURE
-	return _STATUS_PENDING
+	return _STATUS_SUCCESS
 
 ## Capture the just-finished round into _history. Called once on the
 ## RESOLVING → PLANNING transition. Costs and labels are frozen at this
@@ -129,13 +166,19 @@ func _snapshot_round_to_history() -> void:
 	var plan: Array[PlayerAction] = _view.player_plan.actions
 	var cursor: int = _view.player_plan.index
 	var terminated: bool = _view.player_plan.terminated
+	# Round is finished by the time we snapshot — every action has reached
+	# its would-complete tick, so pass a saturated `ticks_in` to the status
+	# helper. The result collapses to the final SUCCESS/FAILURE the chip had
+	# at the last frame of playback.
+	var ticks_in: int = _plan_store.action_points_per_round
+	var cum: Array[int] = _cumulative_completion_ticks(plan)
 	var entries: Array = []
 	for i: int in range(plan.size()):
 		var action: PlayerAction = plan[i]
 		entries.append({
 			"label": _label_for(action),
 			"cost": _plan_store.action_cost(action),
-			"status": _resolving_status(i, cursor, terminated),
+			"status": _resolving_status(i, cursor, terminated, cum[i], ticks_in),
 			"type": action.type,
 		})
 	if entries.is_empty():

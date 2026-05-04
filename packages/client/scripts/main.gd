@@ -74,6 +74,7 @@ func _ready() -> void:
 	_resolution_player.name = "ResolutionPlayer"
 	add_child(_resolution_player)
 	_resolution_player.tick_advanced.connect(_on_resolution_tick)
+	_resolution_player.playback_complete.connect(_on_playback_complete)
 
 	_camera = Camera2D.new()
 	_camera.name = "Camera"
@@ -142,37 +143,20 @@ func _on_joined(msg: ServerMessage) -> void:
 	_action_plan_overlay.set_view(view)
 	_center_camera_on_player(view)
 
-## Frames arrive in one batch from the server. Hand them off to the
-## ResolutionPlayer for paced playback so the player sees each tick advance
-## in turn \u2014 the feed transitions slot-by-slot, the world updates per tick,
-## and the inspector / overlays follow along. The plan store keeps the
-## submitted plan during resolution; per-tick trimming drops resolved
-## actions off the front so the world overlays show only what's left to do.
-##
-## We deliberately do *not* flip to RESOLVING here. The first tick is ~500ms
-## away (ResolutionPlayer.TICK_INTERVAL_S), and during that gap _view is
-## still the previous round's last frame. Switching phase early would push
-## the feed into its resolving-render path with stale player_plan data,
-## briefly blanking out the chips the player just submitted. Instead, the
-## first call to _on_resolution_tick performs the transition with the fresh
-## frame already in hand.
+## Frames arrive in one batch from the server. Hand them straight to the
+## ResolutionPlayer \u2014 it fires the first frame synchronously (so the chip
+## update lands at the start of tick 1's display window) and emits a
+## separate playback_complete after the last frame's hold interval. Empty
+## frame lists also flow through play() and end via playback_complete.
 func _on_round_resolve(msg: ServerMessage) -> void:
 	print("[Main] Round resolved with %d frames." % msg.frames.size())
-	if msg.frames.is_empty():
-		# Nothing to play back \u2014 return straight to planning so the player
-		# isn't stuck in SUBMITTED.
-		_plan_store.phase = PlanStore.PHASE_PLANNING
-		_plan_store.clear()
-		return
 	_resolution_player.play(msg.frames)
 
 ## One frame of the resolving round: push it through every consumer so the
 ## world, sidebar, feed, inspector, and overlays all reflect the same tick.
 ## Phase transitions and plan trimming run *after* the view propagation, so
 ## any rebuilds triggered by them see the fresh frame \u2014 never a stale one.
-## On the last frame, drop back to PLANNING and clear the plan so the next
-## round opens fresh.
-func _on_resolution_tick(view: GameView, is_last: bool) -> void:
+func _on_resolution_tick(view: GameView) -> void:
 	_last_view = view
 	_plan_store.set_view(view)
 	_world_renderer.render_view(view)
@@ -187,9 +171,13 @@ func _on_resolution_tick(view: GameView, is_last: bool) -> void:
 	if _plan_store.phase != PlanStore.PHASE_RESOLVING:
 		_plan_store.phase = PlanStore.PHASE_RESOLVING
 	_plan_store.sync_to_resolution_progress(view)
-	if is_last:
-		_plan_store.phase = PlanStore.PHASE_PLANNING
-		_plan_store.clear()
+
+## Fired one tick interval after the last frame, giving the player time to
+## register the final state. Drop back to PLANNING and clear the plan so
+## the next round opens fresh.
+func _on_playback_complete() -> void:
+	_plan_store.phase = PlanStore.PHASE_PLANNING
+	_plan_store.clear()
 
 func _on_server_error(message: String) -> void:
 	push_error("[Main] Server error: " + message)
